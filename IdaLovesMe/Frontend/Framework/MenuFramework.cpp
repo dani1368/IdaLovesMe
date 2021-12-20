@@ -297,7 +297,7 @@ void ui::HandleResize(GuiWindow* Window, Rect Boundaries, Vec2* buffer) {
 		if (IsInside(Window->Pos.x + Window->Size.x - 15, Window->Pos.y + Window->Size.y - 15, 15, 15) && GetAsyncKeyState(VK_LBUTTON) && !Window->Resizing && !Window->Dragging)
 			Window->Resizing = true;
 		else if (KeyDown(VK_LBUTTON) && Window->Resizing) {
-			const Vec2 mouse_delta{ g.MousePos.x - g.PrevMousePos.x , g.MousePos.y - g.PrevMousePos.y };
+			/*const Vec2 mouse_delta{g.MousePos.x - g.PrevMousePos.x , g.MousePos.y - g.PrevMousePos.y};
 			const Vec2 new_size{ Window->Size.x + mouse_delta.x, Window->Size.y + mouse_delta.y };
 
 			if (new_size.x < Boundaries.Min.x)
@@ -312,7 +312,10 @@ void ui::HandleResize(GuiWindow* Window, Rect Boundaries, Vec2* buffer) {
 			else if (new_size.y > Boundaries.Max.y)
 				Window->Size.y = Boundaries.Max.y;
 			else
-				Window->Size.y = new_size.y;
+				Window->Size.y = new_size.y;*/
+
+			Window->Size.x = std::clamp(g.MousePos.x - Window->Pos.x, Boundaries.Min.x, Boundaries.Max.x);
+			Window->Size.y = std::clamp(g.MousePos.y - Window->Pos.y, Boundaries.Min.y, Boundaries.Max.y);
 		}
 		else if (!ui::KeyDown(VK_LBUTTON) && Window->Resizing)
 			Window->Resizing = false;
