@@ -97,6 +97,12 @@ namespace IdaLovesMe {
 		NextWindowInfo			 NextWindowInfo;
 		Vec2					 ItemSpacing;
 		int						 MenuAlpha;
+
+
+		bool					 KeyState[256];
+		bool					 PrevKeyState[256];
+		Vec2					 MousePos;
+		Vec2					 PrevMousePos;
 	};
 
 	namespace ui {
@@ -105,11 +111,11 @@ namespace IdaLovesMe {
 		bool			  KeyPressed(const int key);
 		bool			  KeyDown(const int key);
 		bool			  KeyReleased(const int key);
-		bool			  ButtonBehavior(Rect bb, bool* out_hovered, GuiFlags flags);
+		bool			  ButtonBehavior(Rect bb, bool& hovered, bool& held, GuiFlags flags = NULL);
 		bool			  ChildsAreStable(GuiWindow* Window);
-		template<typename T>
-		bool			  SliderBehavior(std::string item_id, Rect bb, T value, T min_value, T max_value, GuiFlags flags);
 
+		template		  <typename T>
+		bool			  SliderBehavior(std::string item_id, Rect bb, T value, T min_value, T max_value, GuiFlags flags);
 		//
 		//-------Context-------//
 		void			  Shutdown(GuiContext* context);
@@ -151,24 +157,17 @@ namespace IdaLovesMe {
 		void			  TabButton(const char* label, int* selected, int num, int total, const int flags);
 		void			  Checkbox(const char* label, bool* v);
 
-		template<typename T>
+		template	      <typename T>
 		void			  Slider(const char* label, T* v, T v_min, T v_max, const char* format = NULL, GuiFlags flags = NULL);
 		void			  SliderInt(const char* label, int* v, int v_min, int v_max, const char* format = NULL);
 		void			  SliderFloat(const char* label, float* v, float v_min, float v_max, const char* format = NULL);
 
-		void			  Multiselect(const char* label, std::unordered_map<int, bool>* data, std::vector<const char*> items);
+		//void			  Multiselect(const char* label, std::unordered_map<int, bool>* data, std::vector<const char*> items);
 		bool			  Button(const char* label, const Vec2& size = Vec2(0,0));
 	}
 
 	namespace Globals {
 		extern GuiContext* Gui_Ctx;
-		static Vec2		   mouse_pos;
-		static Vec2		   previous_mouse_pos;
-
-		static bool		   key_state[256];
-		static bool		   prev_key_state[256];
-
-		static bool		   input_loop_started = false;
 	}
 }
 

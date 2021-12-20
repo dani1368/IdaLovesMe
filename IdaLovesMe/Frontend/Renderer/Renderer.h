@@ -54,11 +54,12 @@ namespace Render {
         void Rect(IdaLovesMe::Vec2 Pos, IdaLovesMe::Vec2 Size, float linewidth, D3DCOLOR color);
         void FilledRect(IdaLovesMe::Vec2 Pos, IdaLovesMe::Vec2 Size, D3DCOLOR color);
         void BorderedRect(IdaLovesMe::Vec2 Pos, IdaLovesMe::Vec2 Size, float border_width, D3DCOLOR color, D3DCOLOR color_border);
-        void RoundedRect(float x, float y, float w, float h, float radius, bool smoothing, D3DCOLOR color, D3DCOLOR bcolor);
+        //void RoundedRect(float x, float y, float w, float h, float radius, bool smoothing, D3DCOLOR color, D3DCOLOR bcolor);
+
         void Gradient(IdaLovesMe::Vec2 pos, IdaLovesMe::Vec2 size, D3DCOLOR color, D3DCOLOR other_color, bool vertical = false);
        
-        void Circle(float x, float y, float radius, int rotate, int type, bool smoothing, int resolution, D3DCOLOR color);
-        void CircleFilled(float x, float y, float rad, float rotate, int type, int resolution, D3DCOLOR color);
+        //void Circle(float x, float y, float radius, int rotate, int type, bool smoothing, int resolution, D3DCOLOR color);
+        //void CircleFilled(float x, float y, float rad, float rotate, int type, int resolution, D3DCOLOR color);
 
         void Triangle(IdaLovesMe::Vec2 top, IdaLovesMe::Vec2 bleft, IdaLovesMe::Vec2 bright, D3DCOLOR color);
 
@@ -74,6 +75,7 @@ namespace Render {
         //=============================================================================================
         IDirect3DTexture9* GetBgTexture();
         IdaLovesMe::Vec2   GetTextSize(ID3DXFont* Font, const char * Text);
+        LPDIRECT3DDEVICE9   GetD3dDevice();
         //=============================================================================================
 
     private:

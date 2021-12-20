@@ -27,6 +27,8 @@ void CMenu::Initialize()
 
 void CMenu::Draw()
 {
+	c_config* cfg = c_config::get();
+
 	static float alpha = 0;
 	float fc = 255.f / 0.2f * Misc::Utilities->GetDeltaTime();
 	if (!this->m_bIsOpened && alpha > 0.f)
@@ -58,12 +60,14 @@ void CMenu::Draw()
 	
 	if (this->m_nCurrentTab == 0) {
 		ui::BeginChild("A", ui::GetWindowPos() + Vec2(100, 30), Vec2(258, 506), false);
-		if (ui::Button("Test"))
-			Misc::Utilities->Console_Log("Pressed");
+		
+		ui::SliderFloat("FloatSlider", &cfg->f["Uwu"], 0, 5);
+		ui::SliderInt("IntSlider", &cfg->i["Uwu"], 0, 5);
 
-		ui::SliderFloat("FloatSlider", &c_config::get()->f["Uwu"], 0, 5);
+		ui::Checkbox("Checkbox", &cfg->b["niga"]);
 
-		ui::SliderInt("IntSlider", &c_config::get()->i["Uwu"], 0, 5);
+		ui::Button("Button");
+
 		ui::EndChild();
 
 		//ui::BeginChild("B", ui::GetWindowPos() + Vec2(ui::GetWindowSize().x / 2 + 46, 30), child_size, false);

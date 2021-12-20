@@ -106,8 +106,7 @@ void CDraw::Line(Vec2 Pos, Vec2 Pos2, D3DCOLOR color)
     m_Line->Draw(vLine, 2, color);
     m_Line->End();
 }
-
-
+/*
 void CDraw::Circle(float x, float y, float radius, int rotate, int type, bool smoothing, int resolution, D3DCOLOR color)
 {
     std::vector<vertex> circle(resolution + 2);
@@ -165,7 +164,7 @@ void CDraw::Circle(float x, float y, float radius, int rotate, int type, bool sm
 
     m_Device->DrawPrimitive(D3DPT_LINESTRIP, 0, resolution);
     if (m_VB != NULL) m_VB->Release();
-    */
+    
 }
 
 void CDraw::CircleFilled(float x, float y, float rad, float rotate, int type, int resolution, D3DCOLOR color)
@@ -224,9 +223,9 @@ void CDraw::CircleFilled(float x, float y, float rad, float rotate, int type, in
     m_Device->SetFVF(D3DFVF_XYZRHW | D3DFVF_DIFFUSE);
     m_Device->DrawPrimitive(D3DPT_TRIANGLEFAN, 0, resolution);
     if (m_VB != NULL) m_VB->Release();
-    */
+    
 }
-
+*/
 void CDraw::Rect(Vec2 Pos, Vec2 Size, float linewidth, D3DCOLOR color)
 {
     if (linewidth == 0 || linewidth == 1)
@@ -260,6 +259,9 @@ void CDraw::FilledRect(Vec2 Pos, Vec2 Size, D3DCOLOR color)
     m_Device->SetRenderState(D3DRS_ANTIALIASEDLINEENABLE, FALSE);
 
     m_Device->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, vertices, sizeof(vertex));
+
+    m_Device->SetRenderState(D3DRS_MULTISAMPLEANTIALIAS, TRUE);
+    m_Device->SetRenderState(D3DRS_ANTIALIASEDLINEENABLE, TRUE);
 }
 
 
@@ -269,7 +271,7 @@ void CDraw::BorderedRect(Vec2 Pos, Vec2 Size, float border_width, D3DCOLOR color
     Rect(Vec2(Pos.x - border_width, Pos.y - border_width), Vec2(Size.x + 2 * border_width, Size.y + border_width), border_width, color_border);
 }
 
-
+/*
 void CDraw::RoundedRect(float x, float y, float w, float h, float radius, bool smoothing, DWORD color, DWORD bcolor)
 {
     FilledRect(Vec2(x + radius, y + radius), Vec2(w - 2 * radius - 1, h - 2 * radius - 1), color);   // Center rect.
@@ -304,7 +306,7 @@ void CDraw::RoundedRect(float x, float y, float w, float h, float radius, bool s
         CircleFilled(x + radius, y + h - radius - 1, radius, 270, QUARTER, 16, color);       // Bottom-left corner
     }
 }
-
+*/
 void CDraw::Gradient(Vec2 Pos, Vec2 Size, D3DCOLOR color, D3DCOLOR other_color, bool vertical) {
 
     vertex vertices[4] = {
@@ -316,7 +318,14 @@ void CDraw::Gradient(Vec2 Pos, Vec2 Size, D3DCOLOR color, D3DCOLOR other_color, 
 
     m_Device->SetFVF(D3DFVF_XYZRHW | D3DFVF_DIFFUSE);
     m_Device->SetTexture(0, nullptr);
+
+    m_Device->SetRenderState(D3DRS_MULTISAMPLEANTIALIAS, FALSE);
+    m_Device->SetRenderState(D3DRS_ANTIALIASEDLINEENABLE, FALSE);
+
     m_Device->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, vertices, sizeof(vertex));
+
+    m_Device->SetRenderState(D3DRS_MULTISAMPLEANTIALIAS, TRUE);
+    m_Device->SetRenderState(D3DRS_ANTIALIASEDLINEENABLE, TRUE);
 }
 
 void CDraw::Text(const char* text, float x_, float y_, int orientation, LPD3DXFONT Font, bool bordered, D3DCOLOR color)
@@ -421,4 +430,9 @@ Vec2 CDraw::GetTextSize(ID3DXFont* Font, const char* Text)
     Font->DrawTextA(0, Text, strlen(Text), &rect, DT_CALCRECT, D3DCOLOR_ARGB(0, 0, 0, 0));
    
     return Vec2(float(rect.right - rect.left), float(rect.bottom - rect.top));
+}
+
+LPDIRECT3DDEVICE9 CDraw::GetD3dDevice() 
+{
+    return this->m_Device;
 }
