@@ -3,6 +3,7 @@
 
 #include <unordered_map>
 
+
 typedef int GuiFlags;
 
 namespace IdaLovesMe {
@@ -46,12 +47,13 @@ namespace IdaLovesMe {
 	};
 
 	enum GuiFlags_ {
-		GuiFlags_None		 = 0,
-		GuiFlags_NoMove		 = 1 << 0,
-		GuiFlags_NoResize	 = 1 << 1,
-		GuiFlags_ChildWindow = 1 << 2,
-		GuiFlags_FloatSlider = 1 << 3,
-		GuiFlags_IntSlider   = 1 << 4,
+		GuiFlags_None =		   0,
+		GuiFlags_NoMove =	   1 << 0,
+		GuiFlags_NoResize =	   1 << 1,
+		GuiFlags_FloatSlider = 1 << 2,
+		GuiFlags_IntSlider =   1 << 3,
+		GuiFlags_NoTabButton = 1 << 4,
+		GuiFlags_ChildWindow = 1 << 5
 	};
 
 	struct GuiWindow {
@@ -73,6 +75,7 @@ namespace IdaLovesMe {
 		bool					Resizing;
 		bool					Block;
 		bool					Init;
+		bool					ItemActive;
 
 		Vec2					NewSize;
 		int						ySize = 10;
@@ -104,8 +107,8 @@ namespace IdaLovesMe {
 		bool			  KeyReleased(const int key);
 		bool			  ButtonBehavior(Rect bb, bool* out_hovered, GuiFlags flags);
 		bool			  ChildsAreStable(GuiWindow* Window);
-		//bool			  SliderBehavior(std::string item_id, Rect bb, int*v, int* v_min, int* v_max, GuiFlags flags);
-		//bool			  SliderBehavior(std::string item_id, Rect bb, float* v, float* v_min, float* v_max, GuiFlags flags);
+		template<typename T>
+		bool			  SliderBehavior(std::string item_id, Rect bb, T value, T min_value, T max_value, GuiFlags flags);
 
 		//
 		//-------Context-------//
@@ -147,8 +150,12 @@ namespace IdaLovesMe {
 		//-------Controls-------//
 		void			  TabButton(const char* label, int* selected, int num, int total, const int flags);
 		void			  Checkbox(const char* label, bool* v);
-		void			  SliderInt(const char* label, int* v, int v_min, int v_max, const char* format = NULL, GuiFlags flags = GuiFlags_None);
-		void			  SliderFloat(const char* label, float* v, float v_min, float v_max, const char* format = NULL, GuiFlags flags = GuiFlags_None);
+
+		template<typename T>
+		void			  Slider(const char* label, T* v, T v_min, T v_max, const char* format = NULL, GuiFlags flags = NULL);
+		void			  SliderInt(const char* label, int* v, int v_min, int v_max, const char* format = NULL);
+		void			  SliderFloat(const char* label, float* v, float v_min, float v_max, const char* format = NULL);
+
 		void			  Multiselect(const char* label, std::unordered_map<int, bool>* data, std::vector<const char*> items);
 		bool			  Button(const char* label, const Vec2& size = Vec2(0,0));
 	}

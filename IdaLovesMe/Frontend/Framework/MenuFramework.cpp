@@ -312,7 +312,7 @@ void ui::Begin(const char* Name, GuiFlags flags) {
 		}
 	}
 
-	if (!Window->Flags && GuiFlags_ChildWindow && !ui::ChildsAreStable(Window))
+	if (!(Window->Flags & GuiFlags_ChildWindow) && !ui::ChildsAreStable(Window) ||  Window->ItemActive)
 		Window->Block = true;
 	else
 		Window->Block = false;
@@ -355,21 +355,21 @@ void ui::Begin(const char* Name, GuiFlags flags) {
 		if (!strlen(Name) == 0)
 			label_size = Render::Draw->GetTextSize(Render::Fonts::Verdana, Name);
 		
-		D3DCOLOR border_color = Window->Resizing == true ? D3DCOLOR_RGBA(173, 244, 5, g.MenuAlpha) : D3DCOLOR_RGBA(40, 250, 40, g.MenuAlpha);
+		D3DCOLOR border_color = Window->Resizing == true ? D3DCOLOR_RGBA(173, 244, 5, g.MenuAlpha) : D3DCOLOR_RGBA(40, 40, 40, g.MenuAlpha);
 
-		Render::Draw->Line(Window->Pos, Window->Pos + Vec2(0, Window->Size.y), D3DCOLOR_RGBA(255, 12, 12, g.MenuAlpha));
-		Render::Draw->Line(Window->Pos + Vec2(0, Window->Size.y - 1), Window->Pos + Window->Size - Vec2(0, 1), D3DCOLOR_RGBA(255, 12, 12, g.MenuAlpha));
-		Render::Draw->Line(Window->Pos + Window->Size - Vec2(1, 1), Window->Pos + Vec2(Window->Size.x - 1, 0), D3DCOLOR_RGBA(255, 12, 12, g.MenuAlpha));
-		Render::Draw->Line(Window->Pos, Window->Pos + Vec2(10, 0), D3DCOLOR_RGBA(255, 12, 12, g.MenuAlpha));
-		Render::Draw->Line(Window->Pos + Vec2(16 + label_size.x, 0), Window->Pos + Vec2(Window->Size.x, 0), D3DCOLOR_RGBA(255, 12, 12, g.MenuAlpha));
+		Render::Draw->FilledRect(Window->Pos + Vec2(2, 2), Window->Size - Vec2(4, 4), D3DCOLOR_RGBA(23, 23, 23, g.MenuAlpha));
+
+		Render::Draw->Line(Window->Pos, Window->Pos + Vec2(0, Window->Size.y), D3DCOLOR_RGBA(12, 12, 12, g.MenuAlpha));
+		Render::Draw->Line(Window->Pos + Vec2(0, Window->Size.y - 1), Window->Pos + Window->Size - Vec2(0, 1), D3DCOLOR_RGBA(12, 12, 12, g.MenuAlpha));
+		Render::Draw->Line(Window->Pos + Window->Size - Vec2(1, 1), Window->Pos + Vec2(Window->Size.x - 1, 0), D3DCOLOR_RGBA(12, 12, 12, g.MenuAlpha));
+		Render::Draw->Line(Window->Pos, Window->Pos + Vec2(10, 0), D3DCOLOR_RGBA(12, 12, 12, g.MenuAlpha));
+		Render::Draw->Line(Window->Pos + Vec2(16 + label_size.x, 0), Window->Pos + Vec2(Window->Size.x, 0), D3DCOLOR_RGBA(12, 12, 12, g.MenuAlpha));
 
 		Render::Draw->Line(Window->Pos + Vec2(1, 1), Vec2(Window->Pos.x + 1, Window->Pos.y + Window->Size.y - 1), border_color);
 		Render::Draw->Line(Window->Pos + Vec2(1, Window->Size.y - 2), Vec2(Window->Pos.x + Window->Size.x - 1, Window->Pos.y + Window->Size.y - 2), border_color);
 		Render::Draw->Line(Window->Pos + Vec2(Window->Size.x - 2, 1), Window->Pos + Window->Size - Vec2(2, 2), border_color);
 		Render::Draw->Line(Window->Pos + Vec2(1, 1), Window->Pos + Vec2(10, 1), border_color);
 		Render::Draw->Line(Window->Pos + Vec2(16 + label_size.x, 1), Window->Pos + Vec2(Window->Size.x - 1, 1), border_color);
-
-		Render::Draw->FilledRect(Window->Pos + Vec2(2, 2), Window->Size - Vec2(4, 4), D3DCOLOR_RGBA(23, 23, 255, g.MenuAlpha));
 
 		Render::Draw->Triangle(Window->Pos + Window->Size - Vec2(2, 2), Window->Pos + Window->Size - Vec2(2, 8), Window->Pos + Window->Size - Vec2(8, 2), border_color);
 	}																						
@@ -401,9 +401,10 @@ void ui::BeginChild(const char* Name, Vec2 default_pos, Vec2 default_size, GuiFl
 			
 			Vec2 ChildPos = default_pos;
 			Vec2 ChildSize = default_size;
-			HandleMoving(pre_child_window, Boundaries, &ChildPos);
-			HandleResize(pre_child_window, Boundaries, &pre_child_window->NewSize);
-
+			if (!pre_child_window->Block) {
+				HandleMoving(pre_child_window, Boundaries, &ChildPos);
+				HandleResize(pre_child_window, Boundaries, &pre_child_window->NewSize);
+			}
 			Vec2 MinSize = Vec2((Boundaries.Max.x - 2.f) * (22.4f / 100.f), (Boundaries.Max.y - 2) * (13.4f / 100.f));
 			Vec2 Step = Vec2((Boundaries.Max.x - MinSize.x) / 9, (Boundaries.Max.y - MinSize.y) / 10);
 
@@ -426,6 +427,8 @@ void ui::BeginChild(const char* Name, Vec2 default_pos, Vec2 default_size, GuiFl
 	}
 	
 	child_window->CursorPos += Vec2(22, 26);
+
+	parent_window->ItemActive = child_window->ItemActive;
 }
 
 void ui::EndChild() {
@@ -539,128 +542,82 @@ bool ui::Button(const char* label, const Vec2& size) {
 	Render::Draw->Text(label, bb.Min.x + (bb.Max.x / 2) - (label_size.x / 2), bb.Min.y + (bb.Max.y / 2) - (label_size.y / 2), LEFT, Render::Fonts::Verdana, false, D3DCOLOR_RGBA(205, 205, 205, g.MenuAlpha));
 	return pressed;
 }
-/*
-bool ui::SliderBehavior(std::string item_id, Rect bb, int* v, int* v_min, int* v_max, GuiFlags flags) {
+
+template<typename T>
+bool ui::SliderBehavior(std::string item_id, Rect bb, T value, T min_value, T max_value, GuiFlags flags) {
 	GuiWindow* current_window = GetCurrentWindow();
 	bool hovered;
-
+	
 	if (IsInside(bb.Min.x, bb.Min.y, bb.Max.x, bb.Max.y) && current_window->SelectedItem == "")
 		hovered = true;
 	else 
 		hovered = false;
 
-	if (hovered && key_pressed(VK_LBUTTON) && !current_window->Block)
+	if (hovered && KeyPressed(VK_LBUTTON) && !current_window->Block) {
 		current_window->Block = true;
+		current_window->ItemActive = true;
+	}
 
 	else if (KeyDown(VK_LBUTTON) && current_window->Block && (hovered || current_window->SelectedItem == item_id)) {
 		current_window->SelectedItem = item_id;
-		*v = static_cast<int>(std::clamp(mouse_pos.x - bb.Min.x, 0.0f, (bb.Max.x - 1)) / (bb.Max.x - 1) * (*v_max - *v_min) + *v_min);
+		if (flags & GuiFlags_FloatSlider)
+			*value = static_cast<float>(std::clamp(mouse_pos.x - bb.Min.x, 0.0f, (bb.Max.x - 1)) / (bb.Max.x - 1) * (*max_value - *min_value) + *min_value);
+		else if (flags & GuiFlags_IntSlider)
+			*value = static_cast<int>(std::clamp(mouse_pos.x - bb.Min.x, 0.0f, (bb.Max.x - 1)) / (bb.Max.x - 1) * (*max_value - *min_value) + *min_value);
 	}
 
 	else if (!KeyDown(VK_LBUTTON) && current_window->Block) {
 		current_window->SelectedItem = "";
 		current_window->Block = false;
-	}
-
-	return hovered;
-}
-
-bool ui::SliderBehavior(std::string item_id, Rect bb, float* v, float* v_min, float* v_max, GuiFlags flags) {
-	GuiWindow* current_window = GetCurrentWindow();
-	bool hovered;
-
-	if (IsInside(bb.Min.x, bb.Min.y, bb.Max.x, bb.Max.y) && current_window->SelectedItem == "")
-		hovered = true;
-	else 
-		hovered = false;
-
-	if (hovered && key_pressed(VK_LBUTTON) && !current_window->Block)
-		current_window->Block = true;
-
-	else if (KeyDown(VK_LBUTTON) && current_window->Block && (hovered || current_window->SelectedItem == item_id)) {
-		current_window->SelectedItem = item_id;
-		float value_unmapped = std::clamp(mouse_pos.x - bb.Min.x, 0.0f, static_cast<float>(bb.Max.x));
-		float value_mapped = static_cast<float>((value_unmapped / static_cast<float>(bb.Max.x)) * (*v_max - *v_min) + *v_min);
-		*v = value_mapped;
-	}
-
-	else if (!KeyDown(VK_LBUTTON) && current_window->Block) {
-		current_window->SelectedItem = "";
-		current_window->Block = false;
+		current_window->ItemActive = false;
 	}
 	return hovered;
 }
 
-void ui::SliderInt(const char* label, int* v, int v_min, int v_max, const char* format, GuiFlags flags) {
+template<typename T>
+void ui::Slider(const char* label, T* v, T v_min, T v_max, const char* format, GuiFlags flags) {
 	GuiContext& g = *Gui_Ctx;
 	GuiWindow* Window = GetCurrentWindow();
-	Vec2 label_size = Graphics::Render->TextSize(Graphics::Fonts::Verdana, label);
+	Vec2 label_size = Render::Draw->GetTextSize(Render::Fonts::Verdana, label);
+	char formatted_string[100];
 
 	const float w = std::clamp(Window->Size.x - 90, 155.f, 210.f);
-
 	Rect frame_bb = { Window->CursorPos - Vec2(-20 , 3), Vec2(w, label_size.y + 12) };
-
-	AddItemToWindow(Window, Rect(frame_bb.Min, frame_bb.Max));
-
-	Graphics::Render->Text(label, frame_bb.Min.x, frame_bb.Min.y, LEFT, Graphics::Fonts::Verdana, false, D3DCOLOR_RGBA(205, 205, 205, g.MenuAlpha));
-
 	Rect slider_bb = { frame_bb.Min + Vec2(0, label_size.y + 4), Vec2(frame_bb.Max.x, 6) };
 
 	bool hovered = SliderBehavior(label, slider_bb, v, &v_min, &v_max, flags);
 
-	int draw_width = (static_cast<float>(*v - v_min) / (v_max - v_min) * (w - 1));
-	
-	if (hovered)
-		Graphics::Render->FilledRect(slider_bb.Min, slider_bb.Max + Vec2(0, 1), D3DCOLOR_RGBA(65, 65, 65, g.MenuAlpha));
+	const float rect_width = (static_cast<float>(*v) - v_min) / (v_max - v_min) * w - 1;
+
+	if (!format && flags & GuiFlags_IntSlider)
+		sprintf_s(formatted_string, "%d", (int)*v);
+	else if (!format && GuiFlags_FloatSlider)
+		sprintf_s(formatted_string, "%f", (float)*v);
 	else
-		Graphics::Render->FilledRect(slider_bb.Min, slider_bb.Max + Vec2(0, 1), D3DCOLOR_RGBA(55, 55, 55, g.MenuAlpha));
+		sprintf_s(formatted_string, format, *v);
 
-	//Graphics::Render->FilledRect_(slider_bb.Min + Vec2(1, 1), Vec2(dynamic_width, slider_bb.Max.y), D3DCOLOR_RGBA(173, 244, 5, g.MenuAlpha));
-	Graphics::Render->FilledRect(slider_bb.Min + Vec2(1, 1), Vec2(draw_width, slider_bb.Max.y), D3DCOLOR_RGBA(173, 244, 5, g.MenuAlpha));
-	Graphics::Render->Box(slider_bb.Min, slider_bb.Max + Vec2(0, 1), D3DCOLOR_RGBA(12, 12, 12, g.MenuAlpha));
-	Graphics::Render->Gradient(slider_bb.Min + Vec2(1, 1), Vec2(draw_width, slider_bb.Max.y), D3DCOLOR_RGBA(0, 0, 0, 0), D3DCOLOR_RGBA(0, 0, 0, std::clamp(120, 0, g.MenuAlpha)), true);
-
-	char formatted_string[100];
-	sprintf_s(formatted_string, format, *v);
-	Vec2 value_width = Graphics::Render->TextSize(Graphics::Fonts::Tahombd, formatted_string);
-	
-	Graphics::Render->Text(formatted_string, slider_bb.Min.x + draw_width - value_width.x / 2, slider_bb.Min.y, LEFT, Graphics::Fonts::Tahombd, true, D3DCOLOR_RGBA(205,205,205, g.MenuAlpha));
-}
-
-void ui::SliderFloat(const char* label, float* v, float v_min, float v_max, const char* format, GuiFlags flags) {
-	GuiContext& g = *Gui_Ctx;
-	GuiWindow* Window = GetCurrentWindow();
-	Vec2 label_size = Graphics::Render->TextSize(Graphics::Fonts::Verdana, label);
-
-	const float w = std::clamp(Window->Size.x - 90, 155.f, 210.f);
-
-	Rect frame_bb = { Window->CursorPos - Vec2(-20 , 3), Vec2(w, label_size.y + 12) };
+	Vec2 value_width = Render::Draw->GetTextSize(Render::Fonts::Tahombd, formatted_string);
 
 	AddItemToWindow(Window, Rect(frame_bb.Min, frame_bb.Max));
 
-	Graphics::Render->Text(label, frame_bb.Min.x, frame_bb.Min.y, LEFT, Graphics::Fonts::Verdana, false, D3DCOLOR_RGBA(205, 205, 205, g.MenuAlpha));
-
-	Rect slider_bb = { frame_bb.Min + Vec2(0, label_size.y + 4), Vec2(frame_bb.Max.x, 6) };
-
-	bool hovered = SliderBehavior(label, slider_bb, v, &v_min, &v_max, flags);
-
-	const float draw_width = (static_cast<float>(*v) - v_min) / (v_max - v_min) * w - 1;
+	Render::Draw->Text(label, frame_bb.Min.x, frame_bb.Min.y, LEFT, Render::Fonts::Verdana, false, D3DCOLOR_RGBA(205, 205, 205, g.MenuAlpha));
 
 	if (hovered)
-		Graphics::Render->FilledRect(slider_bb.Min, slider_bb.Max + Vec2(0, 1), D3DCOLOR_RGBA(65, 65, 65, g.MenuAlpha));
+		Render::Draw->FilledRect(slider_bb.Min, slider_bb.Max + Vec2(0, 1), D3DCOLOR_RGBA(65, 65, 65, g.MenuAlpha));
 	else
-		Graphics::Render->FilledRect(slider_bb.Min, slider_bb.Max + Vec2(0, 1), D3DCOLOR_RGBA(55, 55, 55, g.MenuAlpha));
+		Render::Draw->FilledRect(slider_bb.Min, slider_bb.Max + Vec2(0, 1), D3DCOLOR_RGBA(55, 55, 55, g.MenuAlpha));
 
-	//Graphics::Render->FilledRect_(slider_bb.Min + Vec2(1, 1), Vec2(dynamic_width, slider_bb.Max.y), D3DCOLOR_RGBA(173, 244, 5, g.MenuAlpha));
-	Graphics::Render->FilledRect(slider_bb.Min + Vec2(1, 1), Vec2(draw_width, slider_bb.Max.y), D3DCOLOR_RGBA(173, 244, 5, g.MenuAlpha));
-	Graphics::Render->Box(slider_bb.Min, slider_bb.Max + Vec2(0, 1), D3DCOLOR_RGBA(12, 12, 12, g.MenuAlpha));
-	Graphics::Render->Gradient(slider_bb.Min + Vec2(1, 1), Vec2(draw_width, slider_bb.Max.y), D3DCOLOR_RGBA(0, 0, 0, 0), D3DCOLOR_RGBA(0, 0, 0, std::clamp(120, 0, g.MenuAlpha)), true);
+	Render::Draw->FilledRect(slider_bb.Min + Vec2(1, 1), Vec2(rect_width, slider_bb.Max.y), D3DCOLOR_RGBA(173, 244, 5, g.MenuAlpha));
+	Render::Draw->Rect(slider_bb.Min, slider_bb.Max + Vec2(0, 1), 1, D3DCOLOR_RGBA(12, 12, 12, g.MenuAlpha));
+	Render::Draw->Gradient(slider_bb.Min + Vec2(1, 1), Vec2(rect_width, slider_bb.Max.y), D3DCOLOR_RGBA(0, 0, 0, 0), D3DCOLOR_RGBA(0, 0, 0, std::clamp(120, 0, g.MenuAlpha)), true);
 
-	char formatted_string[100];
-	sprintf_s(formatted_string, format, *v);
-
-	Vec2 value_width = Graphics::Render->TextSize(Graphics::Fonts::Tahombd, formatted_string);
-
-	Graphics::Render->Text(formatted_string, slider_bb.Min.x + draw_width - value_width.x / 2, slider_bb.Min.y, LEFT, Graphics::Fonts::Tahombd, true, D3DCOLOR_RGBA(205, 205, 205, g.MenuAlpha));
+	Render::Draw->Text(formatted_string, slider_bb.Min.x + rect_width - value_width.x / 2, slider_bb.Min.y, LEFT, Render::Fonts::Tahombd, true, D3DCOLOR_RGBA(205, 205, 205, g.MenuAlpha));
 }
-*/
+
+void ui::SliderFloat(const char* label, float* v, float v_min, float v_max, const char* format) {
+	return Slider(label, v, v_min, v_max, format, GuiFlags_FloatSlider);
+}
+
+void ui::SliderInt(const char* label, int* v, int v_min, int v_max, const char* format) {
+	return Slider(label, v, v_min, v_max, format, GuiFlags_IntSlider);
+}

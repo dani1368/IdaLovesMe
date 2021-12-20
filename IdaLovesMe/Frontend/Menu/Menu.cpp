@@ -8,6 +8,7 @@ using namespace IdaLovesMe;
 
 void CMenu::Initialize() 
 {
+	c_config* cfg = c_config::get();
 	if (this->m_bInitialized)
 		return;
 
@@ -18,6 +19,8 @@ void CMenu::Initialize()
 
 	this->m_bIsOpened = true;
 	this->m_bInitialized = true;
+
+	cfg->i["Uwu"] = 0;
 
 	Misc::Utilities->Game_Msg("Cheat Initialized!");
 }
@@ -58,6 +61,9 @@ void CMenu::Draw()
 		if (ui::Button("Test"))
 			Misc::Utilities->Console_Log("Pressed");
 
+		ui::SliderFloat("FloatSlider", &c_config::get()->f["Uwu"], 0, 5);
+
+		ui::SliderInt("IntSlider", &c_config::get()->i["Uwu"], 0, 5);
 		ui::EndChild();
 
 		//ui::BeginChild("B", ui::GetWindowPos() + Vec2(ui::GetWindowSize().x / 2 + 46, 30), child_size, false);
