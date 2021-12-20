@@ -184,19 +184,5 @@ LRESULT CUtilities::WndProcHandler(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lP
 }
 
 float CUtilities::GetDeltaTime() {
-	float dwLastTime = Interfaces::Globals->curtime;
-
-	if (Interfaces::Globals)
-	{
-		dwCurrentTime = Interfaces::Globals->curtime;
-	}
-
-	if (dwCurrentTime != 0)
-	{
-		deltaTime = float(dwCurrentTime - this->dwLastTime);
-	}
-
-	this->dwLastTime = dwLastTime;
-
-	return deltaTime;
+	return Interfaces::Globals ? Interfaces::Globals->frametime : 0;
 }

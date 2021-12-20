@@ -35,7 +35,7 @@ void CMenu::Draw()
 	CConfig* cfg = CConfig::get();
 
 	static float alpha = 0;
-	float fc = 255.f / 0.2f * Misc::Utilities->GetDeltaTime();
+	float fc = Misc::Utilities->GetDeltaTime() * 255 * 8;
 	if (!this->m_bIsOpened && alpha > 0.f)
 		alpha = std::clamp(alpha - fc / 255.f, 0.f, 1.f);
 

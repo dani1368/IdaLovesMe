@@ -1,6 +1,7 @@
 #include "../Globalincludes.h"
 #include "../../Frontend/Menu/Menu.h"
 #include "../Utilities/Utilities.h"
+#include "../../Frontend/Framework/MenuFramework.h"
 
 WNDPROC oWndProc;
 
@@ -12,7 +13,7 @@ namespace Hooked
 			PostQuitMessage(0);
 
 		if (msg == WM_KEYDOWN)
-			if (wParam == CMenu::get()->Menu_key)
+			if (wParam == CMenu::get()->Menu_key && (IdaLovesMe::Globals::Gui_Ctx->MenuAlpha == 255 || IdaLovesMe::Globals::Gui_Ctx->MenuAlpha == 0))
 				CMenu::get()->SetMenuOpened(!CMenu::get()->IsMenuOpened());
 
 		if (CMenu::get()->IsMenuOpened()) {
