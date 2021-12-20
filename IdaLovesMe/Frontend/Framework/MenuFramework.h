@@ -77,9 +77,10 @@ namespace IdaLovesMe {
 		bool					Init;
 		bool					ItemActive;
 
-		Vec2					NewSize;
+		int					    xSize = 3;
 		int						ySize = 10;
-		int						xSize = 3;
+		int						xPos = 0;
+		int						yPos = 0;
 	};
 
 	struct NextWindowInfo {
@@ -143,7 +144,7 @@ namespace IdaLovesMe {
 
 		void			  GetInputFromWindow(const std::string &window_name);
 
-		void			  HandleMoving(GuiWindow* Window, Rect Constraints = Rect{}, Vec2 *v = nullptr);
+		void			  HandleMoving(GuiWindow* Window, Rect Constraints = Rect{}, Vec2* v = nullptr );
 		void			  HandleResize(GuiWindow* Window, Rect Constraints = Rect{}, Vec2* buffer = nullptr);
 		void			  AddItemToWindow(GuiWindow* Window, Rect size);
 
@@ -158,12 +159,19 @@ namespace IdaLovesMe {
 		void			  Checkbox(const char* label, bool* v);
 
 		template	      <typename T>
-		void			  Slider(const char* label, T* v, T v_min, T v_max, const char* format = NULL, GuiFlags flags = NULL);
+		void              Slider(const char* label, T* v, T v_min, T v_max, const char* format = NULL, GuiFlags flags = NULL, float scale = 1.f);
 		void			  SliderInt(const char* label, int* v, int v_min, int v_max, const char* format = NULL);
-		void			  SliderFloat(const char* label, float* v, float v_min, float v_max, const char* format = NULL);
+		void			  SliderFloat(const char* label, float* v, float v_min, float v_max, const char* format, float scale);
 
 		//void			  Multiselect(const char* label, std::unordered_map<int, bool>* data, std::vector<const char*> items);
 		bool			  Button(const char* label, const Vec2& size = Vec2(0,0));
+
+		//int				  SingleSelect(const char* label, int* current_item, std::vector<const char*> items);
+
+		//int				  MultiSelect(const char* label, std::unordered_map<int, bool>* data, std::vector<const char*> items);
+		//bool              Selectable(const char* label, bool selected, GuiFlags flags, const Vec2& size_arg);
+		//bool			  BeginCombo(const char* label, const char* preview_value, GuiFlags flags, int items);
+		//void			  EndCombo();
 	}
 
 	namespace Globals {

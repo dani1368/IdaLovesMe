@@ -89,8 +89,8 @@ void CDraw::Reset()
 void CDraw::Line(Vec2 Pos, Vec2 Pos2, D3DCOLOR Color)
 {
     vertex vertices[2] = {
-            { Pos.x, Pos.y, 0.0f, 1.0f, Color },
-            { Pos2.x, Pos2.y, 0.0f, 1.0f, Color },
+        { round(Pos.x), round(Pos.y), 0.0f, 1.0f, Color },
+        { round(Pos2.x), round(Pos2.y), 0.0f, 1.0f, Color },
     };
     m_Device->SetFVF(D3DFVF_XYZRHW | D3DFVF_DIFFUSE);
     m_Device->SetTexture(0, nullptr);

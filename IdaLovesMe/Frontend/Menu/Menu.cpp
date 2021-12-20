@@ -1,14 +1,19 @@
 #include "Menu.h"
 #include "../Framework/MenuFramework.h"
 #include "../../Backend/Utilities/Utilities.h"
+#include "../../Backend/Config/Settings.h"
 
 #include <algorithm>
 
 using namespace IdaLovesMe;
 
+void CConfig::LoadDefaults() {
+
+}
+
 void CMenu::Initialize() 
 {
-	c_config* cfg = c_config::get();
+	CConfig* cfg = CConfig::get();
 	if (this->m_bInitialized)
 		return;
 
@@ -20,14 +25,14 @@ void CMenu::Initialize()
 	this->m_bIsOpened = true;
 	this->m_bInitialized = true;
 
-	cfg->i["Uwu"] = 0;
+	cfg->i["Uwu"] = 20;
 
 	Misc::Utilities->Game_Msg("Cheat Initialized!");
 }
 
 void CMenu::Draw()
 {
-	c_config* cfg = c_config::get();
+	CConfig* cfg = CConfig::get();
 
 	static float alpha = 0;
 	float fc = 255.f / 0.2f * Misc::Utilities->GetDeltaTime();
@@ -60,18 +65,19 @@ void CMenu::Draw()
 	
 	if (this->m_nCurrentTab == 0) {
 		ui::BeginChild("A", ui::GetWindowPos() + Vec2(100, 30), Vec2(258, 506), false);
-		
-		ui::SliderFloat("FloatSlider", &cfg->f["Uwu"], 0, 5);
-		ui::SliderInt("IntSlider", &cfg->i["Uwu"], 0, 5);
-
-		ui::Checkbox("Checkbox", &cfg->b["niga"]);
-
-		ui::Button("Buttonnnnnnnnnn");
-
+		ui::Checkbox("Enabled", &cfg->b["niga"]);
+		ui::SliderInt("Minimum damage", &cfg->i["Uwu"], 0, 126, cfg->i["Uwu"] == 0 ? "Auto" : (cfg->i["Uwu"] > 100 ? "HP+%d" : "%dhp"));
+		ui::SliderFloat("Maximum FOV", &cfg->f["Uwu"], 0.f, 180.f, "%.2f°", 0.1f);
+		ui::Button("Log aimbot shots");
 		ui::EndChild();
 
-		//ui::BeginChild("B", ui::GetWindowPos() + Vec2(ui::GetWindowSize().x / 2 + 46, 30), child_size, false);
-		//ui::EndChild();
+		ui::BeginChild("B", ui::GetWindowPos() + Vec2(100, 30), Vec2(258, 506), false);
+		ui::Button("Upgrade resolver");
+
+		if (ui::Button("Unload"))
+			Settings->UnloadCheat = true;
+
+		ui::EndChild();
 	}
 
 	ui::End();

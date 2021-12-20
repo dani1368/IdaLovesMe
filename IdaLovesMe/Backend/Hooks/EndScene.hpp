@@ -45,9 +45,6 @@ namespace Hooked {
 		device->SetVertexDeclaration(vertDec);
 		device->SetVertexShader(vertShader);
 
-		if (GetAsyncKeyState(VK_DELETE) && 1)
-			Settings->UnloadCheat = true;
-
 		return oPresent(device, src, dest, windowOverride, dirtyRegion);
 	}
 

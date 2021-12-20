@@ -22,9 +22,11 @@ private:
 	int m_nCurrentLegitTab;
 };
 
-class c_config : public singleton<c_config> {
+class CConfig : public singleton<CConfig> {
 
 public:
+	void LoadDefaults();
+
 	std::unordered_map<std::string, bool> b;
 	std::unordered_map<std::string, int> i;
 	std::unordered_map<std::string, float> f;
