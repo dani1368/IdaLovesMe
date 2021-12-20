@@ -1,4 +1,4 @@
 # Be Mine
 fully made by Danigator
 
-![Sweetheart](https://i.imgur.com/eCJdsAM.jpg)
+<img src="https://i.imgur.com/eCJdsAM.jpg" width = "400" height = "600">
