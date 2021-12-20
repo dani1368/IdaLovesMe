@@ -66,7 +66,7 @@ void CMenu::Draw()
 
 		ui::Checkbox("Checkbox", &cfg->b["niga"]);
 
-		ui::Button("Button");
+		ui::Button("Buttonnnnnnnnnn");
 
 		ui::EndChild();
 

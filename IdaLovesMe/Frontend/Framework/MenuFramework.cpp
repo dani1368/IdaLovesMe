@@ -364,7 +364,7 @@ void ui::Begin(const char* Name, GuiFlags flags) {
 	static RECT ClipRect;
 
 	if (flags & GuiFlags_ChildWindow)
-		ClipRect = { (LONG)Window->Pos.x, (LONG)Window->Pos.y, LONG(Window->Pos.x + Window->Size.x - 10), LONG(Window->Pos.y + Window->Size.y - 10) };
+		ClipRect = { (LONG)Window->Pos.x, (LONG)Window->Pos.y, LONG(Window->Pos.x + Window->Size.x - 15), LONG(Window->Pos.y + Window->Size.y - 3) };
 	else
 		ClipRect = { (LONG)Window->Pos.x, (LONG)Window->Pos.y, LONG(Window->Pos.x + Window->Size.x), LONG(Window->Pos.y + Window->Size.y) };
 
@@ -567,7 +567,7 @@ bool ui::Button(const char* label, const Vec2& size) {
 	GuiContext& g = *Gui_Ctx;
 	GuiWindow* Window = GetCurrentWindow();
 	Vec2 label_size = Render::Draw->GetTextSize(Render::Fonts::Verdana, label);
-	Vec2 sizea = (size.x == 0 || size.y == 0) ? Vec2(std::clamp(Window->Size.x - 100, 50.f, 200.f), 25) : size;
+	Vec2 sizea = (size.x == 0 || size.y == 0) ? Vec2(std::clamp(Window->Size.x - 100, 61.f, 200.f), 25) : size;
 	Rect bb = { Window->CursorPos + Vec2(20, 0), sizea };
 
 	AddItemToWindow(Window, bb);
@@ -583,7 +583,9 @@ bool ui::Button(const char* label, const Vec2& size) {
 	Render::Draw->Rect(bb.Min, bb.Max, 1, D3DCOLOR_RGBA(12, 12, 12, g.MenuAlpha));
 	Render::Draw->Rect(bb.Min + Vec2(1, 1), bb.Max - Vec2(2, 2), 1, D3DCOLOR_RGBA(50, 50, 50, g.MenuAlpha));
 
-	Render::Draw->Text(label, bb.Min.x + (bb.Max.x / 2) - (label_size.x / 2), bb.Min.y + (bb.Max.y / 2) - (label_size.y / 2), LEFT, Render::Fonts::Verdana, false, D3DCOLOR_RGBA(205, 205, 205, g.MenuAlpha));
+	Vec2 TextPos = Vec2(bb.Min.x + (bb.Max.x / 2) - (label_size.x / 2), bb.Min.y + (bb.Max.y / 2) - (label_size.y / 2));
+
+	Render::Draw->Text(label, std::clamp(TextPos.x, bb.Min.x + 3.f, bb.Min.x + bb.Max.x), TextPos.y , LEFT, Render::Fonts::Verdana, false, D3DCOLOR_RGBA(205, 205, 205, g.MenuAlpha), bb.Min + bb.Max - Vec2(5, 0));
 	return pressed;
 }
 
@@ -594,7 +596,7 @@ void ui::Slider(const char* label, T* v, T v_min, T v_max, const char* format, G
 	Vec2 label_size = Render::Draw->GetTextSize(Render::Fonts::Verdana, label);
 	char formatted_string[100];
 
-	const float w = std::clamp(Window->Size.x - 90, 155.f, 210.f);
+	const float w = std::clamp(Window->Size.x - 90, 63.f, 202.f);
 	Rect frame_bb = { Window->CursorPos - Vec2(-20 , 3), Vec2(w, label_size.y + 12) };
 	Rect slider_bb = { frame_bb.Min + Vec2(0, label_size.y + 4), Vec2(frame_bb.Max.x, 6) };
 

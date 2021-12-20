@@ -29,13 +29,6 @@ namespace Render {
     class CDraw
     {
     public:
-        CDraw()
-        {
-            m_VB = NULL;
-            m_IB = NULL;
-            int FontNr = 0;
-        }
-
         struct sScreen
         {
             float Width;
@@ -44,31 +37,29 @@ namespace Render {
             float y_center;
         } Screen;
 
-        void Sprite(LPDIRECT3DTEXTURE9 tex, IdaLovesMe::Vec2 Pos, IdaLovesMe::Vec2 Size, D3DCOLOR color);
+        void Sprite(LPDIRECT3DTEXTURE9 Texture, IdaLovesMe::Vec2 Pos, IdaLovesMe::Vec2 Size, D3DCOLOR Color);
 
         //=============================================================================================
-        void Line(IdaLovesMe::Vec2 Pos, IdaLovesMe::Vec2 Pos2, DWORD color);
+        void Line(IdaLovesMe::Vec2 Pos, IdaLovesMe::Vec2 Pos2, DWORD Color);
 
-        void Line2(int x, int y, int x2, int y2, D3DCOLOR color);
-
-        void Rect(IdaLovesMe::Vec2 Pos, IdaLovesMe::Vec2 Size, float linewidth, D3DCOLOR color);
+        void Rect(IdaLovesMe::Vec2 Pos, IdaLovesMe::Vec2 Size, float linewidth, D3DCOLOR Color);
         void FilledRect(IdaLovesMe::Vec2 Pos, IdaLovesMe::Vec2 Size, D3DCOLOR color);
-        void BorderedRect(IdaLovesMe::Vec2 Pos, IdaLovesMe::Vec2 Size, float border_width, D3DCOLOR color, D3DCOLOR color_border);
+        void BorderedRect(IdaLovesMe::Vec2 Pos, IdaLovesMe::Vec2 Size, float BorderWidth, D3DCOLOR Color, D3DCOLOR BorderColor);
         //void RoundedRect(float x, float y, float w, float h, float radius, bool smoothing, D3DCOLOR color, D3DCOLOR bcolor);
 
-        void Gradient(IdaLovesMe::Vec2 pos, IdaLovesMe::Vec2 size, D3DCOLOR color, D3DCOLOR other_color, bool vertical = false);
+        void Gradient(IdaLovesMe::Vec2 Pos, IdaLovesMe::Vec2 Size, D3DCOLOR Color, D3DCOLOR OtherColor, bool Vertical = false);
        
         //void Circle(float x, float y, float radius, int rotate, int type, bool smoothing, int resolution, D3DCOLOR color);
         //void CircleFilled(float x, float y, float rad, float rotate, int type, int resolution, D3DCOLOR color);
 
-        void Triangle(IdaLovesMe::Vec2 top, IdaLovesMe::Vec2 bleft, IdaLovesMe::Vec2 bright, D3DCOLOR color);
+        void Triangle(IdaLovesMe::Vec2 Top, IdaLovesMe::Vec2 Left, IdaLovesMe::Vec2 Right, D3DCOLOR Color);
 
-        void Text(const char* text, float x, float y, int orientation, LPD3DXFONT Font, bool bordered, D3DCOLOR color);
+        void Text(const char* Text, float X, float Y, int Orientation, LPD3DXFONT Font, bool Bordered, D3DCOLOR Color, IdaLovesMe::Vec2 MaxSize = IdaLovesMe::Vec2(0, 0));
         //=============================================================================================
 
   
         //=============================================================================================
-        void Init(LPDIRECT3DDEVICE9 pDev);
+        void Init(LPDIRECT3DDEVICE9 D3dDevice);
         void CreateObjects();
         void ReleaseObjects();
         void Reset();
@@ -81,9 +72,6 @@ namespace Render {
     private:
         LPDIRECT3DDEVICE9       m_Device;
         LPD3DXSPRITE            m_Sprite;
-        ID3DXLine*              m_Line;
-        LPDIRECT3DVERTEXBUFFER9 m_VB;    // Buffer to hold vertices
-        LPDIRECT3DINDEXBUFFER9  m_IB;    // Buffer to hold indices
 
         IDirect3DTexture9*      m_BgTexture;
 
