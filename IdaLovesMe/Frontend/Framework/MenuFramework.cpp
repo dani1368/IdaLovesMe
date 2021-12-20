@@ -332,7 +332,6 @@ void ui::HandleResize(GuiWindow* Window, Rect Boundaries, Vec2* buffer) {
 
 			Window->xSize = std::clamp(Window->xSize, 0, 9 - Window->xPos);
 
-
 			if (g.MousePos.y >= Window->Pos.y + Window->Size.y + Step.y)
 				Window->ySize = (int)round((g.MousePos.y - Window->Pos.y - MinSize.y) / Step.y);
 			else if (g.MousePos.y <= Window->Pos.y + Window->Size.y - Step.y)
