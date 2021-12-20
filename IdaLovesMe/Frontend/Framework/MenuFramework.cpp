@@ -311,10 +311,19 @@ void ui::HandleResize(GuiWindow* Window, Rect Boundaries, Vec2* buffer) {
 			Window->Resizing = true;
 
 		else if (KeyDown(VK_LBUTTON) && Window->Resizing) {			
-			Window->xSize = (int)((g.MousePos.x - Window->Pos.x - MinSize.x) / Step.x) + 1;
+			if (g.MousePos.x >= Window->Pos.x + Window->Size.x + Step.x)
+				Window->xSize = (int)round((g.MousePos.x - Window->Pos.x - MinSize.x) / Step.x);
+			else if (g.MousePos.x <= Window->Pos.x + Window->Size.x - Step.x)
+				Window->xSize = (int)round((g.MousePos.x - Window->Pos.x - MinSize.x) / Step.x);
+
 			Window->xSize = std::clamp(Window->xSize, 0, 9);
 
-			Window->ySize = (int)((g.MousePos.y - Window->Pos.y - MinSize.y) / Step.y) + 1;
+
+			if (g.MousePos.y >= Window->Pos.y + Window->Size.y + Step.y)
+				Window->ySize = (int)round((g.MousePos.y - Window->Pos.y - MinSize.y) / Step.y);
+			else if (g.MousePos.y <= Window->Pos.y + Window->Size.y - Step.y)
+				Window->ySize = (int)round((g.MousePos.y - Window->Pos.y - MinSize.y) / Step.y);
+
 			Window->ySize = std::clamp(Window->ySize, 0, 10);
 		}
 		else if (!KeyDown(VK_LBUTTON) && Window->Resizing)
