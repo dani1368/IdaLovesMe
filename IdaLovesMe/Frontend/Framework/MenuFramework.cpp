@@ -369,7 +369,7 @@ void ui::Begin(const char* Name, GuiFlags flags) {
 	}
 
 
-	if ((Window->Flags & GuiFlags_ChildWindow) && g.NextWindowInfo.SizeCond) {
+	if ((Window->Flags & GuiFlags_ChildWindow) || (Window->Flags & GuiFlags_ComboBox) && g.NextWindowInfo.SizeCond) {
 		Window->Size = g.NextWindowInfo.Size;
 		g.NextWindowInfo.SizeCond = false;
 	}
