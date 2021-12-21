@@ -1,5 +1,6 @@
 #include "MenuFramework.h"
 #include "../Renderer/Renderer.h"
+#include "DrawList/DrawList.h"
 #include "../../Backend/Utilities/Utilities.h"
 
 #include <algorithm>
@@ -425,6 +426,7 @@ void ui::Begin(const char* Name, GuiFlags flags) {
 
 	//Drawing
 	if (!(flags & GuiFlags_ChildWindow) && !(flags & GuiFlags_PopUp)) {
+
 		Render::Draw->Sprite(Render::Draw->GetBgTexture(), Window->Pos, Window->Size, D3DCOLOR_RGBA(255, 255, 255, g.MenuAlpha));
 
 		int OutlineColors[6] = { 12, 61, 43, 43, 43, 61 };

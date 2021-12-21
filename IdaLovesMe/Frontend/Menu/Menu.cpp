@@ -94,6 +94,8 @@ void CMenu::Draw()
 	}
 
 	ui::End();
+
+
 }
 
 bool CMenu::IsMenuOpened() 
