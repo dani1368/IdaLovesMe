@@ -1,5 +1,6 @@
 #include "MenuFramework.h"
 #include "../Renderer/Renderer.h"
+#include "DrawList/DrawList.h"
 #include "../../Backend/Utilities/Utilities.h"
 
 #include <algorithm>
@@ -399,6 +400,10 @@ void ui::Begin(const char* Name, GuiFlags flags) {
 
 	//Drawing
 	if (!(flags & GuiFlags_ChildWindow) && !(flags & GuiFlags_ComboBox)) {
+		
+		DrawList::AddFilledRect(500, 500, 200, 200, 35, 35, 35, 255);
+		DrawList::AddText(505, 505, "i love ida", 255, 255, 255, 255, Render::Fonts::Verdana);
+
 		Render::Draw->Sprite(Render::Draw->GetBgTexture(), Window->Pos, Window->Size, D3DCOLOR_RGBA(255, 255, 255, g.MenuAlpha));
 
 		int OutlineColors[6] = { 12, 61, 43, 43, 43, 61 };
@@ -458,6 +463,17 @@ void ui::Begin(const char* Name, GuiFlags flags) {
 
 void ui::End() {
 	Render::Draw->GetD3dDevice()->SetRenderState(D3DRS_SCISSORTESTENABLE, FALSE);
+
+	if (GetCurrentWindow()->Flags == GuiFlags_None) {
+		for (const auto obj : DrawList::Drawlist) {
+			if (obj.type == "text")
+				Render::Draw->Text(obj.text, obj.x, obj.y, LEFT, obj.font, false, D3DCOLOR_RGBA(obj.r, obj.g, obj.b, obj.a));
+			else if (obj.type == "filledrect")
+				Render::Draw->FilledRect(Vec2(obj.x, obj.y), Vec2(obj.w, obj.h), D3DCOLOR_RGBA(obj.r, obj.g, obj.b, obj.a));
+		}
+
+		DrawList::Drawlist.clear();
+	}
 }
 
 void ui::BeginChild(const char* Name, Vec2 default_pos, Vec2 default_size, GuiFlags flags) {
