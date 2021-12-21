@@ -30,6 +30,6 @@ public:
 	std::unordered_map<std::string, bool> b;
 	std::unordered_map<std::string, int> i;
 	std::unordered_map<std::string, float> f;
-	std::unordered_map<std::string, float[4]> c;
+	std::unordered_map<std::string, int[4]> c;
 	std::unordered_map<std::string, std::unordered_map<int, bool>> m;
 };

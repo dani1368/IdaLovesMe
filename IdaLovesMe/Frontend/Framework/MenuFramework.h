@@ -47,19 +47,21 @@ namespace IdaLovesMe {
 	};
 
 	enum GuiFlags_ {
-		GuiFlags_None =				 0,
-		GuiFlags_NoMove =			 1 << 0,
-		GuiFlags_NoResize =			 1 << 1,
-		GuiFlags_FloatSlider =		 1 << 2,
-		GuiFlags_IntSlider =		 1 << 3,
-		GuiFlags_NoTabButton =		 1 << 4,
-		GuiFlags_ChildWindow =		 1 << 5,
+		GuiFlags_None = 0,
+		GuiFlags_NoMove = 1 << 0,
+		GuiFlags_NoResize = 1 << 1,
+		GuiFlags_FloatSlider = 1 << 2,
+		GuiFlags_IntSlider = 1 << 3,
+		GuiFlags_NoTabButton = 1 << 4,
+		GuiFlags_ChildWindow = 1 << 5,
 		GuiFlags_ReturnKeyReleased = 1 << 6,
-		GuiFlags_ComboBox		   = 1 << 7,
-		GuiFlags_TabButton       = 1 << 8,
-		GuiFlags_CheckBox		 = 1 << 9,
-		GuiFlags_Selectable      = 1 << 10,
-		GuiFlags_Button          = 1 << 11,
+		GuiFlags_ComboBox = 1 << 7,
+		GuiFlags_TabButton = 1 << 8,
+		GuiFlags_CheckBox = 1 << 9,
+		GuiFlags_Selectable = 1 << 10,
+		GuiFlags_Button = 1 << 11,
+		GuiFlags_ColorPicker = 1 << 12,
+		GuiFlags_SingleSelect = 1 << 13
 	};
 
 	struct GuiWindow {
@@ -68,6 +70,7 @@ namespace IdaLovesMe {
 
 		Vec2					Pos, Size;
 		Vec2					CursorPos;
+		Vec2					PevCursorPos;
 		Vec2					ContentSize;
 		Rect					Buffer;
 		
@@ -180,6 +183,7 @@ namespace IdaLovesMe {
 		bool              Selectable(const char* label, bool selected = false, GuiFlags flags = NULL, const Vec2& size_arg = Vec2(0, 0));
 		bool			  BeginCombo(const char* label, const char* preview_value, int items, GuiFlags flags = NULL);
 		void			  EndCombo();
+		bool			  ColorPicker(const char* label, int col[4], GuiFlags flags = NULL);
 	}
 
 	namespace Globals {

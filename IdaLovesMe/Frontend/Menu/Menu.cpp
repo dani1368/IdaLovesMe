@@ -26,6 +26,10 @@ void CMenu::Initialize()
 	this->m_bInitialized = true;
 
 	cfg->i["Uwu"] = 20;
+	cfg->c["MenuColor"][0] = 163;
+	cfg->c["MenuColor"][1] = 212;
+	cfg->c["MenuColor"][2] = 31;
+	cfg->c["MenuColor"][3] = 255;
 
 	Misc::Utilities->Game_Msg("Cheat Initialized!");
 }
@@ -35,7 +39,7 @@ void CMenu::Draw()
 	CConfig* cfg = CConfig::get();
 
 	static float alpha = 0;
-	float fc = 255.f / 0.2f * Misc::Utilities->GetDeltaTime() * 255 * 8;
+	float fc = Misc::Utilities->GetDeltaTime() * 255 * 8;
 	if (!this->m_bIsOpened && alpha > 0.f)
 		alpha = std::clamp(alpha - fc / 255.f, 0.f, 1.f);
 
@@ -78,9 +82,12 @@ void CMenu::Draw()
 		if (ui::Button("Unload"))
 			Settings->UnloadCheat = true;
 
-		ui::SingleSelect("Singelselect 2", &cfg->i["Singelselecto"], {"Item 1", "Item 2", "Item 3", "Item 4"});
+		//ui::SingleSelect("Singelselect 2", &cfg->i["Singelselecto"], {"Item 1", "Item 2", "Item 3", "Item 4"});
 	
-		//ui::MultiSelect("Multiselector", &cfg->m["MultiSelecto"], { "You are stupido", "Stiko best coder", "gs.digital best", "l0l0l0l" });
+		ui::MultiSelect("Multiselector", &cfg->m["MultiSelecto"], { "You are stupido", "Stiko best coder", "gs.digital best", "l0l0l0l" });
+
+		ui::ColorPicker("ColorPickero", cfg->c["MenuColor"]);
+
 		ui::EndChild();
 	}
 

@@ -13,8 +13,9 @@ namespace Hooked
 			PostQuitMessage(0);
 
 		if (msg == WM_KEYDOWN)
-			if (wParam == CMenu::get()->Menu_key && (IdaLovesMe::Globals::Gui_Ctx->MenuAlpha == 255 || IdaLovesMe::Globals::Gui_Ctx->MenuAlpha == 0))
-				CMenu::get()->SetMenuOpened(!CMenu::get()->IsMenuOpened());
+			if (IdaLovesMe::Globals::Gui_Ctx)
+				if (wParam == CMenu::get()->Menu_key && (IdaLovesMe::Globals::Gui_Ctx->MenuAlpha == 255 || IdaLovesMe::Globals::Gui_Ctx->MenuAlpha == 0))
+					CMenu::get()->SetMenuOpened(!CMenu::get()->IsMenuOpened());
 
 		if (CMenu::get()->IsMenuOpened()) {
 			Misc::Utilities->WndProcHandler(window, msg, wParam, lParam);
