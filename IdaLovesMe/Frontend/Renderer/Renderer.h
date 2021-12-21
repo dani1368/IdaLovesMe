@@ -47,7 +47,7 @@ namespace Render {
         void BorderedRect(IdaLovesMe::Vec2 Pos, IdaLovesMe::Vec2 Size, float BorderWidth, D3DCOLOR Color, D3DCOLOR BorderColor);
         //void RoundedRect(float x, float y, float w, float h, float radius, bool smoothing, D3DCOLOR color, D3DCOLOR bcolor);
 
-        void Gradient(IdaLovesMe::Vec2 Pos, IdaLovesMe::Vec2 Size, D3DCOLOR Color, D3DCOLOR OtherColor, bool Vertical = false);
+        void Gradient(IdaLovesMe::Vec2 Pos, IdaLovesMe::Vec2 Size, D3DCOLOR LColor, D3DCOLOR ROtherColor, bool Vertical = false, D3DCOLOR BLColor = 0x0, D3DCOLOR BROtherColor = 0x0);
        
         //void Circle(float x, float y, float radius, int rotate, int type, bool smoothing, int resolution, D3DCOLOR color);
         //void CircleFilled(float x, float y, float rad, float rotate, int type, int resolution, D3DCOLOR color);

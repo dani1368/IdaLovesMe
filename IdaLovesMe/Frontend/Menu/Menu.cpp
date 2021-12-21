@@ -85,6 +85,8 @@ void CMenu::Draw()
 		//ui::SingleSelect("Singelselect 2", &cfg->i["Singelselecto"], {"Item 1", "Item 2", "Item 3", "Item 4"});
 	
 		ui::MultiSelect("Multiselector", &cfg->m["MultiSelecto"], { "You are stupido", "Stiko best coder", "gs.digital best", "l0l0l0l" });
+		//ui::MultiSelect("Multiselecto2", &cfg->m["MultiSelecto2"], { "You are stupido", "Stiko best coder", "gs.digital best", "l0l0l0l" });
+		//ui::MultiSelect("Multiselector3", &cfg->m["MultiSelecto3"], { "You are stupido", "Stiko best coder", "gs.digital best", "l0l0l0l" });
 
 		ui::ColorPicker("ColorPickero", cfg->c["MenuColor"]);
 

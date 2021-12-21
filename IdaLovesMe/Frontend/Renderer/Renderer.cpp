@@ -305,13 +305,13 @@ void CDraw::RoundedRect(float x, float y, float w, float h, float radius, bool s
     }
 }
 */
-void CDraw::Gradient(Vec2 Pos, Vec2 Size, D3DCOLOR Color, D3DCOLOR OtherColor, bool Vertical) {
-
+void CDraw::Gradient(Vec2 Pos, Vec2 Size, D3DCOLOR LColor, D3DCOLOR ROtherColor, bool Vertical, D3DCOLOR BLColor, D3DCOLOR BROtherColor)
+{
     vertex vertices[4] = {
-        { Pos.x, Pos.y, 0.0f, 1.0f, Color },
-        { Pos.x + Size.x, Pos.y, 0.0f, 1.0f, Vertical ? Color : OtherColor },
-        { Pos.x, Pos.y + Size.y, 0.0f, 1.0f, Vertical ? OtherColor : Color },
-        { Pos.x + Size.x, Pos.y + Size.y, 0.0f, 1.0f, OtherColor }
+        { Pos.x, Pos.y, 0.0f, 1.0f, LColor },
+        { Pos.x + Size.x, Pos.y, 0.0f, 1.0f, (Vertical && BROtherColor == 0x0) ? LColor : ROtherColor },
+        { Pos.x, Pos.y + Size.y, 0.0f, 1.0f, (BLColor == 0x0 ? (Vertical ? ROtherColor : LColor) : BLColor) },
+        { Pos.x + Size.x, Pos.y + Size.y, 0.0f, 1.0f, BROtherColor == 0x0 ? ROtherColor : BROtherColor }
     };
 
     m_Device->SetFVF(D3DFVF_XYZRHW | D3DFVF_DIFFUSE);

@@ -10,6 +10,32 @@ using namespace IdaLovesMe;
 using namespace Globals;
 
 GuiContext* IdaLovesMe::Globals::Gui_Ctx = NULL;
+std::vector<DrawList::RenderObject> DrawList::Drawlist;
+
+void DrawList::AddText(const char* text, int x, int y, D3DCOLOR Color, LPD3DXFONT font, bool bordered) {
+	auto obj = new RenderObject(DrawType_Text, Vec2(x, y), Vec2(0, 0), Color, text, font, bordered, NULL, false);
+
+	DrawList::Drawlist.push_back(*obj);
+}
+
+void DrawList::AddFilledRect(Vec2 Pos, Vec2 Size, D3DCOLOR Color) {
+	auto obj = new RenderObject(DrawType_FilledRect, Pos, Size, Color, NULL, NULL, false, NULL, false);
+
+	DrawList::Drawlist.push_back(*obj);
+}
+
+void DrawList::AddRect(Vec2 Pos, Vec2 Size, D3DCOLOR Color) {
+	auto obj = new RenderObject(DrawType_Rect, Pos, Size, Color, NULL, NULL, false, NULL, false);
+
+	DrawList::Drawlist.push_back(*obj);
+}
+
+void DrawList::AddGradient(Vec2 Pos, Vec2 Size, D3DCOLOR LColor, D3DCOLOR ROtherColor, D3DCOLOR BLColor, D3DCOLOR BROtherColor, bool Vertical) {
+	D3DCOLOR Buffer[4] = { LColor, ROtherColor, BLColor, BROtherColor };
+	auto obj = new RenderObject(DrawType_Gradient, Pos, Size, NULL, NULL, NULL, false, Buffer, Vertical);
+
+	DrawList::Drawlist.push_back(*obj);
+}
 
 void ui::Shutdown(GuiContext* context) {
 	GuiContext& g = *context;
@@ -370,18 +396,18 @@ void ui::Begin(const char* Name, GuiFlags flags) {
 		g.NextWindowInfo.PosCond = false;
 	}
 
-	if ((Window->Flags & GuiFlags_ChildWindow) || (Window->Flags & GuiFlags_ComboBox) || (Window->Flags & GuiFlags_ColorPicker) && g.NextWindowInfo.SizeCond) {
+	if ((Window->Flags & GuiFlags_ChildWindow) || (Window->Flags & GuiFlags_PopUp) && g.NextWindowInfo.SizeCond) {
 		Window->Size = g.NextWindowInfo.Size;
 		g.NextWindowInfo.SizeCond = false;
 	}
 
-	if (!(Window->Flags & GuiFlags_ChildWindow) && !(Window->Flags & GuiFlags_ComboBox) && !(Window->Flags & GuiFlags_ColorPicker) && !ui::ChildsAreStable(Window))
+	if (!(Window->Flags & GuiFlags_ChildWindow) && !(Window->Flags & GuiFlags_PopUp)  && !ui::ChildsAreStable(Window))
 		Window->Block = true;
 	else
 		Window->Block = false;
 
 	//Handle Resize and Moving
-	if (!Window->Block && !(flags & GuiFlags_ChildWindow) && !(Window->Flags & GuiFlags_ComboBox)) {
+	if (!Window->Block && !(flags & GuiFlags_ChildWindow) && !(Window->Flags & GuiFlags_PopUp)) {
 		HandleMoving(Window, Rect{});
 		HandleResize(Window, Rect{ Vec2(660, 560), Vec2(1920, 1080) });
 	}
@@ -399,10 +425,7 @@ void ui::Begin(const char* Name, GuiFlags flags) {
 	Render::Draw->GetD3dDevice()->SetScissorRect(&ClipRect);
 
 	//Drawing
-	if (!(flags & GuiFlags_ChildWindow) && !(flags & GuiFlags_ComboBox)) {
-		
-		DrawList::AddFilledRect(500, 500, 200, 200, 35, 35, 35, 255);
-		DrawList::AddText(505, 505, "i love ida", 255, 255, 255, 255, Render::Fonts::Verdana);
+	if (!(flags & GuiFlags_ChildWindow) && !(flags & GuiFlags_PopUp)) {
 
 		Render::Draw->Sprite(Render::Draw->GetBgTexture(), Window->Pos, Window->Size, D3DCOLOR_RGBA(255, 255, 255, g.MenuAlpha));
 
@@ -454,8 +477,13 @@ void ui::Begin(const char* Name, GuiFlags flags) {
 		Render::Draw->GetD3dDevice()->SetRenderState(D3DRS_SCISSORTESTENABLE, TRUE);
 	}
 	else if ((flags & GuiFlags_ComboBox) && Window->Opened) {
-		Render::Draw->Rect(Window->Pos, Window->Size, 1, D3DCOLOR_RGBA(12, 12, 12, g.MenuAlpha));
-		Render::Draw->FilledRect(Window->Pos + Vec2(1, 1), Window->Size - Vec2(2, 2), D3DCOLOR_RGBA(35, 35, 35, g.MenuAlpha));
+		DrawList::AddRect(Window->Pos, Window->Size, D3DCOLOR_RGBA(12, 12, 12, g.MenuAlpha));
+		DrawList::AddFilledRect(Window->Pos + Vec2(1, 1), Window->Size - Vec2(2, 2), D3DCOLOR_RGBA(35, 35, 35, g.MenuAlpha));
+	}
+	else if ((flags & GuiFlags_ColorPicker && Window->Opened)) {
+		DrawList::AddRect(Window->Pos, Window->Size, D3DCOLOR_RGBA(12, 12, 12, g.MenuAlpha));
+		DrawList::AddRect(Window->Pos + Vec2(1, 1), Window->Size - Vec2(2, 2), D3DCOLOR_RGBA(60, 60, 60, g.MenuAlpha));
+		DrawList::AddFilledRect(Window->Pos + Vec2(2, 2), Window->Size - Vec2(4, 4), D3DCOLOR_RGBA(40, 40, 40, g.MenuAlpha));
 	}
 
 	SetCurrentWindow(Window);
@@ -466,10 +494,14 @@ void ui::End() {
 
 	if (GetCurrentWindow()->Flags == GuiFlags_None) {
 		for (const auto obj : DrawList::Drawlist) {
-			if (obj.type == "text")
-				Render::Draw->Text(obj.text, obj.x, obj.y, LEFT, obj.font, false, D3DCOLOR_RGBA(obj.r, obj.g, obj.b, obj.a));
-			else if (obj.type == "filledrect")
-				Render::Draw->FilledRect(Vec2(obj.x, obj.y), Vec2(obj.w, obj.h), D3DCOLOR_RGBA(obj.r, obj.g, obj.b, obj.a));
+			if (obj.Type == DrawType_Text)
+				Render::Draw->Text(obj.Text, obj.Pos.x, obj.Pos.y, LEFT, obj.Font, false, obj.Color);
+			else if (obj.Type == DrawType_FilledRect)
+				Render::Draw->FilledRect(obj.Pos, obj.Size, obj.Color);
+			else if (obj.Type == DrawType_Rect)
+				Render::Draw->Rect(obj.Pos, obj.Size, 1, obj.Color);
+			else if (obj.Type == DrawType_Gradient)
+				Render::Draw->Gradient(obj.Pos, obj.Size, obj.GradientColors[0], obj.GradientColors[1], obj.Vertical, obj.GradientColors[2], obj.GradientColors[3]);
 		}
 
 		DrawList::Drawlist.clear();
@@ -714,9 +746,9 @@ bool ui::Selectable(const char* label, bool selected, GuiFlags flags, const Vec2
 	AddItemToWindow(Window, Framebb, Window->Flags);
 
 	if (hovered)
-		Render::Draw->FilledRect(Framebb.Min, Framebb.Max, D3DCOLOR_RGBA(25, 25, 25, g.MenuAlpha));
+		DrawList::AddFilledRect(Framebb.Min, Framebb.Max, D3DCOLOR_RGBA(25, 25, 25, g.MenuAlpha));
 
-	Render::Draw->Text(label, Framebb.Min.x + 10, Framebb.Min.y + (Framebb.Max.y / 2) - label_size.y / 2, LEFT, TextFont, false, TextColor);
+	DrawList::AddText(label, Framebb.Min.x + 10, Framebb.Min.y + (Framebb.Max.y / 2) - label_size.y / 2, TextColor, TextFont, false);
 
 	return (flags & GuiFlags_SingleSelect) ? held : pressed;
 }
@@ -725,7 +757,7 @@ bool ui::BeginCombo(const char* label, const char* preview_value, int items, Gui
 	GuiContext& g = *Gui_Ctx;
 	GuiWindow* Window = GetCurrentWindow();
 
-	flags |= GuiFlags_ComboBox;
+	flags |= GuiFlags_PopUp | GuiFlags_ComboBox;
 
 	Vec2 label_size = Render::Draw->GetTextSize(Render::Fonts::Verdana, label);
 	Vec2 preview_size = Render::Draw->GetTextSize(Render::Fonts::Verdana, preview_value);
@@ -840,7 +872,7 @@ bool ui::ColorPicker(const char* label, int col[4], GuiFlags flags) {
 	GuiContext& g = *Gui_Ctx;
 	GuiWindow* Window = GetCurrentWindow();
 
-	flags |= GuiFlags_ColorPicker;
+	flags |= GuiFlags_PopUp | GuiFlags_ColorPicker;
 
 	Rect Fullbb = { Window->Pos.x + Window->Size.x - 41, Window->PevCursorPos.y , 17, 9 };
 
@@ -853,17 +885,34 @@ bool ui::ColorPicker(const char* label, int col[4], GuiFlags flags) {
 	Render::Draw->FilledRect(Fullbb.Min + Vec2(1, 1), Fullbb.Max - Vec2(2, 2), D3DCOLOR_RGBA(col[0], col[1], col[2], g.MenuAlpha));
 	//Render::Draw->Gradient(Fullbb.Min + Vec2(1, 1), Fullbb.Max - Vec2(2, 2), D3DCOLOR_RGBA(0, 0, 0, g.MenuAlpha), D3DCOLOR_RGBA(0, 0, 0, g.MenuAlpha), true);
 
-	//SetNextWindowPos(Fullbb.Min + Vec2(0, Fullbb.Max.y + 1));
-	//SetNextWindowSize(Vec2(180, 175));
+	SetNextWindowPos(Fullbb.Min + Vec2(-1, Fullbb.Max.y + 1));
+	SetNextWindowSize(Vec2(180, 175));
 
-	//Begin();
-	//if (pressed)
-		//Popup->Opened = !Popup->Opened;
+	Begin(label, flags);
+	GuiWindow* PopUp = GetCurrentWindow();
+	PopUp->ParentWindow = Window;
 
-	//Render::Draw->Text(preview_value, Framebb.Min.x + 10, Framebb.Min.y + (Framebb.Max.y / 2) - preview_size.y / 2, LEFT, Render::Fonts::Verdana, false, D3DCOLOR_RGBA(157, 157, 157, g.MenuAlpha));
-	//SetNextWindowPos(Fullbb.Min + Vec2(0, Fullbb.Max.y + 1));
-	//SetNextWindowSize(Vec2(Framebb.Max.x, (20 * items) + 2));
+	if (pressed)
+		PopUp->Opened = !PopUp->Opened;
 
-	//Begin(label, flags);
+	if (PopUp->Opened) {
+		DrawList::AddRect(PopUp->Pos + Vec2(4, 4), Vec2(152, 152), D3DCOLOR_RGBA(12, 12, 12, g.MenuAlpha));
+		DrawList::AddGradient(PopUp->Pos + Vec2(5, 5), Vec2(150, 150), D3DCOLOR_RGBA(255, 255, 255, g.MenuAlpha), D3DCOLOR_RGBA(col[0], col[1], col[2], g.MenuAlpha), D3DCOLOR_RGBA(0, 0, 0, g.MenuAlpha), D3DCOLOR_RGBA(0, 0, 0, g.MenuAlpha), false);
+
+		DrawList::AddRect(PopUp->Pos + Vec2(4, 159), Vec2(152, 12), D3DCOLOR_RGBA(12, 12, 12, g.MenuAlpha));
+		DrawList::AddFilledRect(PopUp->Pos + Vec2(5, 160), Vec2(150, 10), D3DCOLOR_RGBA(col[0], col[1], col[2], g.MenuAlpha));
+
+		DrawList::AddRect(PopUp->Pos + Vec2(159, 4), Vec2(17, 152), D3DCOLOR_RGBA(12, 12, 12, g.MenuAlpha));
+
+		const D3DCOLOR hue_colors[6 + 1] = { D3DCOLOR_RGBA(255,0,0,255), D3DCOLOR_RGBA(255,0,255,255), D3DCOLOR_RGBA(0,0,255,255), D3DCOLOR_RGBA(0,255,255,255), D3DCOLOR_RGBA(0,255,0,255), D3DCOLOR_RGBA(255,255,0,255), D3DCOLOR_RGBA(255,0,0,255) };
+		
+		for (int i = 0; i < 6; ++i)
+			DrawList::AddGradient(PopUp->Pos + Vec2(160, 5 + (25 * i)), Vec2(15, 25), hue_colors[i], hue_colors[i + 1], 0UL, 0UL, true);
+		
+	}
+
+	End();
+	SetCurrentWindow(PopUp->ParentWindow);
+
 	return true;
 }
