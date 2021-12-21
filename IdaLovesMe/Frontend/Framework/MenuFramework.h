@@ -47,13 +47,19 @@ namespace IdaLovesMe {
 	};
 
 	enum GuiFlags_ {
-		GuiFlags_None =		   0,
-		GuiFlags_NoMove =	   1 << 0,
-		GuiFlags_NoResize =	   1 << 1,
-		GuiFlags_FloatSlider = 1 << 2,
-		GuiFlags_IntSlider =   1 << 3,
-		GuiFlags_NoTabButton = 1 << 4,
-		GuiFlags_ChildWindow = 1 << 5
+		GuiFlags_None =				 0,
+		GuiFlags_NoMove =			 1 << 0,
+		GuiFlags_NoResize =			 1 << 1,
+		GuiFlags_FloatSlider =		 1 << 2,
+		GuiFlags_IntSlider =		 1 << 3,
+		GuiFlags_NoTabButton =		 1 << 4,
+		GuiFlags_ChildWindow =		 1 << 5,
+		GuiFlags_ReturnKeyReleased = 1 << 6,
+		GuiFlags_ComboBox		   = 1 << 7,
+		GuiFlags_TabButton       = 1 << 8,
+		GuiFlags_CheckBox		 = 1 << 9,
+		GuiFlags_Selectable      = 1 << 10,
+		GuiFlags_Button          = 1 << 11,
 	};
 
 	struct GuiWindow {
@@ -71,11 +77,12 @@ namespace IdaLovesMe {
 		std::string				SelectedItem;
 		int						ItemCount;
 
+		bool					Opened;
 		bool					Dragging;
 		bool					Resizing;
 		bool					Block;
 		bool					Init;
-		bool					ItemActive;
+		std::unordered_map<const char*, bool> ItemActive;
 
 		int					    xSize = 3;
 		int						ySize = 10;
@@ -93,6 +100,7 @@ namespace IdaLovesMe {
 	struct GuiContext {
 		bool					 Initialized;
 		std::vector<GuiWindow*>  Windows;
+		std::vector<GuiWindow*>	 WindowPopups;
 		std::vector<std::string> WindowsByName;
 		GuiWindow*				 CurrentWindow;
 		NextWindowInfo			 NextWindowInfo;
@@ -108,15 +116,16 @@ namespace IdaLovesMe {
 
 	namespace ui {
 		//-------Helpers-------//
+		bool              NoItemsActive(GuiWindow* Window);
 		bool			  IsInside(float x, float y, float w, float h);
 		bool			  KeyPressed(const int key);
 		bool			  KeyDown(const int key);
 		bool			  KeyReleased(const int key);
-		bool			  ButtonBehavior(Rect bb, bool& hovered, bool& held, GuiFlags flags = NULL);
+		bool			  ButtonBehavior(GuiWindow* Window, const char* label, Rect bb, bool& hovered, bool& held, GuiFlags flags = NULL);
 		bool			  ChildsAreStable(GuiWindow* Window);
 
 		template		  <typename T>
-		bool			  SliderBehavior(std::string item_id, Rect bb, T value, T min_value, T max_value, GuiFlags flags);
+		bool			  SliderBehavior(const char* item_id, Rect bb, T value, T min_value, T max_value, GuiFlags flags);
 		//
 		//-------Context-------//
 		void			  Shutdown(GuiContext* context);
@@ -146,7 +155,7 @@ namespace IdaLovesMe {
 
 		void			  HandleMoving(GuiWindow* Window, Rect Constraints = Rect{}, Vec2* v = nullptr );
 		void			  HandleResize(GuiWindow* Window, Rect Constraints = Rect{}, Vec2* buffer = nullptr);
-		void			  AddItemToWindow(GuiWindow* Window, Rect size);
+		void			  AddItemToWindow(GuiWindow* Window, Rect size, GuiFlags flags = NULL);
 
 		void			  Begin(const char* Id, GuiFlags flags);
 		void			  End();
@@ -166,12 +175,11 @@ namespace IdaLovesMe {
 		//void			  Multiselect(const char* label, std::unordered_map<int, bool>* data, std::vector<const char*> items);
 		bool			  Button(const char* label, const Vec2& size = Vec2(0,0));
 
-		//int				  SingleSelect(const char* label, int* current_item, std::vector<const char*> items);
-
-		//int				  MultiSelect(const char* label, std::unordered_map<int, bool>* data, std::vector<const char*> items);
-		//bool              Selectable(const char* label, bool selected, GuiFlags flags, const Vec2& size_arg);
-		//bool			  BeginCombo(const char* label, const char* preview_value, GuiFlags flags, int items);
-		//void			  EndCombo();
+		bool			  SingleSelect(const char* label, int* current_item, std::vector<const char*> items);
+		bool			  MultiSelect(const char* label, std::unordered_map<int, bool>* data, std::vector<const char*> items);
+		bool              Selectable(const char* label, bool selected = false, GuiFlags flags = NULL, const Vec2& size_arg = Vec2(0, 0));
+		bool			  BeginCombo(const char* label, const char* preview_value, int items, GuiFlags flags = NULL);
+		void			  EndCombo();
 	}
 
 	namespace Globals {

@@ -35,7 +35,7 @@ void CMenu::Draw()
 	CConfig* cfg = CConfig::get();
 
 	static float alpha = 0;
-	float fc = 255.f / 0.2f * Misc::Utilities->GetDeltaTime();
+	float fc = 255.f / 0.2f * Misc::Utilities->GetDeltaTime() * 255 * 8;
 	if (!this->m_bIsOpened && alpha > 0.f)
 		alpha = std::clamp(alpha - fc / 255.f, 0.f, 1.f);
 
@@ -69,6 +69,7 @@ void CMenu::Draw()
 		ui::SliderInt("Minimum damage", &cfg->i["Uwu"], 0, 126, cfg->i["Uwu"] == 0 ? "Auto" : (cfg->i["Uwu"] > 100 ? "HP+%d" : "%dhp"));
 		ui::SliderFloat("Maximum FOV", &cfg->f["Uwu"], 0.f, 180.f, "%.2f°", 0.1f);
 		ui::Button("Log aimbot shots");
+		ui::SingleSelect("Singelselect 1", &cfg->i["Singelselector"], { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5"});
 		ui::EndChild();
 
 		ui::BeginChild("B", ui::GetWindowPos() + Vec2(100, 30), Vec2(258, 506), false);
@@ -77,6 +78,9 @@ void CMenu::Draw()
 		if (ui::Button("Unload"))
 			Settings->UnloadCheat = true;
 
+		ui::SingleSelect("Singelselect 2", &cfg->i["Singelselecto"], {"Item 1", "Item 2", "Item 3", "Item 4"});
+	
+		//ui::MultiSelect("Multiselector", &cfg->m["MultiSelecto"], { "You are stupido", "Stiko best coder", "gs.digital best", "l0l0l0l" });
 		ui::EndChild();
 	}
 

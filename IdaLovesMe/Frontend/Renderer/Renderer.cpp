@@ -373,7 +373,7 @@ void CDraw::Sprite(LPDIRECT3DTEXTURE9 Texture, Vec2 Pos, Vec2 Size, D3DCOLOR Col
     m_Sprite->End();
 }
 
-void CDraw::Triangle(Vec2 Top, Vec2 Left, Vec2 Right, D3DCOLOR Color)
+void CDraw::Triangle(Vec2 Top, Vec2 Left, Vec2 Right, D3DCOLOR Color, bool antialias)
 {
     vertex vertices[3] =
     {
@@ -384,13 +384,15 @@ void CDraw::Triangle(Vec2 Top, Vec2 Left, Vec2 Right, D3DCOLOR Color)
 
     m_Device->SetFVF(D3DFVF_XYZRHW | D3DFVF_DIFFUSE);
     m_Device->SetTexture(0, nullptr);
-    m_Device->SetRenderState(D3DRS_MULTISAMPLEANTIALIAS, TRUE);
-    m_Device->SetRenderState(D3DRS_ANTIALIASEDLINEENABLE, TRUE);
-
+ 
+    m_Device->SetRenderState(D3DRS_MULTISAMPLEANTIALIAS, antialias ? TRUE : FALSE);
+    m_Device->SetRenderState(D3DRS_ANTIALIASEDLINEENABLE, antialias ? TRUE : FALSE);
+ 
     m_Device->DrawPrimitiveUP(D3DPT_TRIANGLELIST, 1, vertices, sizeof(vertex));
 
-    m_Device->SetRenderState(D3DRS_MULTISAMPLEANTIALIAS, FALSE);
-    m_Device->SetRenderState(D3DRS_ANTIALIASEDLINEENABLE, FALSE);
+    m_Device->SetRenderState(D3DRS_MULTISAMPLEANTIALIAS, antialias ? TRUE : FALSE);
+    m_Device->SetRenderState(D3DRS_ANTIALIASEDLINEENABLE, antialias ? TRUE : FALSE);
+ 
 }
 
 IDirect3DTexture9* CDraw::GetBgTexture() 

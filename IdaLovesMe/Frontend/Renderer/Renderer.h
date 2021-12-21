@@ -52,7 +52,7 @@ namespace Render {
         //void Circle(float x, float y, float radius, int rotate, int type, bool smoothing, int resolution, D3DCOLOR color);
         //void CircleFilled(float x, float y, float rad, float rotate, int type, int resolution, D3DCOLOR color);
 
-        void Triangle(IdaLovesMe::Vec2 Top, IdaLovesMe::Vec2 Left, IdaLovesMe::Vec2 Right, D3DCOLOR Color);
+        void Triangle(IdaLovesMe::Vec2 Top, IdaLovesMe::Vec2 Left, IdaLovesMe::Vec2 Right, D3DCOLOR Color, bool antialias = false);
 
         void Text(const char* Text, float X, float Y, int Orientation, LPD3DXFONT Font, bool Bordered, D3DCOLOR Color, IdaLovesMe::Vec2 MaxSize = IdaLovesMe::Vec2(0, 0));
         //=============================================================================================

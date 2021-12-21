@@ -75,11 +75,11 @@ static GuiWindow* ui::CreateNewWindow(const char*& name, Vec2 size, GuiFlags fla
 	window->Size = size;
 	window->CursorPos = Vec2(0, 0);
 
+	window->Opened = false;
 	window->Resizing = false;
 	window->Dragging = false;
 	window->Block = false;
 	window->ParentWindow = NULL;
-	window->ItemActive = false;
 	window->ChildWindows;
 	window->Buffer = { Vec2(0,0), Vec2(0,0) };
 
@@ -171,7 +171,7 @@ bool ui::KeyDown(const int key) {
 
 bool ui::KeyReleased(const int key) {
 	GuiContext& g = *Gui_Ctx;
-	return !g.KeyState[key] && !g.PrevKeyState[key];
+	return !g.KeyState[key] && g.PrevKeyState[key];
 }
 
 bool ui::IsInside(const float x, const float y, const float w, const float h) {
@@ -179,22 +179,32 @@ bool ui::IsInside(const float x, const float y, const float w, const float h) {
 	return g.MousePos.x > x && g.MousePos.y > y && g.MousePos.x < w + x && g.MousePos.y < h + y;
 }
 
+bool ui::NoItemsActive(GuiWindow* Window) {
+	for (auto& it : Window->ItemActive) {
+		if (it.second)
+			return false;
+	}
+
+	return true;
+}
+
 bool ui::ChildsAreStable(GuiWindow* Window) {
 	for (std::size_t i = 0; i < Window->ChildWindows.size(); i++) {
-		if (Window->ChildWindows[i]->Dragging || Window->ChildWindows[i]->Resizing || Window->ChildWindows[i]->ItemActive)
+		if (Window->ChildWindows[i]->Dragging || Window->ChildWindows[i]->Resizing || !NoItemsActive(Window->ChildWindows[i]))
 			return false;
 	}
 	return true;
 }
 
-void ui::AddItemToWindow(GuiWindow* Window, Rect size) {
+void ui::AddItemToWindow(GuiWindow* Window, Rect size, GuiFlags flags) {
 	GuiContext& g = *Gui_Ctx;
-	Window->CursorPos = Window->CursorPos + Vec2(0, size.Max.y + g.ItemSpacing.y);
+	Window->CursorPos = Window->CursorPos + Vec2(0, size.Max.y + (flags & GuiFlags_ComboBox ? 0 : g.ItemSpacing.y));
 	Window->ItemCount = Window->ItemCount + 1;
 }
 
-bool ui::ButtonBehavior(Rect bb, bool& hovered, bool& held, GuiFlags flags) {
+bool ui::ButtonBehavior(GuiWindow* Window, const char* label, Rect bb, bool& hovered, bool& held, GuiFlags flags) {
 	GuiWindow* current_window = GetCurrentWindow();
+	bool prev_held = held;
 
 	if (IsInside(bb.Min.x, bb.Min.y, bb.Max.x, bb.Max.y))
 		hovered = true;
@@ -206,14 +216,27 @@ bool ui::ButtonBehavior(Rect bb, bool& hovered, bool& held, GuiFlags flags) {
 	else
 		held = false;
 
-	if (hovered && KeyPressed(VK_LBUTTON))
-		return true;
+	if (!(flags & GuiFlags_TabButton) && !(flags & GuiFlags_Selectable) && !(flags & GuiFlags_IntSlider) && !(flags & GuiFlags_ComboBox)) {
+		if (hovered && KeyPressed(VK_LBUTTON) && !Window->ItemActive[label])
+			Window->ItemActive[label] = true;
+		else if (!KeyDown(VK_LBUTTON && Window->ItemActive[label]))
+			Window->ItemActive[label] = false;
+	}
+
+	if (flags & GuiFlags_ReturnKeyReleased) {
+		if (hovered && KeyReleased(VK_LBUTTON))
+			return true;
+	}
+	else {
+		if (hovered && KeyPressed(VK_LBUTTON))
+			return true;
+	}
 
 	return false;
 }
 
 template<typename T>
-bool ui::SliderBehavior(std::string item_id, Rect bb, T value, T min_value, T max_value, GuiFlags flags) {
+bool ui::SliderBehavior(const char* item_id, Rect bb, T value, T min_value, T max_value, GuiFlags flags) {
 	GuiContext& g = *Gui_Ctx;
 	GuiWindow* current_window = GetCurrentWindow();
 	bool hovered;
@@ -223,13 +246,11 @@ bool ui::SliderBehavior(std::string item_id, Rect bb, T value, T min_value, T ma
 	else
 		hovered = false;
 
-	if (hovered && KeyPressed(VK_LBUTTON) && !current_window->Block) {
-		current_window->Block = true;
-		current_window->ItemActive = true;
-		current_window->ParentWindow->Block = true;
+	if (hovered && KeyPressed(VK_LBUTTON)) {
+		current_window->ItemActive[item_id] = true;
 	}
 
-	else if (KeyDown(VK_LBUTTON) && current_window->Block && (hovered || current_window->SelectedItem == item_id)) {
+	else if (KeyDown(VK_LBUTTON) && (hovered || current_window->SelectedItem == item_id)) {
 		current_window->SelectedItem = item_id;
 		if (flags & GuiFlags_FloatSlider)
 			*value = float(std::clamp(g.MousePos.x - bb.Min.x, 0.0f, (bb.Max.x - 1)) / (bb.Max.x - 1) * (*max_value - *min_value) + *min_value);
@@ -237,11 +258,9 @@ bool ui::SliderBehavior(std::string item_id, Rect bb, T value, T min_value, T ma
 			*value = int(std::clamp(g.MousePos.x - bb.Min.x, 0.0f, (bb.Max.x - 1)) / (bb.Max.x - 1) * (*max_value - *min_value) + *min_value);
 	}
 
-	else if (!KeyDown(VK_LBUTTON) && current_window->Block) {
+	else if (!KeyDown(VK_LBUTTON)) {
 		current_window->SelectedItem = "";
-		current_window->Block = false;
-		current_window->ItemActive = false;
-		current_window->ParentWindow->Block = false;
+		current_window->ItemActive[item_id] = false;
 	}
 	return hovered;
 }
@@ -249,11 +268,11 @@ bool ui::SliderBehavior(std::string item_id, Rect bb, T value, T min_value, T ma
 void ui::HandleMoving(GuiWindow* Window, Rect Boundaries, Vec2* buffer) {
 	GuiContext& g = *Gui_Ctx;
 	if (!(Window->Flags & GuiFlags_ChildWindow)) {
-		
+
 		if (IsInside(Window->Pos.x, Window->Pos.y, Window->Size.x, Window->Size.y) && KeyDown(VK_LBUTTON) && !Window->Dragging && !IsInside(Window->Pos.x + Window->Size.x - 15, Window->Pos.y + Window->Size.y - 15, 15, 15) && !Window->Resizing && !Window->Block)
 			Window->Dragging = true;
 
-		else if (KeyDown(VK_LBUTTON) && Window->Dragging && !Window->ItemActive) {
+		else if (KeyDown(VK_LBUTTON) && Window->Dragging) {
 			const Vec2 mouse_delta{ g.MousePos.x - g.PrevMousePos.x , g.MousePos.y - g.PrevMousePos.y };
 			const Vec2 new_position{ Window->Pos.x + mouse_delta.x, Window->Pos.y + mouse_delta.y };
 
@@ -269,13 +288,12 @@ void ui::HandleMoving(GuiWindow* Window, Rect Boundaries, Vec2* buffer) {
 		Vec2 MinSize = Vec2((Boundaries.Max.x - 2.f) * (22.4f / 100.f), (Boundaries.Max.y - 2.f) * (13.4f / 100.f));
 		Vec2 Step = Vec2((Boundaries.Max.x - MinSize.x - 2.f) / 9, (Boundaries.Max.y - MinSize.y - 2) / 10);
 
-		if (IsInside(Window->Pos.x, Window->Pos.y, Window->Size.x, 35) && KeyDown(VK_LBUTTON) && !Window->Dragging && !Window->Resizing && !Window->ParentWindow->Resizing && ui::ChildsAreStable(Window->ParentWindow)) {
+		if (IsInside(Window->Pos.x, Window->Pos.y, Window->Size.x, 35) && KeyDown(VK_LBUTTON) && !Window->Dragging && !Window->Resizing && !Window->ParentWindow->Resizing && ui::ChildsAreStable(Window->ParentWindow) && NoItemsActive(Window)) {
 			ClickPos.x = g.MousePos.x - Window->Pos.x;
 			Window->Dragging = true;
 		}
 
 		else if (KeyDown(VK_LBUTTON) && Window->Dragging) {
-
 			Window->xPos = (int)round((g.MousePos.x - buffer->x - ClickPos.x) / Step.x);
 			Window->yPos = (int)round((g.MousePos.y - buffer->y) / Step.y);
 
@@ -286,33 +304,19 @@ void ui::HandleMoving(GuiWindow* Window, Rect Boundaries, Vec2* buffer) {
 		else if (!KeyDown(VK_LBUTTON) && Window->Dragging)
 			Window->Dragging = false;
 
-		buffer->x += Window->xPos * Step.x; 
-		buffer->y += Window->yPos* Step.y;
+		buffer->x += Window->xPos * Step.x;
+		buffer->y += Window->yPos * Step.y;
 	}
 }
 
 void ui::HandleResize(GuiWindow* Window, Rect Boundaries, Vec2* buffer) {
 	GuiContext& g = *Gui_Ctx;
-	if (!(Window->Flags & GuiFlags_ChildWindow)) {
-		if (IsInside(Window->Pos.x + Window->Size.x - 15, Window->Pos.y + Window->Size.y - 15, 15, 15) && GetAsyncKeyState(VK_LBUTTON) && !Window->Resizing && !Window->Dragging)
+	if (!(Window->Flags & GuiFlags_ChildWindow) && !(Window->Flags & GuiFlags_ComboBox)) {
+		if (IsInside(Window->Pos.x + Window->Size.x - 15, Window->Pos.y + Window->Size.y - 15, 15, 15) && KeyDown(VK_LBUTTON) && !Window->Resizing && !Window->Dragging)
 			Window->Resizing = true;
 		else if (KeyDown(VK_LBUTTON) && Window->Resizing) {
-			const Vec2 mouse_delta{ g.MousePos.x - g.PrevMousePos.x , g.MousePos.y - g.PrevMousePos.y };
-			const Vec2 new_size{ Window->Size.x + mouse_delta.x, Window->Size.y + mouse_delta.y };
-
-			if (new_size.x < Boundaries.Min.x)
-				Window->Size.x = Boundaries.Min.x;
-			else if (new_size.x > Boundaries.Max.x)
-				Window->Size.x = Boundaries.Max.x;
-			else
-				Window->Size.x = new_size.x;
-
-			if (new_size.y < Boundaries.Min.y)
-				Window->Size.y = Boundaries.Min.y;
-			else if (new_size.y > Boundaries.Max.y)
-				Window->Size.y = Boundaries.Max.y;
-			else
-				Window->Size.y = new_size.y;
+			Window->Size.x = std::clamp(g.MousePos.x - Window->Pos.x, Boundaries.Min.x, Boundaries.Max.x);
+			Window->Size.y = std::clamp(g.MousePos.y - Window->Pos.y, Boundaries.Min.y, Boundaries.Max.y);
 		}
 		else if (!ui::KeyDown(VK_LBUTTON) && Window->Resizing)
 			Window->Resizing = false;
@@ -321,7 +325,7 @@ void ui::HandleResize(GuiWindow* Window, Rect Boundaries, Vec2* buffer) {
 		Vec2 MinSize = Vec2((Boundaries.Max.x - 2.f) * (22.4f / 100.f), (Boundaries.Max.y - 2.f) * (13.4f / 100.f));
 		Vec2 Step = Vec2((Boundaries.Max.x - MinSize.x - 2.f) / 9, (Boundaries.Max.y - MinSize.y - 2) / 10);
 
-		if (IsInside(Window->Pos.x + Window->Size.x - 15, Window->Pos.y + Window->Size.y - 15, 15, 15) && KeyDown(VK_LBUTTON) && !Window->Resizing && !Window->Dragging && !Window->ParentWindow->Resizing && ui::ChildsAreStable(Window->ParentWindow))
+		if (IsInside(Window->Pos.x + Window->Size.x - 15, Window->Pos.y + Window->Size.y - 15, 15, 15) && KeyDown(VK_LBUTTON) && !Window->Resizing && !Window->Dragging && !Window->ParentWindow->Resizing && ui::ChildsAreStable(Window->ParentWindow) && NoItemsActive(Window))
 			Window->Resizing = true;
 
 		else if (KeyDown(VK_LBUTTON) && Window->Resizing) {
@@ -364,22 +368,18 @@ void ui::Begin(const char* Name, GuiFlags flags) {
 		g.NextWindowInfo.PosCond = false;
 	}
 
-	if (Window->Flags & GuiFlags_ChildWindow) {
-		if (g.NextWindowInfo.SizeCond) {
-			Window->Size = g.NextWindowInfo.Size;
-			g.NextWindowInfo.SizeCond = false;
-		}
+	if ((flags & GuiFlags_ChildWindow) && g.NextWindowInfo.SizeCond) {
+		Window->Size = g.NextWindowInfo.Size;
+		g.NextWindowInfo.SizeCond = false;
 	}
 
-	if (!(Window->Flags & GuiFlags_ChildWindow) && !ui::ChildsAreStable(Window) || Window->ItemActive)
+	if (!(Window->Flags & GuiFlags_ChildWindow) && !(Window->Flags & GuiFlags_ComboBox) && !ui::ChildsAreStable(Window))
 		Window->Block = true;
-	else 
+	else
 		Window->Block = false;
 
-
-
 	//Handle Resize and Moving
-	if (!Window->Block && !(flags & GuiFlags_ChildWindow)) {
+	if (!Window->Block && !(flags & GuiFlags_ChildWindow) && !(Window->Flags & GuiFlags_ComboBox)) {
 		HandleMoving(Window, Rect{});
 		HandleResize(Window, Rect{ Vec2(660, 560), Vec2(1920, 1080) });
 	}
@@ -392,12 +392,12 @@ void ui::Begin(const char* Name, GuiFlags flags) {
 	if (flags & GuiFlags_ChildWindow)
 		ClipRect = { (LONG)Window->Pos.x, (LONG)Window->Pos.y, LONG(Window->Pos.x + Window->Size.x - 15), LONG(Window->Pos.y + Window->Size.y - 3) };
 	else
-		ClipRect = { (LONG)Window->Pos.x, (LONG)Window->Pos.y, LONG(Window->Pos.x + Window->Size.x), LONG(Window->Pos.y + Window->Size.y) };
+		ClipRect = { (LONG)Window->Pos.x, (LONG)Window->Pos.y, LONG(Window->Pos.x + Window->Size.x + 1), LONG(Window->Pos.y + Window->Size.y) };
 
 	Render::Draw->GetD3dDevice()->SetScissorRect(&ClipRect);
 
 	//Drawing
-	if (!(flags & GuiFlags_ChildWindow)) {
+	if (!(flags & GuiFlags_ChildWindow) && !(flags & GuiFlags_ComboBox)) {
 		Render::Draw->Sprite(Render::Draw->GetBgTexture(), Window->Pos, Window->Size, D3DCOLOR_RGBA(255, 255, 255, g.MenuAlpha));
 
 		int OutlineColors[6] = { 12, 61, 43, 43, 43, 61 };
@@ -443,10 +443,15 @@ void ui::Begin(const char* Name, GuiFlags flags) {
 		Render::Draw->Line(Window->Pos + Vec2(1, 1), Window->Pos + Vec2(10, 1), border_color);
 		Render::Draw->Line(Window->Pos + Vec2(16 + label_size.x, 1), Window->Pos + Vec2(Window->Size.x - 1, 1), border_color);
 
-		Render::Draw->Triangle(Window->Pos + Window->Size - Vec2(2, 2), Window->Pos + Window->Size - Vec2(2, 8), Window->Pos + Window->Size - Vec2(8, 2), border_color);
+		Render::Draw->Triangle(Window->Pos + Window->Size - Vec2(2, 2), Window->Pos + Window->Size - Vec2(2, 8), Window->Pos + Window->Size - Vec2(8, 2), border_color, true);
 
 		Render::Draw->GetD3dDevice()->SetRenderState(D3DRS_SCISSORTESTENABLE, TRUE);
 	}
+	else if ((flags & GuiFlags_ComboBox) && Window->Opened) {
+		Render::Draw->Rect(Window->Pos, Window->Size, 1, D3DCOLOR_RGBA(12, 12, 12, g.MenuAlpha));
+		Render::Draw->FilledRect(Window->Pos + Vec2(1, 1), Window->Size - Vec2(2, 2), D3DCOLOR_RGBA(35, 35, 35, g.MenuAlpha));
+	}
+
 	SetCurrentWindow(Window);
 }
 
@@ -477,7 +482,7 @@ void ui::BeginChild(const char* Name, Vec2 default_pos, Vec2 default_size, GuiFl
 				HandleMoving(parent_window->ChildWindows.at(idx), Boundaries, &ChildPos);
 				HandleResize(parent_window->ChildWindows.at(idx), Boundaries, &ChildSize);
 			}
-		
+
 			SetNextWindowPos(ChildPos);
 			SetNextWindowSize(ChildSize);
 		}
@@ -492,15 +497,11 @@ void ui::BeginChild(const char* Name, Vec2 default_pos, Vec2 default_size, GuiFl
 		parent_window->ChildWindows.push_back(FindWindowByName(Name));
 		child_window->Init = true;
 
-		// temp. remove
-		if (child_window->Name == "B") {
+		if (child_window->Name == "B")
 			child_window->xPos = 6;
-		}
 	}
 
 	child_window->CursorPos += Vec2(22, 26);
-
-	parent_window->ItemActive = child_window->ItemActive;
 }
 
 void ui::EndChild() {
@@ -548,7 +549,7 @@ void ui::TabButton(const char* label, int* selected, int num, int total, const i
 	}
 
 	bool hovered, held;
-	bool pressed = ButtonBehavior(bb, hovered, held);
+	bool pressed = ButtonBehavior(Window, label, bb, hovered, held, GuiFlags_TabButton);
 
 	if (pressed && !Window->Resizing && ui::ChildsAreStable(Window))
 		*selected = num;
@@ -567,12 +568,12 @@ void ui::Checkbox(const char* label, bool* v) {
 	GuiWindow* Window = GetCurrentWindow();
 	Vec2 label_size = Render::Draw->GetTextSize(Render::Fonts::Verdana, label);
 	Vec2 DrawPos = Window->CursorPos;
-	Rect total_bb = { DrawPos, label_size + Vec2(22, 0) };
+	Rect total_bb = { DrawPos, label_size + Vec2(150, 0) };
 
 	AddItemToWindow(Window, total_bb);
 
 	bool hovered, held;
-	bool pressed = ButtonBehavior(total_bb, hovered, held);
+	bool pressed = ButtonBehavior(Window, label, total_bb, hovered, held, GuiFlags_CheckBox);
 
 	if (pressed)
 		*v = !*v;
@@ -599,11 +600,11 @@ bool ui::Button(const char* label, const Vec2& size) {
 	AddItemToWindow(Window, bb);
 
 	bool hovered, held;
-	bool pressed = ButtonBehavior(bb, hovered, held, GuiFlags_None);
+	bool pressed = ButtonBehavior(Window, label, bb, hovered, held, GuiFlags_ReturnKeyReleased);
 
 	if (held)
 		Render::Draw->Gradient(bb.Min, bb.Max, D3DCOLOR_RGBA(26, 26, 26, g.MenuAlpha), D3DCOLOR_RGBA(34, 34, 34, g.MenuAlpha), true);
-	else if(hovered)
+	else if (hovered)
 		Render::Draw->Gradient(bb.Min, bb.Max, D3DCOLOR_RGBA(40, 40, 40, g.MenuAlpha), D3DCOLOR_RGBA(32, 32, 32, g.MenuAlpha), true);
 	else
 		Render::Draw->Gradient(bb.Min, bb.Max, D3DCOLOR_RGBA(34, 34, 34, g.MenuAlpha), D3DCOLOR_RGBA(26, 26, 26, g.MenuAlpha), true);
@@ -613,6 +614,7 @@ bool ui::Button(const char* label, const Vec2& size) {
 
 	Vec2 TextPos = Vec2(bb.Min.x + (bb.Max.x / 2) - (label_size.x / 2), bb.Min.y + (bb.Max.y / 2) - (label_size.y / 2));
 
+	Render::Draw->Text(label, std::clamp(TextPos.x + 1, bb.Min.x + 3.f, bb.Min.x + bb.Max.x), TextPos.y + 1, LEFT, Render::Fonts::Verdana, false, D3DCOLOR_RGBA(0, 0, 0, g.MenuAlpha), bb.Min + bb.Max - Vec2(5, 0));
 	Render::Draw->Text(label, std::clamp(TextPos.x, bb.Min.x + 3.f, bb.Min.x + bb.Max.x), TextPos.y, LEFT, Render::Fonts::Verdana, false, D3DCOLOR_RGBA(205, 205, 205, g.MenuAlpha), bb.Min + bb.Max - Vec2(5, 0));
 	return pressed;
 }
@@ -638,13 +640,13 @@ void ui::Slider(const char* label, T* v, T v_min, T v_max, const char* format, G
 	if (slider_hovered = SliderBehavior(label, slider_bb, v, &v_min, &v_max, flags))
 		bg_color = { D3DCOLOR_RGBA(72, 72, 72, g.MenuAlpha), D3DCOLOR_RGBA(92, 92, 92, g.MenuAlpha) };
 
-	if (ButtonBehavior(Rect(slider_bb.Min - Vec2(7, 0), Vec2(7, 7)), hovered, held) || (slider_hovered && KeyPressed(VK_LEFT))) 
+	if (ButtonBehavior(Window, label, Rect(slider_bb.Min - Vec2(7, 0), Vec2(7, 7)), hovered, held, GuiFlags_IntSlider) || (slider_hovered && KeyPressed(VK_LEFT)))
 		*v -= (int)*v - scale >= v_min ? scale : 0;
 
 	if (hovered)
 		bg_color = { D3DCOLOR_RGBA(72, 72, 72, g.MenuAlpha), D3DCOLOR_RGBA(92, 92, 92, g.MenuAlpha) };
 
-	if (ButtonBehavior(Rect(slider_bb.Min + slider_bb.Max - Vec2(0, 7), Vec2(7, 7)), hovered, held) || (slider_hovered && KeyPressed(VK_RIGHT)))
+	if (ButtonBehavior(Window, label, Rect(slider_bb.Min + slider_bb.Max - Vec2(0, 7), Vec2(7, 7)), hovered, held, GuiFlags_IntSlider) || (slider_hovered && KeyPressed(VK_RIGHT)))
 		*v += (int)*v + scale < v_max ? scale : 0;
 
 	if (hovered)
@@ -678,4 +680,130 @@ void ui::SliderFloat(const char* label, float* v, float v_min, float v_max, cons
 
 void ui::SliderInt(const char* label, int* v, int v_min, int v_max, const char* format) {
 	return Slider(label, v, v_min, v_max, format, GuiFlags_IntSlider);
+}
+
+bool ui::Selectable(const char* label, bool selected, GuiFlags flags, const Vec2& size_arg) {
+	GuiContext& g = *Gui_Ctx;
+	GuiWindow* Window = GetCurrentWindow();
+	Rect Framebb{ Window->CursorPos, Vec2(size_arg.x == 0 ? Window->Size.x - 2 : size_arg.x, size_arg.y == 0 ? 20 : size_arg.y) };
+
+	bool hovered, held;
+	bool pressed = ButtonBehavior(Window, label, Framebb, hovered, held, GuiFlags_Selectable);
+
+	LPD3DXFONT TextFont = selected || hovered? Render::Fonts::Tahombd : Render::Fonts::Verdana;
+	Vec2 label_size = Render::Draw->GetTextSize(TextFont, label);
+	D3DCOLOR TextColor = selected ? D3DCOLOR_RGBA(163, 212, 31, g.MenuAlpha) : D3DCOLOR_RGBA(205, 205, 205, g.MenuAlpha);
+
+	AddItemToWindow(Window, Framebb, Window->Flags);
+
+	if (hovered)
+		Render::Draw->FilledRect(Framebb.Min, Framebb.Max, D3DCOLOR_RGBA(25, 25, 25, g.MenuAlpha));
+
+	Render::Draw->Text(label, Framebb.Min.x + 10, Framebb.Min.y + (Framebb.Max.y / 2) - label_size.y / 2, LEFT, TextFont, false, TextColor);
+
+	return pressed;
+}
+
+bool ui::BeginCombo(const char* label, const char* preview_value, int items, GuiFlags flags) {
+	GuiContext& g = *Gui_Ctx;
+	GuiWindow* Window = GetCurrentWindow();
+
+	flags |= GuiFlags_ComboBox;
+
+	Vec2 label_size = Render::Draw->GetTextSize(Render::Fonts::Verdana, label);
+	Vec2 preview_size = Render::Draw->GetTextSize(Render::Fonts::Verdana, preview_value);
+
+	Rect Fullbb = { Window->CursorPos, label_size + Vec2(0, 4 + 20) };
+	Rect Framebb = { Fullbb.Min + Vec2(0, label_size.y + 4), Vec2(std::clamp(Window->Size.x - 90, 63.f, 200.f), 20) };
+
+	bool hovered, held;
+	bool pressed = ButtonBehavior(Window, label, Framebb, hovered, held, GuiFlags_ComboBox);
+
+	bool opened = false;
+
+	AddItemToWindow(Window, Fullbb);
+
+	Render::Draw->Text(label, Fullbb.Min.x, Fullbb.Min.y, LEFT, Render::Fonts::Verdana, false, D3DCOLOR_RGBA(205, 205, 205, g.MenuAlpha));
+
+	if (hovered || opened)
+		Render::Draw->Gradient(Framebb.Min + Vec2(1, 1), Framebb.Max - Vec2(2, 2), D3DCOLOR_RGBA(41, 41, 41, g.MenuAlpha), D3DCOLOR_RGBA(46, 46, 46, g.MenuAlpha), true);
+	else
+		Render::Draw->Gradient(Framebb.Min + Vec2(1, 1), Framebb.Max - Vec2(2, 2), D3DCOLOR_RGBA(31, 31, 31, g.MenuAlpha), D3DCOLOR_RGBA(36, 36, 36, g.MenuAlpha), true);
+
+	Render::Draw->Rect(Framebb.Min, Framebb.Max, 1, D3DCOLOR_RGBA(12, 12, 12, g.MenuAlpha));
+
+	Render::Draw->Text(preview_value, Framebb.Min.x + 10, Framebb.Min.y + (Framebb.Max.y / 2) - preview_size.y / 2, LEFT, Render::Fonts::Verdana, false, D3DCOLOR_RGBA(157, 157, 157, g.MenuAlpha));
+
+	Render::Draw->Line(Framebb.Min + Vec2(Framebb.Max.x - 9, 7), Framebb.Min + Vec2(Framebb.Max.x - 4, 7), D3DCOLOR_RGBA(0, 0, 0, g.MenuAlpha));
+	Render::Draw->Triangle(Framebb.Min + Vec2(Framebb.Max.x - 10, 8), Framebb.Min + Vec2(Framebb.Max.x - 7, 11), Framebb.Min + Vec2(Framebb.Max.x - 5, 8), D3DCOLOR_RGBA(157, 157, 157, g.MenuAlpha));
+
+	SetNextWindowPos(Fullbb.Min + Vec2(0, Fullbb.Max.y + 1));
+	SetNextWindowSize(Vec2(Framebb.Max.x, (20 * items) + 2));
+
+	Begin(label, flags);
+	GuiWindow* Popup = GetCurrentWindow();
+	Popup->ParentWindow = Window;
+
+	Popup->CursorPos += Vec2(1, 1);
+
+	opened = Popup->Opened;
+
+	if (!Popup->Opened && hovered && !Window->ItemActive[label])
+		Window->ItemActive[label] = true;
+	else if (!Popup->Opened && !KeyDown(VK_LBUTTON) && Window->ItemActive[label])
+		Window->ItemActive[label] = false;
+	else if (Popup->Opened && IsInside(Framebb.Min.x, Framebb.Min.y, Framebb.Max.x, Framebb.Max.y + Popup->Size.y) && !Window->ItemActive[label])
+		Window->ItemActive[label] = true;
+	else if (Popup->Opened && !KeyDown(VK_LBUTTON) && Window->ItemActive[label])
+		Window->ItemActive[label] = false;
+
+	if (Popup->Opened && KeyPressed(VK_LBUTTON) && !IsInside(Popup->Pos.x, Popup->Pos.y, Popup->Size.x, Popup->Size.y)) {
+		Popup->Opened = false;
+		return false;
+	}
+
+	if (pressed)
+		Popup->Opened = !Popup->Opened;
+
+	return Popup->Opened;
+}
+
+void ui::EndCombo() {
+	GuiWindow* PopUpWindow = GetCurrentWindow();
+
+	PopUpWindow->ItemCount = 0;
+
+	SetCurrentWindow(PopUpWindow->ParentWindow);
+}
+
+bool ui::SingleSelect(const char* label, int* current_item, std::vector<const char*> items) {
+	*current_item = std::clamp(*current_item, 0, int(items.size() - 1));
+
+	int old_item = *current_item;
+
+	if (ui::BeginCombo(label, items.at(*current_item), items.size())) {
+		for (int i = 0; i < items.size(); i++)
+			if (ui::Selectable(items.at(i), *current_item == i))
+				*current_item = i;
+
+		if (*current_item != old_item)
+			GetCurrentWindow()->Opened = false;
+	}
+	ui::EndCombo();
+
+	return old_item != *current_item;
+}
+
+bool ui::MultiSelect(const char* label, std::unordered_map<int, bool>* data, std::vector<const char*> items) {
+	std::unordered_map<int, bool> old_data = *data;
+
+	std::string preview_str = "Niga";
+
+	if (ui::BeginCombo(label, preview_str.c_str(), items.size())) {
+		for (size_t i = 0; i < items.size(); i++)
+			ui::Selectable(items.at(i), false);
+	}
+	ui::EndCombo();
+
+	return old_data != *data;
 }
