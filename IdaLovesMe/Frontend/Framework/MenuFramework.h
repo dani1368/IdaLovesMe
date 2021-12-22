@@ -59,8 +59,9 @@ namespace IdaLovesMe {
 			bool		 Bordered;
 			D3DCOLOR     GradientColors[4] = {0, 0, 0, 0};
 			bool		 Vertical = false;
+			Vec2		 TextClipSize;
 
-			RenderObject(DrawListType Type, Vec2 Pos, Vec2 Size, D3DCOLOR color, const char* text, LPD3DXFONT font, bool Bordered, D3DCOLOR GradientColors[], bool Vertical) {
+			RenderObject(DrawListType Type, Vec2 Pos, Vec2 Size, D3DCOLOR color, const char* text, LPD3DXFONT font, bool Bordered, D3DCOLOR GradientColors[], bool Vertical, Vec2 TextClipSize) {
 				this->Type = Type;
 				this->Pos = Pos;
 				this->Size = Size;
@@ -73,11 +74,12 @@ namespace IdaLovesMe {
 						this->GradientColors[i] = GradientColors[i];
 					
 				this->Vertical = Vertical;
+				this->TextClipSize = TextClipSize;
 			}
 		};
 	public:
 		static std::vector<RenderObject> Drawlist;
-		static void AddText(const char* text, int x, int y, D3DCOLOR Color, LPD3DXFONT font, bool Bordered);
+		static void AddText(const char* text, int x, int y, D3DCOLOR Color, LPD3DXFONT font, bool Bordered = false, Vec2 TextClipSize = Vec2(0, 0));
 		static void AddFilledRect(Vec2 Pos, Vec2 Size, D3DCOLOR Color);
 		static void AddRect(Vec2 Pos, Vec2 Size, D3DCOLOR Color);
 		static void	AddGradient(Vec2 Pos, Vec2 Size, D3DCOLOR LColor, D3DCOLOR ROtherColor, D3DCOLOR BLColor = 0x0, D3DCOLOR BROtherColor = 0x0, bool Vertical = false);

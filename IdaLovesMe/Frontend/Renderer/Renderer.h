@@ -18,6 +18,8 @@ struct vertex
 
 namespace Render {
 
+    using namespace IdaLovesMe;
+
     namespace Fonts
     {
         extern LPD3DXFONT TabIcons;
@@ -37,24 +39,24 @@ namespace Render {
             float y_center;
         } Screen;
 
-        void Sprite(LPDIRECT3DTEXTURE9 Texture, IdaLovesMe::Vec2 Pos, IdaLovesMe::Vec2 Size, D3DCOLOR Color);
+        void Sprite(LPDIRECT3DTEXTURE9 Texture, Vec2 Pos, Vec2 Size, D3DCOLOR Color);
 
         //=============================================================================================
-        void Line(IdaLovesMe::Vec2 Pos, IdaLovesMe::Vec2 Pos2, DWORD Color);
+        void Line(Vec2 Pos, Vec2 Pos2, DWORD Color);
 
-        void Rect(IdaLovesMe::Vec2 Pos, IdaLovesMe::Vec2 Size, float linewidth, D3DCOLOR Color);
-        void FilledRect(IdaLovesMe::Vec2 Pos, IdaLovesMe::Vec2 Size, D3DCOLOR color);
-        void BorderedRect(IdaLovesMe::Vec2 Pos, IdaLovesMe::Vec2 Size, float BorderWidth, D3DCOLOR Color, D3DCOLOR BorderColor);
+        void Rect(Vec2 Pos, Vec2 Size, float linewidth, D3DCOLOR Color);
+        void FilledRect(Vec2 Pos, Vec2 Size, D3DCOLOR color);
+        void BorderedRect(Vec2 Pos, Vec2 Size, float BorderWidth, D3DCOLOR Color, D3DCOLOR BorderColor);
         //void RoundedRect(float x, float y, float w, float h, float radius, bool smoothing, D3DCOLOR color, D3DCOLOR bcolor);
 
-        void Gradient(IdaLovesMe::Vec2 Pos, IdaLovesMe::Vec2 Size, D3DCOLOR LColor, D3DCOLOR ROtherColor, bool Vertical = false, D3DCOLOR BLColor = 0x0, D3DCOLOR BROtherColor = 0x0);
+        void Gradient(Vec2 Pos, Vec2 Size, D3DCOLOR LColor, D3DCOLOR ROtherColor, bool Vertical = false, D3DCOLOR BLColor = 0x0, D3DCOLOR BROtherColor = 0x0);
        
         //void Circle(float x, float y, float radius, int rotate, int type, bool smoothing, int resolution, D3DCOLOR color);
         //void CircleFilled(float x, float y, float rad, float rotate, int type, int resolution, D3DCOLOR color);
 
-        void Triangle(IdaLovesMe::Vec2 Top, IdaLovesMe::Vec2 Left, IdaLovesMe::Vec2 Right, D3DCOLOR Color, bool antialias = false);
+        void Triangle(Vec2 Top, Vec2 Left, Vec2 Right, D3DCOLOR Color, bool antialias = false);
 
-        void Text(const char* Text, float X, float Y, int Orientation, LPD3DXFONT Font, bool Bordered, D3DCOLOR Color, IdaLovesMe::Vec2 MaxSize = IdaLovesMe::Vec2(0, 0));
+        void Text(const char* Text, float X, float Y, int Orientation, LPD3DXFONT Font, bool Bordered, D3DCOLOR Color, Vec2 MaxSize = Vec2(0, 0));
         //=============================================================================================
 
   
@@ -65,7 +67,7 @@ namespace Render {
         void Reset();
         //=============================================================================================
         IDirect3DTexture9* GetBgTexture();
-        IdaLovesMe::Vec2   GetTextSize(ID3DXFont* Font, const char * Text);
+        Vec2   GetTextSize(ID3DXFont* Font, const char * Text);
         LPDIRECT3DDEVICE9   GetD3dDevice();
         //=============================================================================================
 
