@@ -326,12 +326,12 @@ void CDraw::Gradient(Vec2 Pos, Vec2 Size, D3DCOLOR LColor, D3DCOLOR ROtherColor,
     m_Device->SetRenderState(D3DRS_ANTIALIASEDLINEENABLE, TRUE);
 }
 
-void CDraw::Text(const char* text, float x_, float y_, int Orientation, LPD3DXFONT Font, bool Bordered, D3DCOLOR Color, Vec2 MaxSize)
+void CDraw::Text(const char* text, float x_, float y_, int Orientation, LPD3DXFONT Font, bool Bordered, D3DCOLOR Color, Vec2 TextClipSize)
 {
     int x((int)x_), y((int)y_);
 
-    bool NoClipRect = (MaxSize.x == 0 && MaxSize.y == 0) ? true : false;
-    DWORD TextFlags;
+    bool NoClipRect = (TextClipSize.x == 0 && TextClipSize.y == 0) ? true : false;
+    DWORD TextFlags = 0x0;
 
     RECT rect;
     switch (Orientation) 
@@ -343,17 +343,17 @@ void CDraw::Text(const char* text, float x_, float y_, int Orientation, LPD3DXFO
 
     if (Bordered)
     {
-        NoClipRect ? SetRect(&rect, x - 1, y, x - 1, y) : SetRect(&rect, x - 1, y, (int)MaxSize.x - 1, (int)MaxSize.y);
+        NoClipRect ? SetRect(&rect, x - 1, y, x - 1, y) : SetRect(&rect, x - 1, y, (int)TextClipSize.x - 1, (int)TextClipSize.y);
         Font->DrawTextA(NULL, text, -1, &rect, TextFlags, D3DCOLOR_RGBA(0, 0, 0, get_a(Color)));
-        NoClipRect ? SetRect(&rect, x - 1, y, x - 1, y) : SetRect(&rect, x + 1, (int)MaxSize.y, (int)MaxSize.x + 1, (int)MaxSize.y);
+        NoClipRect ? SetRect(&rect, x - 1, y, x - 1, y) : SetRect(&rect, x + 1, (int)TextClipSize.y, (int)TextClipSize.x + 1, (int)TextClipSize.y);
         Font->DrawTextA(NULL, text, -1, &rect, TextFlags, D3DCOLOR_RGBA(0, 0, 0, get_a(Color)));
-        NoClipRect ? SetRect(&rect, x, y - 1, x, y - 1) : SetRect(&rect, x, y - 1, (int)MaxSize.x, (int)MaxSize.y - 1);
+        NoClipRect ? SetRect(&rect, x, y - 1, x, y - 1) : SetRect(&rect, x, y - 1, (int)TextClipSize.x, (int)TextClipSize.y - 1);
         Font->DrawTextA(NULL, text, -1, &rect, TextFlags, D3DCOLOR_RGBA(0, 0, 0, get_a(Color)));
-        NoClipRect ? SetRect(&rect, x, y + 1, x, y + 1) : SetRect(&rect, x, y + 1, (int)MaxSize.x, (int)MaxSize.y + 1);
+        NoClipRect ? SetRect(&rect, x, y + 1, x, y + 1) : SetRect(&rect, x, y + 1, (int)TextClipSize.x, (int)TextClipSize.y + 1);
         Font->DrawTextA(NULL, text, -1, &rect, TextFlags, D3DCOLOR_RGBA(0, 0, 0, get_a(Color)));
     }
 
-    NoClipRect ? SetRect(&rect, x, y, x, y) : SetRect(&rect, x, y, (int)MaxSize.x, (int)MaxSize.y);
+    NoClipRect ? SetRect(&rect, x, y, x, y) : SetRect(&rect, x, y, (int)TextClipSize.x, (int)TextClipSize.y);
     Font->DrawTextA(NULL, text, -1, &rect, TextFlags, Color);
 }
 

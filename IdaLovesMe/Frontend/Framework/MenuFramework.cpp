@@ -11,27 +11,27 @@ using namespace Globals;
 GuiContext* IdaLovesMe::Globals::Gui_Ctx = NULL;
 std::vector<DrawList::RenderObject> DrawList::Drawlist;
 
-void DrawList::AddText(const char* text, int x, int y, D3DCOLOR Color, LPD3DXFONT font, bool bordered) {
-	auto obj = new RenderObject(DrawType_Text, Vec2(x, y), Vec2(0, 0), Color, text, font, bordered, NULL, false);
+void DrawList::AddText(const char* text, int x, int y, D3DCOLOR Color, LPD3DXFONT font, bool bordered, Vec2 TextClipSize) {
+	auto obj = new RenderObject(DrawType_Text, Vec2(x, y), Vec2(0, 0), Color, text, font, bordered, NULL, false, TextClipSize);
 
 	DrawList::Drawlist.push_back(*obj);
 }
 
 void DrawList::AddFilledRect(Vec2 Pos, Vec2 Size, D3DCOLOR Color) {
-	auto obj = new RenderObject(DrawType_FilledRect, Pos, Size, Color, NULL, NULL, false, NULL, false);
+	auto obj = new RenderObject(DrawType_FilledRect, Pos, Size, Color, NULL, NULL, false, NULL, false, Vec2(0,0));
 
 	DrawList::Drawlist.push_back(*obj);
 }
 
 void DrawList::AddRect(Vec2 Pos, Vec2 Size, D3DCOLOR Color) {
-	auto obj = new RenderObject(DrawType_Rect, Pos, Size, Color, NULL, NULL, false, NULL, false);
+	auto obj = new RenderObject(DrawType_Rect, Pos, Size, Color, NULL, NULL, false, NULL, false, Vec2(0, 0));
 
 	DrawList::Drawlist.push_back(*obj);
 }
 
 void DrawList::AddGradient(Vec2 Pos, Vec2 Size, D3DCOLOR LColor, D3DCOLOR ROtherColor, D3DCOLOR BLColor, D3DCOLOR BROtherColor, bool Vertical) {
 	D3DCOLOR Buffer[4] = { LColor, ROtherColor, BLColor, BROtherColor };
-	auto obj = new RenderObject(DrawType_Gradient, Pos, Size, NULL, NULL, NULL, false, Buffer, Vertical);
+	auto obj = new RenderObject(DrawType_Gradient, Pos, Size, NULL, NULL, NULL, false, Buffer, Vertical, Vec2(0, 0));
 
 	DrawList::Drawlist.push_back(*obj);
 }
@@ -414,15 +414,6 @@ void ui::Begin(const char* Name, GuiFlags flags) {
 	Window->CursorPos = Window->Pos;
 	Window->Flags = flags;
 
-	static RECT ClipRect;
-
-	if (flags & GuiFlags_ChildWindow)
-		ClipRect = { (LONG)Window->Pos.x, (LONG)Window->Pos.y, LONG(Window->Pos.x + Window->Size.x - 15), LONG(Window->Pos.y + Window->Size.y - 3) };
-	else
-		ClipRect = { (LONG)Window->Pos.x, (LONG)Window->Pos.y, LONG(Window->Pos.x + Window->Size.x + 1), LONG(Window->Pos.y + Window->Size.y) };
-
-	Render::Draw->GetD3dDevice()->SetScissorRect(&ClipRect);
-
 	//Drawing
 	if (!(flags & GuiFlags_ChildWindow) && !(flags & GuiFlags_PopUp)) {
 		Render::Draw->Sprite(Render::Draw->GetBgTexture(), Window->Pos, Window->Size, D3DCOLOR_RGBA(255, 255, 255, g.MenuAlpha));
@@ -471,8 +462,6 @@ void ui::Begin(const char* Name, GuiFlags flags) {
 		Render::Draw->Line(Window->Pos + Vec2(16 + label_size.x, 1), Window->Pos + Vec2(Window->Size.x - 1, 1), border_color);
 
 		Render::Draw->Triangle(Window->Pos + Window->Size - Vec2(2, 2), Window->Pos + Window->Size - Vec2(2, 8), Window->Pos + Window->Size - Vec2(8, 2), border_color, true);
-
-		Render::Draw->GetD3dDevice()->SetRenderState(D3DRS_SCISSORTESTENABLE, TRUE);
 	}
 	else if ((flags & GuiFlags_ComboBox) && Window->Opened) {
 		DrawList::AddRect(Window->Pos, Window->Size, D3DCOLOR_RGBA(12, 12, 12, g.MenuAlpha));
@@ -488,12 +477,11 @@ void ui::Begin(const char* Name, GuiFlags flags) {
 }
 
 void ui::End() {
-	Render::Draw->GetD3dDevice()->SetRenderState(D3DRS_SCISSORTESTENABLE, FALSE);
 
 	if (GetCurrentWindow()->Flags == GuiFlags_None) {
 		for (const auto obj : DrawList::Drawlist) {
 			if (obj.Type == DrawType_Text)
-				Render::Draw->Text(obj.Text, obj.Pos.x, obj.Pos.y, LEFT, obj.Font, false, obj.Color);
+				Render::Draw->Text(obj.Text, obj.Pos.x, obj.Pos.y, LEFT, obj.Font, false, obj.Color, obj.TextClipSize);
 			else if (obj.Type == DrawType_FilledRect)
 				Render::Draw->FilledRect(obj.Pos, obj.Size, obj.Color);
 			else if (obj.Type == DrawType_Rect)
@@ -540,6 +528,12 @@ void ui::BeginChild(const char* Name, Vec2 default_pos, Vec2 default_size, GuiFl
 	GuiWindow* child_window = GetCurrentWindow();
 	child_window->ParentWindow = parent_window;
 
+	RECT ClipRect = { (LONG)child_window->Pos.x, (LONG)child_window->Pos.y, LONG(child_window->Pos.x + child_window->Size.x - 15), LONG(child_window->Pos.y + child_window->Size.y - 3) };
+
+	Render::Draw->GetD3dDevice()->SetScissorRect(&ClipRect);
+
+	Render::Draw->GetD3dDevice()->SetRenderState(D3DRS_SCISSORTESTENABLE, TRUE);
+
 	if (!child_window->Init) {
 		parent_window->ChildWindows.push_back(FindWindowByName(Name));
 		child_window->Init = true;
@@ -566,7 +560,7 @@ void ui::EndChild() {
 
 	window->ItemCount = 0;
 
-	ui::End();
+	Render::Draw->GetD3dDevice()->SetRenderState(D3DRS_SCISSORTESTENABLE, FALSE);
 
 	Render::Draw->Text(window->Name.c_str(), window->Pos.x + 13, window->Pos.y + (text_size.y / -2), LEFT, Render::Fonts::Tahombd, false, window->Dragging ? D3DCOLOR_RGBA(173, 244, 5, g.MenuAlpha) : D3DCOLOR_RGBA(205, 205, 205, g.MenuAlpha));
 
@@ -746,7 +740,7 @@ bool ui::Selectable(const char* label, bool selected, GuiFlags flags, const Vec2
 	if (hovered)
 		DrawList::AddFilledRect(Framebb.Min, Framebb.Max, D3DCOLOR_RGBA(25, 25, 25, g.MenuAlpha));
 
-	DrawList::AddText(label, Framebb.Min.x + 10, Framebb.Min.y + (Framebb.Max.y / 2) - label_size.y / 2, TextColor, TextFont, false);
+	DrawList::AddText(label, Framebb.Min.x + 10, Framebb.Min.y + (Framebb.Max.y / 2) - label_size.y / 2, TextColor, TextFont, false, Framebb.Min + Framebb.Max - Vec2(15, 0));
 
 	return (flags & GuiFlags_SingleSelect) ? held : pressed;
 }
@@ -818,8 +812,6 @@ bool ui::BeginCombo(const char* label, const char* preview_value, int items, Gui
 void ui::EndCombo() {
 	GuiWindow* PopUpWindow = GetCurrentWindow();
 
-	Render::Draw->GetD3dDevice()->SetRenderState(D3DRS_SCISSORTESTENABLE, FALSE);
-
 	PopUpWindow->ItemCount = 0;
 	
 	SetCurrentWindow(PopUpWindow->ParentWindow);
@@ -875,7 +867,7 @@ bool ui::ColorPicker(const char* label, int col[4], GuiFlags flags) {
 	Rect Fullbb = { Window->Pos.x + Window->Size.x - 41, Window->PevCursorPos.y , 17, 9 };
 
 	bool hovered, held;
-	bool pressed = ButtonBehavior(Window, label, Fullbb, hovered, held, GuiFlags_ComboBox | GuiFlags_ReturnKeyReleased);
+	bool pressed = ButtonBehavior(Window, label, Fullbb, hovered, held, GuiFlags_ColorPicker | GuiFlags_ReturnKeyReleased);
 
 	AddItemToWindow(Window, Fullbb, GuiFlags_ColorPicker);
 
