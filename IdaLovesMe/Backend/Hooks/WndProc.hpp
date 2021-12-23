@@ -17,10 +17,16 @@ namespace Hooked
 				if (wParam == CMenu::get()->Menu_key && (IdaLovesMe::Globals::Gui_Ctx->MenuAlpha == 255 || IdaLovesMe::Globals::Gui_Ctx->MenuAlpha == 0))
 					CMenu::get()->SetMenuOpened(!CMenu::get()->IsMenuOpened());
 
+		if (msg == WM_MOUSEWHEEL) {
+			if (IdaLovesMe::Globals::Gui_Ctx)
+				IdaLovesMe::Globals::Gui_Ctx->MouseWheel += GET_WHEEL_DELTA_WPARAM(wParam) > 0 ? +1.0f : -1.0f;
+		}
+			
+
 		if (CMenu::get()->IsMenuOpened()) {
 			Misc::Utilities->WndProcHandler(window, msg, wParam, lParam);
 
-			if (wParam != 'W' && wParam != 'A' && wParam != 'S' && wParam != 'D' && wParam != VK_SHIFT && wParam != VK_CONTROL && wParam != VK_TAB && wParam != VK_SPACE)
+			if (wParam == VK_LBUTTON || wParam == VK_RBUTTON)
 				return true;
 		}
 

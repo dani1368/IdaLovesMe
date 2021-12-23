@@ -3,6 +3,7 @@
 
 #include <unordered_map>
 
+
 typedef int GuiFlags;
 typedef int DrawListType;
 
@@ -139,6 +140,7 @@ namespace IdaLovesMe {
 		Vec2					 Pos, Size;
 		Vec2					 CursorPos;
 		Vec2					 PevCursorPos;
+		Vec2					 PrevCursorPos;
 		
 		GuiWindow*				 ParentWindow;
 		std::vector<GuiWindow*>  ChildWindows;
@@ -157,6 +159,8 @@ namespace IdaLovesMe {
 		int						 ySize = 10;
 		int						 xPos = 0;
 		int						 yPos = 0;
+
+		float					 ScrollRatio;
 	};
 
 	struct NextWindowInfo {
@@ -181,6 +185,7 @@ namespace IdaLovesMe {
 		bool					 PrevKeyState[256];
 		Vec2					 MousePos;
 		Vec2					 PrevMousePos;
+		float					 MouseWheel = 0.f;
 	};
 
 	namespace ui {

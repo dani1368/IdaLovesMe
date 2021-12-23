@@ -50,7 +50,7 @@ namespace Render {
         //void RoundedRect(float x, float y, float w, float h, float radius, bool smoothing, D3DCOLOR color, D3DCOLOR bcolor);
 
         void Gradient(Vec2 Pos, Vec2 Size, D3DCOLOR LColor, D3DCOLOR ROtherColor, bool Vertical = false, bool Antialias = false);
-       
+
         //void Circle(float x, float y, float radius, int rotate, int type, bool smoothing, int resolution, D3DCOLOR color);
         //void CircleFilled(float x, float y, float rad, float rotate, int type, int resolution, D3DCOLOR color);
 
@@ -59,7 +59,7 @@ namespace Render {
         void Text(const char* Text, float X, float Y, int Orientation, LPD3DXFONT Font, bool Bordered, D3DCOLOR Color, Vec2 MaxSize = Vec2(0, 0));
         //=============================================================================================
 
-  
+
         //=============================================================================================
         void Init(LPDIRECT3DDEVICE9 D3dDevice);
         void CreateObjects();
@@ -67,7 +67,7 @@ namespace Render {
         void Reset();
         //=============================================================================================
         IDirect3DTexture9* GetBgTexture();
-        Vec2   GetTextSize(ID3DXFont* Font, const char * Text);
+        Vec2   GetTextSize(ID3DXFont* Font, const char* Text);
         LPDIRECT3DDEVICE9   GetD3dDevice();
         //=============================================================================================
 
@@ -75,7 +75,7 @@ namespace Render {
         LPDIRECT3DDEVICE9       m_Device;
         LPD3DXSPRITE            m_Sprite;
 
-        IDirect3DTexture9*      m_BgTexture;
+        IDirect3DTexture9* m_BgTexture;
 
         HANDLE                  m_TabFont;
         HANDLE                  m_LegitTabFont;
