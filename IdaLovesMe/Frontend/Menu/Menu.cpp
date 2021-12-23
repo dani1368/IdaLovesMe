@@ -94,8 +94,6 @@ void CMenu::Draw()
 	}
 
 	ui::End();
-
-
 }
 
 bool CMenu::IsMenuOpened() 
@@ -106,4 +104,10 @@ bool CMenu::IsMenuOpened()
 void CMenu::SetMenuOpened(bool v) 
 {
 	this->m_bIsOpened = v;
+}
+
+D3DCOLOR CMenu::GetMenuColor() {
+	GuiContext* g = Globals::Gui_Ctx;
+	CConfig* cfg = CConfig::get();
+	return D3DCOLOR_RGBA(cfg->c["MenuColor"][0], cfg->c["MenuColor"][1], cfg->c["MenuColor"][2], min(cfg->c["MenuColor"][3], g->MenuAlpha));
 }

@@ -1,8 +1,9 @@
 #include "MenuFramework.h"
 #include "../Renderer/Renderer.h"
 #include "../../Backend/Utilities/Utilities.h"
+#include "../Renderer/color.h"
+#include "../Menu/Menu.h"
 
-#include <algorithm>
 #pragma warning(disable : 4244)
 
 using namespace IdaLovesMe;
@@ -12,26 +13,25 @@ GuiContext* IdaLovesMe::Globals::Gui_Ctx = NULL;
 std::vector<DrawList::RenderObject> DrawList::Drawlist;
 
 void DrawList::AddText(const char* text, int x, int y, D3DCOLOR Color, LPD3DXFONT font, bool bordered, Vec2 TextClipSize) {
-	auto obj = new RenderObject(DrawType_Text, Vec2(x, y), Vec2(0, 0), Color, text, font, bordered, NULL, false, TextClipSize);
+	auto obj = new RenderObject(DrawType_Text, Vec2(x, y), Vec2(0, 0), Color, NULL, text, font, bordered, false, TextClipSize, false);
 
 	DrawList::Drawlist.push_back(*obj);
 }
 
 void DrawList::AddFilledRect(Vec2 Pos, Vec2 Size, D3DCOLOR Color) {
-	auto obj = new RenderObject(DrawType_FilledRect, Pos, Size, Color, NULL, NULL, false, NULL, false, Vec2(0,0));
+	auto obj = new RenderObject(DrawType_FilledRect, Pos, Size, Color, NULL, NULL, NULL, false, false, Vec2(0,0), false);
 
 	DrawList::Drawlist.push_back(*obj);
 }
 
-void DrawList::AddRect(Vec2 Pos, Vec2 Size, D3DCOLOR Color) {
-	auto obj = new RenderObject(DrawType_Rect, Pos, Size, Color, NULL, NULL, false, NULL, false, Vec2(0, 0));
+void DrawList::AddRect(Vec2 Pos, Vec2 Size, D3DCOLOR Color, bool Antialias) {
+	auto obj = new RenderObject(DrawType_Rect, Pos, Size, Color, NULL, NULL, NULL, false, false, Vec2(0, 0), Antialias);
 
 	DrawList::Drawlist.push_back(*obj);
 }
 
-void DrawList::AddGradient(Vec2 Pos, Vec2 Size, D3DCOLOR LColor, D3DCOLOR ROtherColor, D3DCOLOR BLColor, D3DCOLOR BROtherColor, bool Vertical) {
-	D3DCOLOR Buffer[4] = { LColor, ROtherColor, BLColor, BROtherColor };
-	auto obj = new RenderObject(DrawType_Gradient, Pos, Size, NULL, NULL, NULL, false, Buffer, Vertical, Vec2(0, 0));
+void DrawList::AddGradient(Vec2 Pos, Vec2 Size, D3DCOLOR Color, D3DCOLOR OtherColor, bool Vertical, bool Antialias) {
+	auto obj = new RenderObject(DrawType_Gradient, Pos, Size, Color, OtherColor, NULL, NULL, false, Vertical, Vec2(0, 0), Antialias);
 
 	DrawList::Drawlist.push_back(*obj);
 }
@@ -107,7 +107,6 @@ static GuiWindow* ui::CreateNewWindow(const char*& name, Vec2 size, GuiFlags fla
 	window->Block = false;
 	window->ParentWindow = NULL;
 	window->ChildWindows;
-	window->Buffer = { Vec2(0,0), Vec2(0,0) };
 
 	g.Windows.push_back(window);
 	g.WindowsByName.push_back(name);
@@ -227,7 +226,6 @@ void ui::AddItemToWindow(GuiWindow* Window, Rect size, GuiFlags flags) {
 	Window->PevCursorPos = Window->CursorPos;
 	if (!(flags & GuiFlags_ColorPicker))
 		Window->CursorPos = Window->CursorPos + Vec2(0, size.Max.y + (flags & GuiFlags_ComboBox ? 2 : g.ItemSpacing.y));
-	Window->ItemCount = Window->ItemCount + 1;
 }
 
 bool ui::ButtonBehavior(GuiWindow* Window, const char* label, Rect bb, bool& hovered, bool& held, GuiFlags flags) {
@@ -291,6 +289,42 @@ bool ui::SliderBehavior(const char* item_id, Rect bb, T value, T min_value, T ma
 	}
 	return hovered;
 }
+
+HSV ui::ColorPickerBehavior(GuiWindow* PickerWindow, Rect& RcColor, Rect& RcAlpha, Rect& RcHue, int col[4]) {
+	GuiContext& g = *Gui_Ctx;
+
+	static int ActiveBar = -1;
+
+	CColor Ccol = CColor(col[0], col[1], col[2], col[3]);
+	static HSV hsv = HSV(Ccol.Hue(), Ccol.Saturation(), Ccol.Brightness(), Ccol.a());
+
+	bool hovered, held;
+	ButtonBehavior(PickerWindow->ParentWindow, PickerWindow->Name.c_str(), { PickerWindow->Pos, PickerWindow->Size }, hovered, held);
+
+	if (KeyDown(VK_LBUTTON)) {
+		if ((IsInside(RcColor.Min.x, RcColor.Min.y, RcColor.Max.x, RcColor.Max.y) || ActiveBar == 0) && ActiveBar != 1 && ActiveBar != 2)
+			ActiveBar = 0;
+		else if ((IsInside(RcHue.Min.x, RcHue.Min.y, RcHue.Max.x, RcHue.Max.y) || ActiveBar == 1) && ActiveBar != 0 && ActiveBar != 2)
+			ActiveBar = 1;
+		else if ((IsInside(RcAlpha.Min.x, RcAlpha.Min.y, RcAlpha.Max.x, RcAlpha.Max.y) || ActiveBar == 2) && ActiveBar != 0 && ActiveBar != 1)
+			ActiveBar = 2;
+	}
+	else
+		ActiveBar = -1;
+
+	switch (ActiveBar) {
+	case 0:
+		hsv.s = (g.MousePos.x - RcColor.Min.x) / RcColor.Max.x;
+		hsv.v = 1.f - (g.MousePos.y - RcColor.Min.y) / RcColor.Max.y; break;
+	case 1:
+		hsv.h = 1.f - (g.MousePos.y - RcHue.Min.y) / RcHue.Max.y; break;
+	case 2:
+		hsv.a = std::clamp(((g.MousePos.x - RcAlpha.Min.x) / RcAlpha.Max.x) * 255, 0.f, 255.f); break;
+	}
+
+	return hsv;
+}
+
 
 void ui::HandleMoving(GuiWindow* Window, Rect Boundaries, Vec2* buffer) {
 	GuiContext& g = *Gui_Ctx;
@@ -486,9 +520,9 @@ void ui::End() {
 			else if (obj.Type == DrawType_FilledRect)
 				Render::Draw->FilledRect(obj.Pos, obj.Size, obj.Color);
 			else if (obj.Type == DrawType_Rect)
-				Render::Draw->Rect(obj.Pos, obj.Size, 1, obj.Color);
+				Render::Draw->Rect(obj.Pos, obj.Size, 1, obj.Color, obj.Antialias);
 			else if (obj.Type == DrawType_Gradient)
-				Render::Draw->Gradient(obj.Pos, obj.Size, obj.GradientColors[0], obj.GradientColors[1], obj.Vertical, obj.GradientColors[2], obj.GradientColors[3]);
+				Render::Draw->Gradient(obj.Pos, obj.Size, obj.Color, obj.OtherColor, obj.Vertical, obj.Antialias);
 		}
 
 		DrawList::Drawlist.clear();
@@ -559,11 +593,9 @@ void ui::EndChild() {
 	Graphics::Render->Gradient_(DrawPos + Vec2(2, size.y - 21), Vec2(size.x - 3, 20), D3DCOLOR_RGBA(19, 19, 19, 0), D3DCOLOR_RGBA(19, 19, 19, g.MenuAlpha), true);
 	*/
 
-	window->ItemCount = 0;
-
 	Render::Draw->GetD3dDevice()->SetRenderState(D3DRS_SCISSORTESTENABLE, FALSE);
 
-	Render::Draw->Text(window->Name.c_str(), window->Pos.x + 13, window->Pos.y + (text_size.y / -2), LEFT, Render::Fonts::Tahombd, false, window->Dragging ? D3DCOLOR_RGBA(173, 244, 5, g.MenuAlpha) : D3DCOLOR_RGBA(205, 205, 205, g.MenuAlpha));
+	Render::Draw->Text(window->Name.c_str(), window->Pos.x + 13, window->Pos.y + (text_size.y / -2), LEFT, Render::Fonts::Tahombd, false, window->Dragging ? CMenu::get()->GetMenuColor() : D3DCOLOR_RGBA(205, 205, 205, g.MenuAlpha));
 
 	SetCurrentWindow(g.Windows.at(0));
 }
@@ -612,6 +644,8 @@ void ui::Checkbox(const char* label, bool* v) {
 	Vec2 DrawPos = Window->CursorPos;
 	Rect total_bb = { DrawPos, label_size + Vec2(150, 0) };
 
+	D3DCOLOR EnabledColor = CMenu::get()->GetMenuColor();
+
 	AddItemToWindow(Window, total_bb);
 
 	bool hovered, held;
@@ -621,7 +655,7 @@ void ui::Checkbox(const char* label, bool* v) {
 		*v = !*v;
 
 	if (*v)
-		Render::Draw->Gradient(DrawPos + Vec2(1, 1), Vec2(6, 6), D3DCOLOR_RGBA(163, 212, 31, std::clamp(250, 0, g.MenuAlpha)), D3DCOLOR_RGBA(163, 212, 31, std::clamp(180, 0, g.MenuAlpha)), true);
+		Render::Draw->Gradient(DrawPos + Vec2(1, 1), Vec2(6, 6), CMenu::get()->GetMenuColor(), D3DCOLOR_RGBA(get_r(EnabledColor), get_g(EnabledColor), get_b(EnabledColor), std::clamp(180, 0, g.MenuAlpha)), true);
 	else
 		if (hovered)
 			Render::Draw->Gradient(DrawPos + Vec2(1, 1), Vec2(6, 6), D3DCOLOR_RGBA(85, 85, 85, std::clamp(255, 0, g.MenuAlpha)), D3DCOLOR_RGBA(55, 55, 55, std::clamp(255, 0, g.MenuAlpha)), true);
@@ -709,7 +743,7 @@ void ui::Slider(const char* label, T* v, T v_min, T v_max, const char* format, G
 
 	Render::Draw->Gradient(slider_bb.Min + Vec2(0, 1), slider_bb.Max - Vec2(0, 1), bg_color[0], bg_color[1], true);
 
-	Render::Draw->FilledRect(slider_bb.Min + Vec2(1, 1), Vec2(rect_width, slider_bb.Max.y), D3DCOLOR_RGBA(163, 212, 31, g.MenuAlpha));
+	Render::Draw->FilledRect(slider_bb.Min + Vec2(1, 1), Vec2(rect_width, slider_bb.Max.y), CMenu::get()->GetMenuColor());
 	Render::Draw->Rect(slider_bb.Min, slider_bb.Max + Vec2(0, 1), 1, D3DCOLOR_RGBA(12, 12, 12, g.MenuAlpha));
 	Render::Draw->Gradient(slider_bb.Min + Vec2(1, 1), Vec2(rect_width, slider_bb.Max.y), D3DCOLOR_RGBA(0, 0, 0, 0), D3DCOLOR_RGBA(0, 0, 0, std::clamp(120, 0, g.MenuAlpha)), true);
 
@@ -734,7 +768,7 @@ bool ui::Selectable(const char* label, bool selected, GuiFlags flags, const Vec2
 
 	LPD3DXFONT TextFont = selected || hovered ? Render::Fonts::Tahombd : Render::Fonts::Verdana;
 	Vec2 label_size = Render::Draw->GetTextSize(TextFont, label);
-	D3DCOLOR TextColor = selected ? D3DCOLOR_RGBA(163, 212, 31, g.MenuAlpha) : D3DCOLOR_RGBA(205, 205, 205, g.MenuAlpha);
+	D3DCOLOR TextColor = selected ? CMenu::get()->GetMenuColor() : D3DCOLOR_RGBA(205, 205, 205, g.MenuAlpha);
 
 	AddItemToWindow(Window, Framebb, Window->Flags);
 
@@ -812,8 +846,6 @@ bool ui::BeginCombo(const char* label, const char* preview_value, int items, Gui
 
 void ui::EndCombo() {
 	GuiWindow* PopUpWindow = GetCurrentWindow();
-
-	PopUpWindow->ItemCount = 0;
 	
 	SetCurrentWindow(PopUpWindow->ParentWindow);
 }
@@ -874,36 +906,65 @@ bool ui::ColorPicker(const char* label, int col[4], GuiFlags flags) {
 
 	Render::Draw->Rect(Fullbb.Min, Fullbb.Max, 1, D3DCOLOR_RGBA(12, 12, 12, g.MenuAlpha));
 	Render::Draw->FilledRect(Fullbb.Min + Vec2(1, 1), Fullbb.Max - Vec2(2, 2), D3DCOLOR_RGBA(col[0], col[1], col[2], g.MenuAlpha));
-	//Render::Draw->Gradient(Fullbb.Min + Vec2(1, 1), Fullbb.Max - Vec2(2, 2), D3DCOLOR_RGBA(0, 0, 0, g.MenuAlpha), D3DCOLOR_RGBA(0, 0, 0, g.MenuAlpha), true);
 
 	SetNextWindowPos(Fullbb.Min + Vec2(-1, Fullbb.Max.y + 1));
 	SetNextWindowSize(Vec2(180, 175));
 
 	Begin(label, flags);
-	GuiWindow* PopUp = GetCurrentWindow();
-	PopUp->ParentWindow = Window;
+	GuiWindow* PickerWindow = GetCurrentWindow();
+	PickerWindow->ParentWindow = Window;
+
+	Rect ColorRect = { PickerWindow->Pos + Vec2(5, 5), Vec2(150, 150) };
+	Rect AlphaRect = { PickerWindow->Pos + Vec2(5, 160), Vec2(150, 10) };
+	Rect HueRect =	 { PickerWindow->Pos + Vec2(160, 5), Vec2(15, 150) };
+
+	HSV ColHSV = ColorPickerBehavior(PickerWindow, ColorRect, AlphaRect, HueRect, col);
+	CColor Topr = CColor::FromHSB(ColHSV.h, 1.f, 1.f);
+
+	Vec2 ColorPos = { std::clamp(ColorRect.Min.x + int(std::roundf(ColHSV.s * ColorRect.Max.x)), ColorRect.Min.x, ColorRect.Min.x + ColorRect.Max.x), std::clamp(ColorRect.Min.y + int((1.f - ColHSV.v) * ColorRect.Max.y), ColorRect.Min.y, ColorRect.Min.y + ColorRect.Max.y) };
+	Vec2 HuePos = { HueRect.Min.x, std::clamp(HueRect.Min.y + int((1.f - ColHSV.h) * HueRect.Max.y), HueRect.Min.y, HueRect.Min.y + HueRect.Max.y) };
+	Vec2 AlphaPos = { std::clamp(AlphaRect.Min.x + int(AlphaRect.Max.x * (ColHSV.a / 255.f)), AlphaRect.Min.x, AlphaRect.Min.x + AlphaRect.Max.x), AlphaRect.Min.y };
 
 	if (pressed)
-		PopUp->Opened = !PopUp->Opened;
+		PickerWindow->Opened = !PickerWindow->Opened;
 
-	if (PopUp->Opened) {
-		DrawList::AddRect(PopUp->Pos + Vec2(4, 4), Vec2(152, 152), D3DCOLOR_RGBA(12, 12, 12, g.MenuAlpha));
-		DrawList::AddGradient(PopUp->Pos + Vec2(5, 5), Vec2(150, 150), D3DCOLOR_RGBA(255, 255, 255, g.MenuAlpha), D3DCOLOR_RGBA(col[0], col[1], col[2], g.MenuAlpha), D3DCOLOR_RGBA(0, 0, 0, g.MenuAlpha), D3DCOLOR_RGBA(0, 0, 0, g.MenuAlpha), false);
+	if (PickerWindow->Opened) {
+		// Color Picker
+		DrawList::AddGradient(ColorRect.Min, ColorRect.Max, D3DCOLOR_RGBA(255, 255, 255, g.MenuAlpha), D3DCOLOR_RGBA(Topr.r(), Topr.g(), Topr.b(), 255), false, false);
+		DrawList::AddGradient(ColorRect.Min, ColorRect.Max, D3DCOLOR_RGBA(0, 0, 0, std::clamp(0, 0, g.MenuAlpha)), D3DCOLOR_RGBA(0, 0, 0, g.MenuAlpha), true, false);
+		DrawList::AddRect(ColorRect.Min - Vec2(1, 1), Vec2(152, 152), D3DCOLOR_RGBA(12, 12, 12, g.MenuAlpha));
 
-		DrawList::AddRect(PopUp->Pos + Vec2(4, 159), Vec2(152, 12), D3DCOLOR_RGBA(12, 12, 12, g.MenuAlpha));
-		DrawList::AddFilledRect(PopUp->Pos + Vec2(5, 160), Vec2(150, 10), D3DCOLOR_RGBA(col[0], col[1], col[2], g.MenuAlpha));
+		//Alpha Bar
+		DrawList::AddRect(AlphaRect.Min - Vec2(1, 1), Vec2(152, 12), D3DCOLOR_RGBA(12, 12, 12, g.MenuAlpha));
+		DrawList::AddFilledRect(AlphaRect.Min, AlphaRect.Max, D3DCOLOR_RGBA(col[0], col[1], col[2], col[3]));
 
-		DrawList::AddRect(PopUp->Pos + Vec2(159, 4), Vec2(17, 152), D3DCOLOR_RGBA(12, 12, 12, g.MenuAlpha));
-
-		const D3DCOLOR hue_colors[6 + 1] = { D3DCOLOR_RGBA(255,0,0,255), D3DCOLOR_RGBA(255,0,255,255), D3DCOLOR_RGBA(0,0,255,255), D3DCOLOR_RGBA(0,255,255,255), D3DCOLOR_RGBA(0,255,0,255), D3DCOLOR_RGBA(255,255,0,255), D3DCOLOR_RGBA(255,0,0,255) };
-		
+		//Hue Bar
+		DrawList::AddRect(HueRect.Min - Vec2(1, 1), Vec2(17, 152), D3DCOLOR_RGBA(12, 12, 12, g.MenuAlpha));
+		const D3DCOLOR hue_colors[6 + 1] = { D3DCOLOR_RGBA(220, 30, 34, 255), D3DCOLOR_RGBA(220, 30, 216, 255), D3DCOLOR_RGBA(30, 34, 220, 255), D3DCOLOR_RGBA(30,220,216,255), D3DCOLOR_RGBA(34,219,30,255), D3DCOLOR_RGBA(220,187,30,255), D3DCOLOR_RGBA(220,33,30,255) };
 		for (int i = 0; i < 6; ++i)
-			DrawList::AddGradient(PopUp->Pos + Vec2(160, 5 + (25 * i)), Vec2(15, 25), hue_colors[i], hue_colors[i + 1], 0UL, 0UL, true);
+			DrawList::AddGradient(PickerWindow->Pos + Vec2(160, 5 + (25 * i)), Vec2(15, 25), hue_colors[i], hue_colors[i + 1], true);
 		
+		//Picker Dot
+		DrawList::AddRect(ColorPos - Vec2(2, 2), Vec2(4, 4), D3DCOLOR_RGBA(12, 12 , 12, g.MenuAlpha));
+		DrawList::AddRect(ColorPos - Vec2(1, 1), Vec2(2, 2), D3DCOLOR_RGBA(255, 255, 255, std::clamp(127, 0, g.MenuAlpha)));
+
+		//Alpha Bar
+		DrawList::AddRect(AlphaPos + Vec2(0, 0), Vec2(4, 10), D3DCOLOR_RGBA(12, 12, 12, std::clamp(255, 0, g.MenuAlpha)));
+		DrawList::AddRect(AlphaPos + Vec2(1, 1), Vec2(2, 8), D3DCOLOR_RGBA(255, 255, 255, std::clamp(140, 0, g.MenuAlpha)));
+
+		//Hue Indicator
+		DrawList::AddRect(HuePos - Vec2(0, 2), Vec2(15, 4), D3DCOLOR_RGBA(12, 12, 12, std::clamp(180, 0, g.MenuAlpha)));
+		DrawList::AddRect(HuePos - Vec2(-1, 1), Vec2(13, 2), D3DCOLOR_RGBA(255, 255, 255, std::clamp(140, 0, g.MenuAlpha)));
 	}
 
+	CColor outcolor = CColor::FromHSB(ColHSV.h, ColHSV.s, ColHSV.v, ColHSV.a);
+	col[0] = outcolor.r();
+	col[1] = outcolor.g();
+	col[2] = outcolor.b();
+	col[3] = outcolor.a();
+
 	End();
-	SetCurrentWindow(PopUp->ParentWindow);
+	SetCurrentWindow(PickerWindow->ParentWindow);
 
 	return true;
 }

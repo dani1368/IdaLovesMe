@@ -44,12 +44,12 @@ namespace Render {
         //=============================================================================================
         void Line(Vec2 Pos, Vec2 Pos2, DWORD Color);
 
-        void Rect(Vec2 Pos, Vec2 Size, float linewidth, D3DCOLOR Color);
-        void FilledRect(Vec2 Pos, Vec2 Size, D3DCOLOR color);
+        void Rect(Vec2 Pos, Vec2 Size, float linewidth, D3DCOLOR Color, bool Antialias = false);
+        void FilledRect(Vec2 Pos, Vec2 Size, D3DCOLOR color, bool Antialias = false);
         void BorderedRect(Vec2 Pos, Vec2 Size, float BorderWidth, D3DCOLOR Color, D3DCOLOR BorderColor);
         //void RoundedRect(float x, float y, float w, float h, float radius, bool smoothing, D3DCOLOR color, D3DCOLOR bcolor);
 
-        void Gradient(Vec2 Pos, Vec2 Size, D3DCOLOR LColor, D3DCOLOR ROtherColor, bool Vertical = false, D3DCOLOR BLColor = 0x0, D3DCOLOR BROtherColor = 0x0);
+        void Gradient(Vec2 Pos, Vec2 Size, D3DCOLOR LColor, D3DCOLOR ROtherColor, bool Vertical = false, bool Antialias = false);
        
         //void Circle(float x, float y, float radius, int rotate, int type, bool smoothing, int resolution, D3DCOLOR color);
         //void CircleFilled(float x, float y, float rad, float rotate, int type, int resolution, D3DCOLOR color);

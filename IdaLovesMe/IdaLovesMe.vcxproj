@@ -36,6 +36,7 @@
     <ClInclude Include="Backend\ValveSDK\vfunc.h" />
     <ClInclude Include="Frontend\Framework\MenuFramework.h" />
     <ClInclude Include="Frontend\Menu\Menu.h" />
+    <ClInclude Include="Frontend\Renderer\color.h" />
     <ClInclude Include="Frontend\Renderer\Renderer.h" />
     <ClInclude Include="Backend\Misc\singleton.h" />
   </ItemGroup>

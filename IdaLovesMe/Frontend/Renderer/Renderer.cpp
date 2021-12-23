@@ -224,25 +224,25 @@ void CDraw::CircleFilled(float x, float y, float rad, float rotate, int type, in
     
 }
 */
-void CDraw::Rect(Vec2 Pos, Vec2 Size, float LineWidth, D3DCOLOR Color)
+void CDraw::Rect(Vec2 Pos, Vec2 Size, float LineWidth, D3DCOLOR Color, bool Antialias)
 {
     if (LineWidth == 0 || LineWidth == 1)
     {
-        FilledRect(Pos, Vec2(Size.x, 1), Color);             // Top
-        FilledRect(Vec2(Pos.x, Pos.y + Size.y - 1), Vec2(Size.x, 1), Color);         // Bottom
-        FilledRect(Vec2(Pos.x, Pos.y + 1), Vec2(1, Size.y - 2 * 1), Color);       // Left
-        FilledRect(Vec2(Pos.x + Size.x - 1, Pos.y + 1), Vec2(1, Size.y - 2 * 1), Color);   // Right
+        FilledRect(Pos, Vec2(Size.x, 1), Color, Antialias);             // Top
+        FilledRect(Vec2(Pos.x, Pos.y + Size.y - 1), Vec2(Size.x, 1), Color, Antialias);         // Bottom
+        FilledRect(Vec2(Pos.x, Pos.y + 1), Vec2(1, Size.y - 2 * 1), Color, Antialias);       // Left
+        FilledRect(Vec2(Pos.x + Size.x - 1, Pos.y + 1), Vec2(1, Size.y - 2 * 1), Color, Antialias);   // Right
     }
     else
     {
-        FilledRect(Pos, Vec2(Size.x, LineWidth), Color);                                     // Top
-        FilledRect(Vec2(Pos.x, Pos.y + Size.y - LineWidth), Vec2(Size.x, LineWidth), Color);                         // Bottom
-        FilledRect(Vec2(Pos.x, Pos.y + LineWidth), Vec2(LineWidth, Size.x - 2 * LineWidth), Color);               // Left
-        FilledRect(Vec2(Pos.x + Size.x - LineWidth, Pos.y + LineWidth), Vec2(LineWidth, Size.y - 2 * LineWidth), Color);   // Right
+        FilledRect(Pos, Vec2(Size.x, LineWidth), Color, Antialias);                                     // Top
+        FilledRect(Vec2(Pos.x, Pos.y + Size.y - LineWidth), Vec2(Size.x, LineWidth), Color, Antialias);                         // Bottom
+        FilledRect(Vec2(Pos.x, Pos.y + LineWidth), Vec2(LineWidth, Size.x - 2 * LineWidth), Color, Antialias);               // Left
+        FilledRect(Vec2(Pos.x + Size.x - LineWidth, Pos.y + LineWidth), Vec2(LineWidth, Size.y - 2 * LineWidth), Color, Antialias);   // Right
     }
 }
 
-void CDraw::FilledRect(Vec2 Pos, Vec2 Size, D3DCOLOR Color)
+void CDraw::FilledRect(Vec2 Pos, Vec2 Size, D3DCOLOR Color, bool Antialias)
 {
     vertex vertices[4] = {
         { Pos.x, Pos.y + Size.y, 0.0f, 1.0f, Color },
@@ -253,8 +253,8 @@ void CDraw::FilledRect(Vec2 Pos, Vec2 Size, D3DCOLOR Color)
     m_Device->SetFVF(D3DFVF_XYZRHW | D3DFVF_DIFFUSE);
     m_Device->SetTexture(0, nullptr);
 
-    m_Device->SetRenderState(D3DRS_MULTISAMPLEANTIALIAS, FALSE);
-    m_Device->SetRenderState(D3DRS_ANTIALIASEDLINEENABLE, FALSE);
+    m_Device->SetRenderState(D3DRS_MULTISAMPLEANTIALIAS, Antialias ? TRUE : FALSE);
+    m_Device->SetRenderState(D3DRS_ANTIALIASEDLINEENABLE, Antialias ? TRUE : FALSE);
 
     m_Device->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, vertices, sizeof(vertex));
 
@@ -269,56 +269,20 @@ void CDraw::BorderedRect(Vec2 Pos, Vec2 Size, float BorderWidth, D3DCOLOR Color,
     Rect(Vec2(Pos.x - BorderWidth, Pos.y - BorderWidth), Vec2(Size.x + 2 * BorderWidth, Size.y + BorderWidth), BorderWidth, BorderColor);
 }
 
-/*
-void CDraw::RoundedRect(float x, float y, float w, float h, float radius, bool smoothing, DWORD Color, DWORD bcolor)
-{
-    FilledRect(Vec2(x + radius, y + radius), Vec2(w - 2 * radius - 1, h - 2 * radius - 1), Color);   // Center rect.
-    FilledRect(Vec2(x + radius, y + 1), Vec2(w - 2 * radius - 1, radius - 1), Color);            // Top rect.
-    FilledRect(Vec2(x + radius, y + h - radius - 1), Vec2(w - 2 * radius - 1, radius), Color);     // Bottom rect.
-    FilledRect(Vec2(x + 1, y + radius), Vec2(radius - 1, h - 2 * radius - 1), Color);            // Left rect.
-    FilledRect(Vec2(x + w - radius - 1, y + radius), Vec2(radius, h - 2 * radius - 1), Color);     // Right rect.
-
-    // Smoothing method
-    if (smoothing)
-    {
-        CircleFilled(x + radius, y + radius, radius - 1, 0, QUARTER, 16, Color);             // Top-left corner
-        CircleFilled(x + w - radius - 1, y + radius, radius - 1, 90, QUARTER, 16, Color);        // Top-right corner
-        CircleFilled(x + w - radius - 1, y + h - radius - 1, radius - 1, 180, QUARTER, 16, Color);   // Bottom-right corner
-        CircleFilled(x + radius, y + h - radius - 1, radius - 1, 270, QUARTER, 16, Color);       // Bottom-left corner
-
-        Circle(x + radius + 1, y + radius + 1, radius, 0, QUARTER, true, 16, bcolor);          // Top-left corner
-        Circle(x + w - radius - 2, y + radius + 1, radius, 90, QUARTER, true, 16, bcolor);       // Top-right corner
-        Circle(x + w - radius - 2, y + h - radius - 2, radius, 180, QUARTER, true, 16, bcolor);    // Bottom-right corner
-        Circle(x + radius + 1, y + h - radius - 2, radius, 270, QUARTER, true, 16, bcolor);      // Bottom-left corner
-
-        Line(Vec2(x + radius, y + 1), Vec2(x + w - radius - 1, y + 1), bcolor);       // Top line
-        Line(Vec2(x + radius, y + h - 2), Vec2(x + w - radius - 1, y + h - 2), bcolor);   // Bottom line
-        Line(Vec2(x + 1, y + radius), Vec2(x + 1, y + h - radius - 1), bcolor);       // Left line
-        Line(Vec2(x + w - 2, y + radius), Vec2(x + w - 2, y + h - radius - 1), bcolor);   // Right line
-    }
-    else
-    {
-        CircleFilled(x + radius, y + radius, radius, 0, QUARTER, 16, Color);             // Top-left corner
-        CircleFilled(x + w - radius - 1, y + radius, radius, 90, QUARTER, 16, Color);        // Top-right corner
-        CircleFilled(x + w - radius - 1, y + h - radius - 1, radius, 180, QUARTER, 16, Color);   // Bottom-right corner
-        CircleFilled(x + radius, y + h - radius - 1, radius, 270, QUARTER, 16, Color);       // Bottom-left corner
-    }
-}
-*/
-void CDraw::Gradient(Vec2 Pos, Vec2 Size, D3DCOLOR LColor, D3DCOLOR ROtherColor, bool Vertical, D3DCOLOR BLColor, D3DCOLOR BROtherColor)
+void CDraw::Gradient(Vec2 Pos, Vec2 Size, D3DCOLOR LColor, D3DCOLOR ROtherColor, bool Vertical, bool Antialias)
 {
     vertex vertices[4] = {
         { Pos.x, Pos.y, 0.0f, 1.0f, LColor },
-        { Pos.x + Size.x, Pos.y, 0.0f, 1.0f, (Vertical && BROtherColor == 0x0) ? LColor : ROtherColor },
-        { Pos.x, Pos.y + Size.y, 0.0f, 1.0f, (BLColor == 0x0 ? (Vertical ? ROtherColor : LColor) : BLColor) },
-        { Pos.x + Size.x, Pos.y + Size.y, 0.0f, 1.0f, BROtherColor == 0x0 ? ROtherColor : BROtherColor }
+        { Pos.x + Size.x, Pos.y, 0.0f, 1.0f, Vertical ? LColor : ROtherColor },
+        { Pos.x, Pos.y + Size.y, 0.0f, 1.0f, Vertical ? ROtherColor : LColor },
+        { Pos.x + Size.x, Pos.y + Size.y, 0.0f, 1.0f, ROtherColor }
     };
 
     m_Device->SetFVF(D3DFVF_XYZRHW | D3DFVF_DIFFUSE);
     m_Device->SetTexture(0, nullptr);
 
-    m_Device->SetRenderState(D3DRS_MULTISAMPLEANTIALIAS, FALSE);
-    m_Device->SetRenderState(D3DRS_ANTIALIASEDLINEENABLE, FALSE);
+    m_Device->SetRenderState(D3DRS_MULTISAMPLEANTIALIAS, Antialias ? TRUE : FALSE);
+    m_Device->SetRenderState(D3DRS_ANTIALIASEDLINEENABLE, Antialias ? TRUE : FALSE);
 
     m_Device->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, vertices, sizeof(vertex));
 

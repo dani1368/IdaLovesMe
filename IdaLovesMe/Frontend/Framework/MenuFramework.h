@@ -3,11 +3,31 @@
 
 #include <unordered_map>
 
-
 typedef int GuiFlags;
 typedef int DrawListType;
 
 namespace IdaLovesMe {
+
+	struct HSV {
+		float h;
+		float s;
+		float v;
+		float a;
+
+		HSV() {
+			h = 0;
+			s = 0;
+			v = 0;
+			a = 255;
+		}
+
+		HSV(float h_, float s_, float v_, float a_) {
+			h = h_;
+			s = s_;
+			v = v_;
+			a = a_;
+		}
+	};
 
 	struct Vec2 {
 		float x, y;
@@ -54,35 +74,34 @@ namespace IdaLovesMe {
 			Vec2		 Pos;
 			Vec2		 Size;
 			D3DCOLOR	 Color;
+			D3DCOLOR	 OtherColor;
 			const char*  Text;
 			LPD3DXFONT	 Font;
 			bool		 Bordered;
-			D3DCOLOR     GradientColors[4] = {0, 0, 0, 0};
-			bool		 Vertical = false;
+			bool		 Vertical;
 			Vec2		 TextClipSize;
+			bool		 Antialias;
 
-			RenderObject(DrawListType Type, Vec2 Pos, Vec2 Size, D3DCOLOR color, const char* text, LPD3DXFONT font, bool Bordered, D3DCOLOR GradientColors[], bool Vertical, Vec2 TextClipSize) {
+			RenderObject(DrawListType Type, Vec2 Pos, Vec2 Size, D3DCOLOR color, D3DCOLOR OtherColor, const char* text, LPD3DXFONT font, bool Bordered, bool Vertical, Vec2 TextClipSize, bool Antialias) {
 				this->Type = Type;
 				this->Pos = Pos;
 				this->Size = Size;
 				this->Color = color;
+				this->OtherColor = OtherColor;
 				this->Text = text;
 				this->Font = font;
 				this->Bordered = Bordered;
-				if (GradientColors)
-					for (int i = 0; i < sizeof(GradientColors); i++)
-						this->GradientColors[i] = GradientColors[i];
-					
 				this->Vertical = Vertical;
 				this->TextClipSize = TextClipSize;
+				this->Antialias = Antialias;
 			}
 		};
 	public:
 		static std::vector<RenderObject> Drawlist;
 		static void AddText(const char* text, int x, int y, D3DCOLOR Color, LPD3DXFONT font, bool Bordered = false, Vec2 TextClipSize = Vec2(0, 0));
 		static void AddFilledRect(Vec2 Pos, Vec2 Size, D3DCOLOR Color);
-		static void AddRect(Vec2 Pos, Vec2 Size, D3DCOLOR Color);
-		static void	AddGradient(Vec2 Pos, Vec2 Size, D3DCOLOR LColor, D3DCOLOR ROtherColor, D3DCOLOR BLColor = 0x0, D3DCOLOR BROtherColor = 0x0, bool Vertical = false);
+		static void AddRect(Vec2 Pos, Vec2 Size, D3DCOLOR Color, bool Antialias = false);
+		static void	AddGradient(Vec2 Pos, Vec2 Size, D3DCOLOR Color, D3DCOLOR OtherColor, bool Vertical = false, bool Antialias = false);
 	};
 
 	enum DrawListType_ {
@@ -120,15 +139,12 @@ namespace IdaLovesMe {
 		Vec2					 Pos, Size;
 		Vec2					 CursorPos;
 		Vec2					 PevCursorPos;
-		Vec2					 ContentSize;
-		Rect					 Buffer;
 		
 		GuiWindow*				 ParentWindow;
 		std::vector<GuiWindow*>  ChildWindows;
 		std::vector<GuiWindow>   PopUpWindows;
 
 		std::string				 SelectedItem;
-		int						 ItemCount;
 
 		bool					 Opened;
 		bool					 Dragging;
@@ -181,6 +197,7 @@ namespace IdaLovesMe {
 		bool					 NoItemsActive(GuiWindow* Window);
 		template				 <typename T>
 		bool					 SliderBehavior(const char* item_id, Rect bb, T value, T min_value, T max_value, GuiFlags flags);
+		HSV						 ColorPickerBehavior(GuiWindow* PickerWindow, Rect& RcColor, Rect& RcAlpha, Rect& RcHue, int col[4]);
 		//-------Context-------//
 		void					 Shutdown(GuiContext* context);
 		void					 Init(GuiContext* context);
@@ -217,13 +234,13 @@ namespace IdaLovesMe {
 		void					 SliderFloat(const char* label, float* v, float v_min, float v_max, const char* format, float scale);
 		bool					 SingleSelect(const char* label, int* current_item, std::vector<const char*> items);
 		bool					 MultiSelect(const char* label, std::unordered_map<int, bool>* data, std::vector<const char*> items);
+		bool					 ColorPicker(const char* label, int col[4], GuiFlags flags = NULL);
 		
 		template				 <typename T>
 		void					 Slider(const char* label, T* v, T v_min, T v_max, const char* format = NULL, GuiFlags flags = NULL, float scale = 1.f);
 		bool					 Selectable(const char* label, bool selected = false, GuiFlags flags = NULL, const Vec2& size_arg = Vec2(0, 0));
 		bool					 BeginCombo(const char* label, const char* preview_value, int items, GuiFlags flags = NULL);
 		void					 EndCombo();
-		bool					 ColorPicker(const char* label, int col[4], GuiFlags flags = NULL);
 	}
 
 	namespace Globals {

@@ -72,6 +72,9 @@
     <ClInclude Include="Backend\ValveSDK\IClient.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Frontend\Renderer\color.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Backend\Config\Settings.cpp">
