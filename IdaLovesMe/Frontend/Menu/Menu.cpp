@@ -73,7 +73,19 @@ void CMenu::Draw()
 		ui::SliderInt("Minimum damage", &cfg->i["Uwu"], 0, 126, cfg->i["Uwu"] == 0 ? "Auto" : (cfg->i["Uwu"] > 100 ? "HP+%d" : "%dhp"));
 		ui::SliderFloat("Maximum FOV", &cfg->f["Uwu"], 0.f, 180.f, "%.2f°", 0.1f);
 		ui::Button("Log aimbot shots");
-		ui::SingleSelect("Singelselect 1", &cfg->i["Singelselector"], { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5"});
+		
+		ui::Checkbox("ITsnuub", &cfg->b["niga1"]);
+		ui::Checkbox("Bestest", &cfg->b["niga2"]);
+		ui::Checkbox("Codah", &cfg->b["niga3"]);
+		ui::Checkbox("Suomi", &cfg->b["niga4"]);
+		ui::Checkbox("Marrkuu", &cfg->b["niga5"]);
+		ui::Checkbox("Greatest", &cfg->b["niga6"]);
+		ui::Checkbox("Very cool", &cfg->b["niga7"]);
+		ui::ColorPicker("ColorPickeroddds", cfg->c["MenuColor1"]);
+		ui::SliderInt("Gay Meter", &cfg->i["Uwudsdsd"], 0, 100, "%d%%");
+
+		ui::MultiSelect("Multiselector", &cfg->m["MultiSelecto"], { "You are stupido", "OMG REEL SKEET?", " best", "l0l0l0l" });
+
 		ui::EndChild();
 
 		ui::BeginChild("B", ui::GetWindowPos() + Vec2(100, 30), Vec2(258, 506), false);
@@ -81,15 +93,10 @@ void CMenu::Draw()
 
 		if (ui::Button("Unload"))
 			Settings->UnloadCheat = true;
-
-		//ui::SingleSelect("Singelselect 2", &cfg->i["Singelselecto"], {"Item 1", "Item 2", "Item 3", "Item 4"});
-	
-		ui::MultiSelect("Multiselector", &cfg->m["MultiSelecto"], { "You are stupido", "Stiko best coder", "gs.digital best", "l0l0l0l" });
-		//ui::MultiSelect("Multiselecto2", &cfg->m["MultiSelecto2"], { "You are stupido", "Stiko best coder", "gs.digital best", "l0l0l0l" });
-		//ui::MultiSelect("Multiselector3", &cfg->m["MultiSelecto3"], { "You are stupido", "Stiko best coder", "gs.digital best", "l0l0l0l" });
-
+		ui::Button("Log aimbot shots");
+		
+		ui::SingleSelect("Turbo Pasta", &cfg->i["MultiSelecto32"], { "Selling", "Buy", "Today", "Now" });
 		ui::ColorPicker("ColorPickero", cfg->c["MenuColor"]);
-
 		ui::EndChild();
 	}
 

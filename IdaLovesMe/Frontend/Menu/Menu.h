@@ -12,9 +12,9 @@ public:
 
 	bool IsMenuOpened();
 	void SetMenuOpened(bool v);
-	
-	D3DCOLOR GetMenuColor();
 
+	D3DCOLOR GetMenuColor();
+	
 	int Menu_key = VK_INSERT;
 private:
 	bool m_bInitialized;

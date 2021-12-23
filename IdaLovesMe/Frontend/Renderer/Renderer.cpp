@@ -16,7 +16,7 @@ namespace Render {
     }
 }
 
-void CDraw::CreateObjects() 
+void CDraw::CreateObjects()
 {
     D3DXCreateSprite(m_Device, &m_Sprite);
 
@@ -36,7 +36,7 @@ void CDraw::CreateObjects()
         pp.BackBufferFormat, D3DPOOL_DEFAULT, D3DX_DEFAULT, D3DX_DEFAULT, NULL, NULL, NULL, &this->m_BgTexture);
 }
 
-void CDraw::ReleaseObjects() 
+void CDraw::ReleaseObjects()
 {
     if (!Initialized)
         return;
@@ -47,10 +47,10 @@ void CDraw::ReleaseObjects()
         Fonts::Verdana->Release();
     if (Fonts::Tahombd)
         Fonts::Tahombd->Release();
-    
+
     if (Fonts::TabIcons) {
         Fonts::TabIcons->Release();
-        RemoveFontMemResourceEx(this->m_TabFont); 
+        RemoveFontMemResourceEx(this->m_TabFont);
     }
     if (Fonts::LegitTabIcons) {
         Fonts::LegitTabIcons->Release();
@@ -60,7 +60,7 @@ void CDraw::ReleaseObjects()
     delete Render::Draw;
 }
 
-void CDraw::Init(LPDIRECT3DDEVICE9 D3dDevice) 
+void CDraw::Init(LPDIRECT3DDEVICE9 D3dDevice)
 {
     if (!Initialized) {
         m_Device = D3dDevice;
@@ -144,7 +144,7 @@ void CDraw::Circle(float x, float y, float radius, int rotate, int type, bool sm
     m_VB->Lock(0, (resolution + 2) * sizeof(vertex), (void**)&pVertices, 0);
     memcpy(pVertices, &circle[0], (resolution + 2) * sizeof(vertex));
     m_VB->Unlock();
-    
+
 
     m_Device->SetTexture(0, NULL);
     m_Device->SetPixelShader(NULL);
@@ -162,7 +162,7 @@ void CDraw::Circle(float x, float y, float radius, int rotate, int type, bool sm
 
     m_Device->DrawPrimitive(D3DPT_LINESTRIP, 0, resolution);
     if (m_VB != NULL) m_VB->Release();
-    
+
 }
 
 void CDraw::CircleFilled(float x, float y, float rad, float rotate, int type, int resolution, D3DCOLOR Color)
@@ -175,7 +175,7 @@ void CDraw::CircleFilled(float x, float y, float rad, float rotate, int type, in
     if (type == HALF) pi = D3DX_PI / 2;      // 1/2 circle
     if (type == QUARTER) pi = D3DX_PI / 4;   // 1/4 circle
 
-    
+
     circle[0].x = x;
     circle[0].y = y;
     circle[0].z = 0;
@@ -210,7 +210,7 @@ void CDraw::CircleFilled(float x, float y, float rad, float rotate, int type, in
     m_VB->Lock(0, (resolution + 2) * sizeof(vertex), (void**)&pVertices, 0);
     memcpy(pVertices, &circle[0], (resolution + 2) * sizeof(vertex));
     m_VB->Unlock();
-    
+
     m_Device->SetTexture(0, NULL);
     m_Device->SetPixelShader(NULL);
     m_Device->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
@@ -221,7 +221,7 @@ void CDraw::CircleFilled(float x, float y, float rad, float rotate, int type, in
     m_Device->SetFVF(D3DFVF_XYZRHW | D3DFVF_DIFFUSE);
     m_Device->DrawPrimitive(D3DPT_TRIANGLEFAN, 0, resolution);
     if (m_VB != NULL) m_VB->Release();
-    
+
 }
 */
 void CDraw::Rect(Vec2 Pos, Vec2 Size, float LineWidth, D3DCOLOR Color, bool Antialias)
@@ -247,7 +247,7 @@ void CDraw::FilledRect(Vec2 Pos, Vec2 Size, D3DCOLOR Color, bool Antialias)
     vertex vertices[4] = {
         { Pos.x, Pos.y + Size.y, 0.0f, 1.0f, Color },
         { Pos.x, Pos.y, 0.0f, 1.0f, Color },
-        { Pos.x + Size.x, Pos.y + Size.y, 0.0f, 1.0f, Color },                  
+        { Pos.x + Size.x, Pos.y + Size.y, 0.0f, 1.0f, Color },
         { Pos.x + Size.x, Pos.y, 0.0f, 1.0f, Color }
     };
     m_Device->SetFVF(D3DFVF_XYZRHW | D3DFVF_DIFFUSE);
@@ -298,7 +298,7 @@ void CDraw::Text(const char* text, float x_, float y_, int Orientation, LPD3DXFO
     DWORD TextFlags = 0x0;
 
     RECT rect;
-    switch (Orientation) 
+    switch (Orientation)
     {
     case LEFT: TextFlags = NoClipRect ? DT_LEFT | DT_NOCLIP : DT_LEFT; break;
     case CENTER: TextFlags = NoClipRect ? DT_CENTER | DT_NOCLIP : DT_LEFT;  break;
@@ -324,8 +324,8 @@ void CDraw::Text(const char* text, float x_, float y_, int Orientation, LPD3DXFO
 void CDraw::Sprite(LPDIRECT3DTEXTURE9 Texture, Vec2 Pos, Vec2 Size, D3DCOLOR Color)
 {
     D3DXVECTOR3 pos = D3DXVECTOR3(Pos.x, Pos.y, 0.0f);
-    RECT DrawArea = {(LONG)pos.x, (LONG)pos.y, LONG(pos.x + Size.x), LONG(pos.y + Size.y)};
-    
+    RECT DrawArea = { (LONG)pos.x, (LONG)pos.y, LONG(pos.x + Size.x), LONG(pos.y + Size.y) };
+
     m_Device->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_SELECTARG1);
     m_Device->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
     m_Device->SetTextureStageState(0, D3DTSS_COLORARG2, D3DTA_DIFFUSE);
@@ -348,31 +348,31 @@ void CDraw::Triangle(Vec2 Top, Vec2 Left, Vec2 Right, D3DCOLOR Color, bool antia
 
     m_Device->SetFVF(D3DFVF_XYZRHW | D3DFVF_DIFFUSE);
     m_Device->SetTexture(0, nullptr);
- 
+
     m_Device->SetRenderState(D3DRS_MULTISAMPLEANTIALIAS, antialias ? TRUE : FALSE);
     m_Device->SetRenderState(D3DRS_ANTIALIASEDLINEENABLE, antialias ? TRUE : FALSE);
- 
+
     m_Device->DrawPrimitiveUP(D3DPT_TRIANGLELIST, 1, vertices, sizeof(vertex));
 
     m_Device->SetRenderState(D3DRS_MULTISAMPLEANTIALIAS, antialias ? TRUE : FALSE);
     m_Device->SetRenderState(D3DRS_ANTIALIASEDLINEENABLE, antialias ? TRUE : FALSE);
- 
+
 }
 
-IDirect3DTexture9* CDraw::GetBgTexture() 
+IDirect3DTexture9* CDraw::GetBgTexture()
 {
     return this->m_BgTexture;
 }
 
-Vec2 CDraw::GetTextSize(ID3DXFont* Font, const char* Text) 
+Vec2 CDraw::GetTextSize(ID3DXFont* Font, const char* Text)
 {
     auto rect = RECT();
     Font->DrawTextA(0, Text, strlen(Text), &rect, DT_CALCRECT, D3DCOLOR_ARGB(0, 0, 0, 0));
-   
+
     return Vec2(float(rect.right - rect.left), float(rect.bottom - rect.top));
 }
 
-LPDIRECT3DDEVICE9 CDraw::GetD3dDevice() 
+LPDIRECT3DDEVICE9 CDraw::GetD3dDevice()
 {
     return this->m_Device;
 }
