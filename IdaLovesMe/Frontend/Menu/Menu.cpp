@@ -81,7 +81,7 @@ void CMenu::Draw()
 		ui::Checkbox("Marrkuu", &cfg->b["niga5"]);
 		ui::Checkbox("Greatest", &cfg->b["niga6"]);
 		ui::Checkbox("Very cool", &cfg->b["niga7"]);
-		ui::ColorPicker("ColorPickeroddds", cfg->c["MenuColor1"]);
+		ui::ColorPicker("ColorPickeroddds", cfg->c["MenuColor"]);
 		ui::SliderInt("Gay Meter", &cfg->i["Uwudsdsd"], 0, 100, "%d%%");
 
 		ui::MultiSelect("Multiselector", &cfg->m["MultiSelecto"], { "You are stupido", "OMG REEL SKEET?", " best", "l0l0l0l" });
@@ -96,7 +96,7 @@ void CMenu::Draw()
 		ui::Button("Log aimbot shots");
 		
 		ui::SingleSelect("Turbo Pasta", &cfg->i["MultiSelecto32"], { "Selling", "Buy", "Today", "Now" });
-		ui::ColorPicker("ColorPickero", cfg->c["MenuColor"]);
+		ui::ColorPicker("ColorPickeroddsad", cfg->c["MenuColordsadsa"]);
 		ui::EndChild();
 	}
 
