@@ -70,6 +70,7 @@ void CMenu::Draw()
 	if (this->m_nCurrentTab == 0) {
 		ui::BeginChild("A", ui::GetWindowPos() + Vec2(100, 30), Vec2(258, 506), false);
 		ui::Checkbox("Enabled", &cfg->b["niga"]);
+		ui::KeyBind("Keybind1", &cfg->i["SuperKeybind"], &cfg->i["SuperKeybindstlye"]);
 		ui::SliderInt("Minimum damage", &cfg->i["Uwu"], 0, 126, cfg->i["Uwu"] == 0 ? "Auto" : (cfg->i["Uwu"] > 100 ? "HP+%d" : "%dhp"));
 		ui::SliderFloat("Maximum FOV", &cfg->f["Uwu"], 0.f, 180.f, "%.2f°", 0.1f);
 		ui::Button("Log aimbot shots");

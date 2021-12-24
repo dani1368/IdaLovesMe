@@ -119,11 +119,11 @@ LRESULT CUtilities::WndProcHandler(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lP
 	switch (msg) 
 	{
 	case WM_LBUTTONDOWN: 
-		dbutton = 0;
+		dbutton = 0; break;
 	case WM_RBUTTONDOWN: 
-		dbutton = 1;
+		dbutton = 1; break;
 	case WM_MBUTTONDOWN: 
-		dbutton = 2;
+		dbutton = 2; break;
 	case WM_XBUTTONDOWN: 
 	{
 		if (LOWORD(wParam) == MK_XBUTTON1)

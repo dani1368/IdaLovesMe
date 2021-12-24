@@ -9,6 +9,175 @@
 using namespace IdaLovesMe;
 using namespace Globals;
 
+const char* keys[] = {
+"[-]",
+"[M1]",
+"[M2]",
+"[CN]",
+"[M3]",
+"[M4]",
+"[M5]",
+"[-]",
+"[BCK]",
+"[TAB]",
+"[-]",
+"[-]",
+"[CLR]",
+"[RET]",
+"[-]",
+"[-]",
+"[SHI]",
+"[CTR]",
+"[ALT]",
+"[PAU]",
+"[CAP]",
+"[KAN]",
+"[-]",
+"[JUN]",
+"[FIN]",
+"[KAN]",
+"[-]",
+"[ESC]",
+"[CON]",
+"[NCO]",
+"[ACC]",
+"[MAD]",
+"[SPA]",
+"[PGU]",
+"[PGD]",
+"[END]",
+"[HOM]",
+"[LEF]",
+"[UP]",
+"[RIG]",
+"[DOW]",
+"[SEL]",
+"[PRI]",
+"[EXE]",
+"[PRI]",
+"[INS]",
+"[DEL]",
+"[HEL]",
+"[0]",
+"[1]",
+"[2]",
+"[3]",
+"[4]",
+"[5]",
+"[6]",
+"[7]",
+"[8]",
+"[9]",
+"[0]",
+"[-]",
+"[-]",
+"[-]",
+"[-]",
+"[-]",
+"[-]",
+"[A]",
+"[B]",
+"[C]",
+"[D]",
+"[E]",
+"[F]",
+"[G]",
+"[H]",
+"[I]",
+"[J]",
+"[K]",
+"[L]",
+"[M]",
+"[N]",
+"[O]",
+"[P]",
+"[Q]",
+"[R]",
+"[S]",
+"[T]",
+"[U]",
+"[V]",
+"[W]",
+"[X]",
+"[Y]",
+"[Z]",
+"[WIN]",
+"[WIN]",
+"[5D]",
+"[-]",
+"[SLE]",
+"[KP0]",
+"[KP1]",
+"[KP2]",
+"[KP3]",
+"[KP4]",
+"[KP5]",
+"[KP6]",
+"[KP7]",
+"[KP8]",
+"[KP9]",
+"[KP*]",
+"[KP+]",
+"[SEP]",
+"[KP-]",
+"[KP.]",
+"[KP/]",
+"[F1]",
+"[F2]",
+"[F3]",
+"[F4]",
+"[F5]",
+"[F6]",
+"[F7]",
+"[F8]",
+"[F9]",
+"[F10]",
+"[F11]",
+"[F12]",
+"[F13]",
+"[F14]",
+"[F15]",
+"[F16]",
+"[F17]",
+"[F18]",
+"[F19]",
+"[F20]",
+"[F21]",
+"[F22]",
+"[F23]",
+"[F24]",
+"[-]",
+"[-]",
+"[-]",
+"[-]",
+"[-]",
+"[-]",
+"[-]",
+"[-]",
+"[NUM]",
+"[SCR]",
+"[EQU]",
+"[MAS]",
+"[TOY]",
+"[OYA]",
+"[OYA]",
+"[-]",
+"[-]",
+"[-]",
+"[-]",
+"[-]",
+"[-]",
+"[-]",
+"[-]",
+"[-]",
+"[SHI]",
+"[SHI]",
+"[CTR]",
+"[CTR]",
+"[ALT]",
+"[ALT]"
+};
+
 GuiContext* IdaLovesMe::Globals::Gui_Ctx = NULL;
 std::vector<DrawList::RenderObject> DrawList::Drawlist;
 
@@ -227,7 +396,7 @@ void ui::AddItemToWindow(GuiWindow* Window, Rect size, GuiFlags flags) {
 	GuiContext& g = *Gui_Ctx;
 	Window->PevCursorPos = Window->CursorPos;
 	if (!(flags & GuiFlags_ColorPicker))
-		Window->CursorPos = Window->CursorPos + Vec2(0, size.Max.y + (flags & GuiFlags_ComboBox ? 2 : g.ItemSpacing.y));
+		Window->CursorPos = Window->CursorPos + Vec2(0, size.Max.y + ((flags & GuiFlags_ComboBox) || (flags & GuiFlags_PopUp) ? 2 : g.ItemSpacing.y));
 }
 
 bool ui::ButtonBehavior(GuiWindow* Window, const char* label, Rect bb, bool& hovered, bool& held, GuiFlags flags) {
@@ -283,6 +452,7 @@ HSV ui::ColorPickerBehavior(GuiWindow* PickerWindow, Rect& RcColor, Rect& RcAlph
 	static int ActiveBar = -1;
 
 	CColor Ccol = CColor(col[0], col[1], col[2], col[3]);
+	
 	static HSV hsv = HSV(Ccol.Hue(), Ccol.Saturation(), Ccol.Brightness(), Ccol.a());
 
 	bool hovered, held;
@@ -491,7 +661,7 @@ void ui::Begin(const char* Name, GuiFlags flags) {
 
 		Render::Draw->Triangle(Window->Pos + Window->Size - Vec2(2, 2), Window->Pos + Window->Size - Vec2(2, 8), Window->Pos + Window->Size - Vec2(8, 2), border_color, true);
 	}
-	else if ((flags & GuiFlags_ComboBox) && Window->Opened) {
+	else if (((flags & GuiFlags_ComboBox) || (flags & GuiFlags_PopUp)) && Window->Opened) {
 		DrawList::AddRect(Window->Pos, Window->Size, D3DCOLOR_RGBA(12, 12, 12, g.MenuAlpha));
 		DrawList::AddFilledRect(Window->Pos + Vec2(1, 1), Window->Size - Vec2(2, 2), D3DCOLOR_RGBA(35, 35, 35, g.MenuAlpha));
 	}
@@ -840,8 +1010,6 @@ bool ui::BeginCombo(const char* label, const char* preview_value, int items, Gui
 	GuiWindow* Popup = GetCurrentWindow();
 	Popup->ParentWindow = Window;
 
-	Popup->CursorPos += Vec2(1, 1);
-
 	opened = Popup->Opened;
 
 	if (!Popup->Opened && hovered && !Window->ItemActive[label])
@@ -1003,3 +1171,74 @@ bool ui::ColorPicker(const char* label, int col[4], GuiFlags flags) {
 
 	return true;
 }
+
+bool ui::KeyBind(const char* id, int* current_key, int* key_style) {
+	GuiContext& g = *Gui_Ctx;
+	GuiWindow* Window = GetCurrentWindow();
+	static bool edit_requested = false;
+
+	Vec2 TextSize = Render::Draw->GetTextSize(Render::Fonts::SmallFont, keys[*current_key]);
+	Rect Fullbb = { Window->Pos.x + Window->Size.x - TextSize.x - 25, Window->PevCursorPos.y , TextSize.x, TextSize.y };
+
+	bool hovered, held;
+	bool pressed = ButtonBehavior(Window, id, Fullbb, hovered, held, GuiFlags_ReturnKeyReleased);
+
+	if (pressed)
+		edit_requested = true;
+
+	if (edit_requested) {
+		for (int i = 0; i < 166; i++) {
+			if (g.KeyState[i]) {
+				*current_key = i;
+				edit_requested = false;
+				break;
+			}
+		}
+	}
+
+	D3DCOLOR TextColor = edit_requested ? D3DCOLOR_RGBA(255, 0, 0, g.MenuAlpha) : (hovered ? D3DCOLOR_RGBA(141, 141, 141, g.MenuAlpha) : D3DCOLOR_RGBA(114, 114, 114, g.MenuAlpha) );
+	Render::Draw->Text(keys[*current_key], Fullbb.Min.x + TextSize.x, Fullbb.Min.y, RIGHT, Render::Fonts::SmallFont, true,  TextColor);
+
+	SetNextWindowPos(Vec2(Fullbb.Min.x + TextSize.x - 110, Fullbb.Min.y));
+	SetNextWindowSize(Vec2(100, 80));
+
+	Begin(id, GuiFlags_PopUp);
+	GuiWindow* PopUp = GetCurrentWindow();
+
+	PopUp->CursorPos += Vec2(1, 1);
+
+	if (hovered && KeyReleased(VK_RBUTTON))
+		PopUp->Opened = !PopUp->Opened;
+
+	if (PopUp->Opened) {
+		static bool changed = false;
+
+		static int start_item = *key_style;
+		static int old_item = *key_style;
+
+		if (old_item != *key_style)
+			changed = true;
+		old_item = *key_style;
+
+		if (Selectable("Always on", *key_style == 0 ? true : false))
+			*key_style = 0;
+		else if (Selectable("On hotkey", *key_style == 1 ? true : false))
+			*key_style = 1;
+		else if (Selectable("Toggle", *key_style == 2 ? true : false))
+			*key_style = 2;
+		else if (Selectable("Off hotkey", *key_style == 3 ? true : false))
+			*key_style = 3;
+
+		if (IsInside(GetWindowPos().x, GetWindowPos().y, GetWindowSize().x, GetWindowSize().y) && KeyReleased(VK_LBUTTON)) {
+			if (start_item != *key_style || !changed)
+				PopUp->Opened = false;
+			start_item = *key_style;
+			changed = false;
+		}
+	}
+
+	SetCurrentWindow(Window);
+
+	return 1;
+}
+

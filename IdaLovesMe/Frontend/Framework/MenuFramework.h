@@ -240,6 +240,7 @@ namespace IdaLovesMe {
 		bool					 SingleSelect(const char* label, int* current_item, std::vector<const char*> items);
 		bool					 MultiSelect(const char* label, std::unordered_map<int, bool>* data, std::vector<const char*> items);
 		bool					 ColorPicker(const char* label, int col[4], GuiFlags flags = NULL);
+		bool					 KeyBind(const char* label, int* current_key, int* keystyle);
 		
 		template				 <typename T>
 		void					 Slider(const char* label, T* v, T v_min, T v_max, const char* format = NULL, GuiFlags flags = NULL, float scale = 1.f);
@@ -250,6 +251,7 @@ namespace IdaLovesMe {
 
 	namespace Globals {
 		extern GuiContext*	     Gui_Ctx;
+	
 	}
-}
 
+}

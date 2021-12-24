@@ -26,6 +26,7 @@ namespace Render {
         extern LPD3DXFONT LegitTabIcons;
         extern LPD3DXFONT Verdana;
         extern LPD3DXFONT Tahombd;
+        extern LPD3DXFONT SmallFont;
     }
 
     class CDraw
@@ -47,15 +48,8 @@ namespace Render {
         void Rect(Vec2 Pos, Vec2 Size, float linewidth, D3DCOLOR Color, bool Antialias = false);
         void FilledRect(Vec2 Pos, Vec2 Size, D3DCOLOR color, bool Antialias = false);
         void BorderedRect(Vec2 Pos, Vec2 Size, float BorderWidth, D3DCOLOR Color, D3DCOLOR BorderColor);
-        //void RoundedRect(float x, float y, float w, float h, float radius, bool smoothing, D3DCOLOR color, D3DCOLOR bcolor);
-
         void Gradient(Vec2 Pos, Vec2 Size, D3DCOLOR LColor, D3DCOLOR ROtherColor, bool Vertical = false, bool Antialias = false);
-
-        //void Circle(float x, float y, float radius, int rotate, int type, bool smoothing, int resolution, D3DCOLOR color);
-        //void CircleFilled(float x, float y, float rad, float rotate, int type, int resolution, D3DCOLOR color);
-
         void Triangle(Vec2 Top, Vec2 Left, Vec2 Right, D3DCOLOR Color, bool antialias = false);
-
         void Text(const char* Text, float X, float Y, int Orientation, LPD3DXFONT Font, bool Bordered, D3DCOLOR Color, Vec2 MaxSize = Vec2(0, 0));
         //=============================================================================================
 

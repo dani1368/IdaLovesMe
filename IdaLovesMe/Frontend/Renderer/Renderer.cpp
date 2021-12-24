@@ -13,6 +13,7 @@ namespace Render {
         LPD3DXFONT LegitTabIcons;
         LPD3DXFONT Verdana;
         LPD3DXFONT Tahombd;
+        LPD3DXFONT SmallFont;
     }
 }
 
@@ -25,6 +26,7 @@ void CDraw::CreateObjects()
 
     D3DXCreateFontA(m_Device, 12, 0, 0, 0, 0, ANSI_CHARSET, OUT_DEFAULT_PRECIS, CLEARTYPE_NATURAL_QUALITY, DEFAULT_PITCH, "Verdana", &Fonts::Verdana);
     D3DXCreateFontA(m_Device, 12, 0, FW_BOLD, 0, 0, ANSI_CHARSET, OUT_DEFAULT_PRECIS, CLEARTYPE_NATURAL_QUALITY, FIXED_PITCH, "Tahoma", &Fonts::Tahombd);
+    D3DXCreateFontA(m_Device, 8, 0, 0, 0, 0, ANSI_CHARSET, OUT_DEFAULT_PRECIS, NONANTIALIASED_QUALITY, DEFAULT_PITCH, "Small Fonts", &Fonts::SmallFont);
 
     this->m_TabFont = AddFontMemResourceEx((void*)(FontsData::TabIcons), (DWORD)5192, nullptr, &nFonts);
     D3DXCreateFontA(m_Device, 47, 0, 0, 0, 0, ANSI_CHARSET, OUT_DEFAULT_PRECIS, DRAFT_QUALITY, DEFAULT_PITCH, "gamesense", &Fonts::TabIcons);
@@ -47,6 +49,8 @@ void CDraw::ReleaseObjects()
         Fonts::Verdana->Release();
     if (Fonts::Tahombd)
         Fonts::Tahombd->Release();
+    if (Fonts::SmallFont)
+        Fonts::SmallFont->Release();
 
     if (Fonts::TabIcons) {
         Fonts::TabIcons->Release();
@@ -104,126 +108,6 @@ void CDraw::Line(Vec2 Pos, Vec2 Pos2, D3DCOLOR Color)
     m_Device->SetRenderState(D3DRS_ANTIALIASEDLINEENABLE, TRUE);
 }
 
-/*
-void CDraw::Circle(float x, float y, float radius, int rotate, int type, bool smoothing, int resolution, D3DCOLOR Color)
-{
-    std::vector<vertex> circle(resolution + 2);
-    float angle = rotate * D3DX_PI / 180;
-    float pi;
-
-    if (type == FULL) pi = D3DX_PI;        // Full circle
-    if (type == HALF) pi = D3DX_PI / 2;      // 1/2 circle
-    if (type == QUARTER) pi = D3DX_PI / 4;   // 1/4 circle
-
-    for (int i = 0; i < resolution + 2; i++)
-    {
-        circle[i].x = (float)(x - radius * cos(i * (2 * pi / resolution)));
-        circle[i].y = (float)(y - radius * sin(i * (2 * pi / resolution)));
-        circle[i].z = 0;
-        circle[i].rhw = 1;
-        circle[i].Color = Color;
-    }
-
-    // Rotate matrix
-    int _res = resolution + 2;
-    for (int i = 0; i < _res; i++)
-    {
-        circle[i].x -= x;
-        circle[i].y -= y;
-
-        float xnew = circle[i].x * cos(angle) - circle[i].y * sin(angle);
-        float ynew = circle[i].x * sin(angle) + circle[i].y * cos(angle);
-
-        circle[i].x = xnew + x;
-        circle[i].y = ynew + y;
-    }
-    /*
-    m_Device->CreateVertexBuffer((resolution + 2) * sizeof(vertex), D3DUSAGE_WRITEONLY, D3DFVF_XYZRHW | D3DFVF_DIFFUSE, D3DPOOL_DEFAULT, &m_VB, NULL);
-
-    VOID* pVertices;
-    m_VB->Lock(0, (resolution + 2) * sizeof(vertex), (void**)&pVertices, 0);
-    memcpy(pVertices, &circle[0], (resolution + 2) * sizeof(vertex));
-    m_VB->Unlock();
-
-
-    m_Device->SetTexture(0, NULL);
-    m_Device->SetPixelShader(NULL);
-    if (smoothing)
-    {
-        m_Device->SetRenderState(D3DRS_MULTISAMPLEANTIALIAS, TRUE);
-        m_Device->SetRenderState(D3DRS_ANTIALIASEDLINEENABLE, TRUE);
-    }
-    m_Device->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
-    m_Device->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
-    m_Device->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
-
-    m_Device->SetStreamSource(0, m_VB, 0, sizeof(vertex));
-    m_Device->SetFVF(D3DFVF_XYZRHW | D3DFVF_DIFFUSE);
-
-    m_Device->DrawPrimitive(D3DPT_LINESTRIP, 0, resolution);
-    if (m_VB != NULL) m_VB->Release();
-
-}
-
-void CDraw::CircleFilled(float x, float y, float rad, float rotate, int type, int resolution, D3DCOLOR Color)
-{
-    std::vector<vertex> circle(resolution + 2);
-    float angle = rotate * D3DX_PI / 180;
-    float pi = D3DX_PI;
-
-    if (type == FULL) pi = D3DX_PI;        // Full circle
-    if (type == HALF) pi = D3DX_PI / 2;      // 1/2 circle
-    if (type == QUARTER) pi = D3DX_PI / 4;   // 1/4 circle
-
-
-    circle[0].x = x;
-    circle[0].y = y;
-    circle[0].z = 0;
-    circle[0].rhw = 1;
-    circle[0].Color = Color;
-
-    for (int i = 1; i < resolution + 2; i++)
-    {
-        circle[i].x = (float)(x - rad * cos(pi * ((i - 1) / (resolution / 2.0f))));
-        circle[i].y = (float)(y - rad * sin(pi * ((i - 1) / (resolution / 2.0f))));
-        circle[i].z = 0;
-        circle[i].rhw = 1;
-        circle[i].Color = Color;
-    }
-
-    int _res = resolution + 2;
-    for (int i = 0; i < _res; i++)
-    {
-        circle[i].x -= x;
-        circle[i].y -= y;
-
-        float xnew = circle[i].x * cos(angle) - circle[i].y * sin(angle);
-        float ynew = circle[i].x * sin(angle) + circle[i].y * cos(angle);
-
-        circle[i].x = xnew + x;
-        circle[i].y = ynew + y;
-    }
-    /*
-    m_Device->CreateVertexBuffer((resolution + 2) * sizeof(vertex), D3DUSAGE_WRITEONLY, D3DFVF_XYZRHW | D3DFVF_DIFFUSE, D3DPOOL_DEFAULT, &m_VB, NULL);
-
-    VOID* pVertices;
-    m_VB->Lock(0, (resolution + 2) * sizeof(vertex), (void**)&pVertices, 0);
-    memcpy(pVertices, &circle[0], (resolution + 2) * sizeof(vertex));
-    m_VB->Unlock();
-
-    m_Device->SetTexture(0, NULL);
-    m_Device->SetPixelShader(NULL);
-    m_Device->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
-    m_Device->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
-    m_Device->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
-
-    m_Device->SetStreamSource(0, m_VB, 0, sizeof(vertex));
-    m_Device->SetFVF(D3DFVF_XYZRHW | D3DFVF_DIFFUSE);
-    m_Device->DrawPrimitive(D3DPT_TRIANGLEFAN, 0, resolution);
-    if (m_VB != NULL) m_VB->Release();
-
-}
-*/
 void CDraw::Rect(Vec2 Pos, Vec2 Size, float LineWidth, D3DCOLOR Color, bool Antialias)
 {
     if (LineWidth == 0 || LineWidth == 1)
@@ -301,20 +185,29 @@ void CDraw::Text(const char* text, float x_, float y_, int Orientation, LPD3DXFO
     switch (Orientation)
     {
     case LEFT: TextFlags = NoClipRect ? DT_LEFT | DT_NOCLIP : DT_LEFT; break;
-    case CENTER: TextFlags = NoClipRect ? DT_CENTER | DT_NOCLIP : DT_LEFT;  break;
-    case RIGHT: TextFlags = NoClipRect ? DT_RIGHT | DT_NOCLIP : DT_LEFT; break;
+    case CENTER: TextFlags = NoClipRect ? DT_CENTER | DT_NOCLIP : DT_CENTER;  break;
+    case RIGHT: TextFlags = NoClipRect ? DT_RIGHT | DT_NOCLIP : DT_RIGHT; break;
     }
 
     if (Bordered)
     {
         NoClipRect ? SetRect(&rect, x - 1, y, x - 1, y) : SetRect(&rect, x - 1, y, (int)TextClipSize.x - 1, (int)TextClipSize.y);
-        Font->DrawTextA(NULL, text, -1, &rect, TextFlags, D3DCOLOR_RGBA(0, 0, 0, get_a(Color)));
-        NoClipRect ? SetRect(&rect, x - 1, y, x - 1, y) : SetRect(&rect, x + 1, (int)TextClipSize.y, (int)TextClipSize.x + 1, (int)TextClipSize.y);
-        Font->DrawTextA(NULL, text, -1, &rect, TextFlags, D3DCOLOR_RGBA(0, 0, 0, get_a(Color)));
+        Font->DrawTextA(NULL, text, -1, &rect, TextFlags, D3DCOLOR_RGBA(15, 15, 15, get_a(Color)));
+        NoClipRect ? SetRect(&rect, x + 1, y, x + 1, y) : SetRect(&rect, x + 1, (int)TextClipSize.y, (int)TextClipSize.x + 1, (int)TextClipSize.y);
+        Font->DrawTextA(NULL, text, -1, &rect, TextFlags, D3DCOLOR_RGBA(15, 15, 15, get_a(Color)));
         NoClipRect ? SetRect(&rect, x, y - 1, x, y - 1) : SetRect(&rect, x, y - 1, (int)TextClipSize.x, (int)TextClipSize.y - 1);
-        Font->DrawTextA(NULL, text, -1, &rect, TextFlags, D3DCOLOR_RGBA(0, 0, 0, get_a(Color)));
+        Font->DrawTextA(NULL, text, -1, &rect, TextFlags, D3DCOLOR_RGBA(15, 15, 15, get_a(Color)));
         NoClipRect ? SetRect(&rect, x, y + 1, x, y + 1) : SetRect(&rect, x, y + 1, (int)TextClipSize.x, (int)TextClipSize.y + 1);
-        Font->DrawTextA(NULL, text, -1, &rect, TextFlags, D3DCOLOR_RGBA(0, 0, 0, get_a(Color)));
+        Font->DrawTextA(NULL, text, -1, &rect, TextFlags, D3DCOLOR_RGBA(15, 15, 15, get_a(Color)));
+
+        NoClipRect ? SetRect(&rect, x - 1, y - 1, x - 1, y - 1) : SetRect(&rect, x - 1, y, (int)TextClipSize.x - 1, (int)TextClipSize.y);
+        Font->DrawTextA(NULL, text, -1, &rect, TextFlags, D3DCOLOR_RGBA(15, 15, 15, get_a(Color)));
+        NoClipRect ? SetRect(&rect, x + 1, y + 1, x + 1, y + 1) : SetRect(&rect, x + 1, (int)TextClipSize.y, (int)TextClipSize.x + 1, (int)TextClipSize.y);
+        Font->DrawTextA(NULL, text, -1, &rect, TextFlags, D3DCOLOR_RGBA(15, 15, 15, get_a(Color)));
+        NoClipRect ? SetRect(&rect, x - 1, y + 1, x - 1, y + 1) : SetRect(&rect, x, y - 1, (int)TextClipSize.x, (int)TextClipSize.y - 1);
+        Font->DrawTextA(NULL, text, -1, &rect, TextFlags, D3DCOLOR_RGBA(15, 15, 15, get_a(Color)));
+        NoClipRect ? SetRect(&rect, x + 1, y - 1, x + 1, y - 1) : SetRect(&rect, x, y + 1, (int)TextClipSize.x, (int)TextClipSize.y + 1);
+        Font->DrawTextA(NULL, text, -1, &rect, TextFlags, D3DCOLOR_RGBA(15, 15, 15, get_a(Color)));
     }
 
     NoClipRect ? SetRect(&rect, x, y, x, y) : SetRect(&rect, x, y, (int)TextClipSize.x, (int)TextClipSize.y);
