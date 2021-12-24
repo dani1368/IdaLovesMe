@@ -1010,6 +1010,8 @@ bool ui::BeginCombo(const char* label, const char* preview_value, int items, Gui
 	GuiWindow* Popup = GetCurrentWindow();
 	Popup->ParentWindow = Window;
 
+	Popup->CursorPos += Vec2(1, 1);
+
 	opened = Popup->Opened;
 
 	if (!Popup->Opened && hovered && !Window->ItemActive[label])
@@ -1199,7 +1201,7 @@ bool ui::KeyBind(const char* id, int* current_key, int* key_style) {
 	D3DCOLOR TextColor = edit_requested ? D3DCOLOR_RGBA(255, 0, 0, g.MenuAlpha) : (hovered ? D3DCOLOR_RGBA(141, 141, 141, g.MenuAlpha) : D3DCOLOR_RGBA(114, 114, 114, g.MenuAlpha) );
 	Render::Draw->Text(keys[*current_key], Fullbb.Min.x + TextSize.x, Fullbb.Min.y, RIGHT, Render::Fonts::SmallFont, true,  TextColor);
 
-	SetNextWindowPos(Vec2(Fullbb.Min.x + TextSize.x - 110, Fullbb.Min.y));
+	SetNextWindowPos(Vec2(Fullbb.Min.x - 109, Fullbb.Min.y - 2));
 	SetNextWindowSize(Vec2(100, 80));
 
 	Begin(id, GuiFlags_PopUp);
@@ -1241,4 +1243,3 @@ bool ui::KeyBind(const char* id, int* current_key, int* key_style) {
 
 	return 1;
 }
-

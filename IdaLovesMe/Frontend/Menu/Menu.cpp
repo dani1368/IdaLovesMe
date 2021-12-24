@@ -70,7 +70,7 @@ void CMenu::Draw()
 	if (this->m_nCurrentTab == 0) {
 		ui::BeginChild("A", ui::GetWindowPos() + Vec2(100, 30), Vec2(258, 506), false);
 		ui::Checkbox("Enabled", &cfg->b["niga"]);
-		ui::KeyBind("Keybind1", &cfg->i["SuperKeybind"], &cfg->i["SuperKeybindstlye"]);
+		//ui::KeyBind("Keybind1", &cfg->i["SuperKeybind"], &cfg->i["SuperKeybindstlye"]);
 		ui::SliderInt("Minimum damage", &cfg->i["Uwu"], 0, 126, cfg->i["Uwu"] == 0 ? "Auto" : (cfg->i["Uwu"] > 100 ? "HP+%d" : "%dhp"));
 		ui::SliderFloat("Maximum FOV", &cfg->f["Uwu"], 0.f, 180.f, "%.2f°", 0.1f);
 		ui::Button("Log aimbot shots");
@@ -85,7 +85,7 @@ void CMenu::Draw()
 		ui::ColorPicker("ColorPickeroddds", cfg->c["MenuColor"]);
 		ui::SliderInt("Gay Meter", &cfg->i["Uwudsdsd"], 0, 100, "%d%%");
 
-		ui::MultiSelect("Multiselector", &cfg->m["MultiSelecto"], { "You are stupido", "OMG REEL SKEET?", " best", "l0l0l0l" });
+		ui::MultiSelect("Multiselector", &cfg->m["MultiSelecto"], { "You are stupido", "OMG REEL SKEET?", "best", "l0l0l0l" });
 
 		ui::EndChild();
 
@@ -98,6 +98,9 @@ void CMenu::Draw()
 		
 		ui::SingleSelect("Turbo Pasta", &cfg->i["MultiSelecto32"], { "Selling", "Buy", "Today", "Now" });
 		ui::ColorPicker("ColorPickeroddsad", cfg->c["MenuColordsadsa"]);
+
+		ui::Checkbox("Enabled", &cfg->b["nigadsads"]);
+		ui::KeyBind("Keybind1dwasd", &cfg->i["SuperKeybinddsad123"], &cfg->i["SuperKeybindstlye2132"]);
 		ui::EndChild();
 	}
 
