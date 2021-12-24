@@ -1,7 +1,7 @@
 #pragma once
 #include "../../Backend/Globalincludes.h"
 #include "../../Backend/Misc/singleton.h"
-
+#include "../Framework/MenuFramework.h"
 #include <unordered_map>
 
 class CMenu : public singleton<CMenu> 

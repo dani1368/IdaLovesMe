@@ -229,7 +229,7 @@ namespace IdaLovesMe {
 		void					 Begin(const char* Id, GuiFlags flags);
 		void					 End();
 
-		void					 BeginChild(const char* Id, Vec2 default_pos, Vec2 default_size, GuiFlags flags);
+		void					 BeginChild(const char* id, Rect X = { Vec2(0, 0), Vec2(3,10) }, GuiFlags flags = NULL);
 		void					 EndChild();
 		//-------Controls-------//
 		void					 TabButton(const char* label, int* selected, int num, int total, const int flags);
@@ -241,7 +241,7 @@ namespace IdaLovesMe {
 		bool					 MultiSelect(const char* label, std::unordered_map<int, bool>* data, std::vector<const char*> items);
 		bool					 ColorPicker(const char* label, int col[4], GuiFlags flags = NULL);
 		bool					 KeyBind(const char* label, int* current_key, int* keystyle);
-		void					 Label(const char* label, GuiFlags flags = NULL);
+		void					 Label(const char* label, bool special = false, GuiFlags flags = NULL);
 		
 		template				 <typename T>
 		void					 Slider(const char* label, T* v, T v_min, T v_max, const char* format = NULL, GuiFlags flags = NULL, float scale = 1.f);

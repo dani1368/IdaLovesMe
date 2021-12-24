@@ -526,7 +526,7 @@ void ui::HandleMoving(GuiWindow* Window, Rect Boundaries, Vec2* buffer) {
 			const Vec2 mouse_delta{ g.MousePos.x - g.PrevMousePos.x , g.MousePos.y - g.PrevMousePos.y };
 			const Vec2 new_position{ Window->Pos.x + mouse_delta.x, Window->Pos.y + mouse_delta.y };
 
-			Window->Pos = new_position;
+			Window->Pos = Vec2(std::clamp(new_position.x, Boundaries.Min.x, Boundaries.Max.x), std::clamp(new_position.y, Boundaries.Min.y, Boundaries.Max.y));
 		}
 
 		else if (!KeyDown(VK_LBUTTON) && Window->Dragging)
@@ -630,7 +630,7 @@ void ui::Begin(const char* Name, GuiFlags flags) {
 
 	//Handle Resize and Moving
 	if (!Window->Block && !(flags & GuiFlags_ChildWindow) && !(Window->Flags & GuiFlags_PopUp)) {
-		HandleMoving(Window, Rect{});
+		HandleMoving(Window, Rect{Vec2(0 - Window->Size.x / 2, 0 - Window->Size.y / 2), Vec2(Render::Draw->Screen.Width + Window->Size.x / 2, Render::Draw->Screen.Height + Window->Size.y / 2) } );
 		HandleResize(Window, Rect{ Vec2(660, 560), Vec2(1920, 1080) });
 	}
 
@@ -670,8 +670,13 @@ void ui::Begin(const char* Name, GuiFlags flags) {
 	else if (flags & GuiFlags_ChildWindow) {
 		Vec2 label_size;
 
-		if (!strlen(Name) == 0)
-			label_size = Render::Draw->GetTextSize(Render::Fonts::Verdana, Name);
+		std::string ChildName = Window->Name;
+
+		if (Window->Name.find("#") != std::string::npos)
+			ChildName = ChildName.substr(0, Window->Name.find("#"));
+
+		if (!ChildName.empty())
+			label_size = Render::Draw->GetTextSize(Render::Fonts::Verdana, ChildName.c_str());
 
 		Window->Pos = Vec2(floor(Window->Pos.x), floor(Window->Pos.y));
 		Window->Size = Vec2(floor(Window->Size.x), floor(Window->Size.y));
@@ -728,7 +733,7 @@ void ui::End() {
 
 }
 
-void ui::BeginChild(const char* Name, Vec2 default_pos, Vec2 default_size, GuiFlags flags) {
+void ui::BeginChild(const char* Name, Rect X, GuiFlags flags) {
 	GuiContext& g = *Gui_Ctx;
 	GuiWindow* parent_window = g.Windows.at(0);
 	flags |= GuiFlags_ChildWindow;
@@ -744,8 +749,8 @@ void ui::BeginChild(const char* Name, Vec2 default_pos, Vec2 default_size, GuiFl
 		if (parent_window->ChildWindows.at(idx)) {
 			Rect Boundaries = { parent_window->Pos.x + 99, parent_window->Pos.y + 29, parent_window->Size.x - (99 + 23), parent_window->Size.y - (29 + 23) };
 
-			Vec2 ChildPos = default_pos;
-			Vec2 ChildSize = default_size;
+			Vec2 ChildPos = ui::GetWindowPos() + Vec2(100, 30);
+			Vec2 ChildSize;
 
 			if (!parent_window->ChildWindows.at(idx)->Block) {
 				HandleMoving(parent_window->ChildWindows.at(idx), Boundaries, &ChildPos);
@@ -763,17 +768,19 @@ void ui::BeginChild(const char* Name, Vec2 default_pos, Vec2 default_size, GuiFl
 	child_window->ParentWindow = parent_window;
 
 	RECT ClipRect = { (LONG)child_window->Pos.x, (LONG)child_window->Pos.y + 4, LONG(child_window->Pos.x + child_window->Size.x - 15), LONG(child_window->Pos.y + child_window->Size.y - 3) };
-
 	Render::Draw->GetD3dDevice()->SetScissorRect(&ClipRect);
-
 	Render::Draw->GetD3dDevice()->SetRenderState(D3DRS_SCISSORTESTENABLE, TRUE);
 
 	if (!child_window->Init) {
 		parent_window->ChildWindows.push_back(FindWindowByName(Name));
+		
+		child_window->xPos = (int)X.Min.x;
+		child_window->yPos = (int)X.Min.y;
+		
+		child_window->xSize = (int)X.Max.x;
+		child_window->ySize = (int)X.Max.y;
+		
 		child_window->Init = true;
-
-		if (child_window->Name == "Other")
-			child_window->xPos = 6;
 	}
 
 	child_window->CursorPos += Vec2(22, 26);
@@ -782,10 +789,7 @@ void ui::BeginChild(const char* Name, Vec2 default_pos, Vec2 default_size, GuiFl
 void ui::EndChild() {
 	GuiContext& g = *Gui_Ctx;
 	GuiWindow* window = GetCurrentWindow();
-	Vec2 text_size;
-	if (!window->Name.empty())
-		text_size = Render::Draw->GetTextSize(Render::Fonts::Tahombd, window->Name.c_str());
-
+	
 	window->CursorPos.y += 22;
 
 	Render::Draw->GetD3dDevice()->SetRenderState(D3DRS_SCISSORTESTENABLE, FALSE);
@@ -817,8 +821,18 @@ void ui::EndChild() {
 	window->CursorPos.y += !(window->PrevCursorPos.y > (int)window->Pos.y + (int)window->Size.y) ? 0 : (int)(offset * window->ScrollRatio);
 	window->PrevCursorPos = window->CursorPos;
 	
-	Render::Draw->Text(window->Name.c_str(), window->Pos.x + 14, window->Pos.y + (text_size.y / -2) + 1, LEFT, Render::Fonts::Tahombd, false, D3DCOLOR_RGBA(0, 0, 0, g.MenuAlpha));
-	Render::Draw->Text(window->Name.c_str(), window->Pos.x + 13, window->Pos.y + (text_size.y / -2), LEFT, Render::Fonts::Tahombd, false, window->Dragging ? CMenu::get()->GetMenuColor() : D3DCOLOR_RGBA(205, 205, 205, g.MenuAlpha));
+	Vec2 text_size;
+	std::string ChildName = window->Name;
+
+	if (window->Name.find("#") != std::string::npos)
+		ChildName = ChildName.substr(0, window->Name.find("#"));
+
+	
+	if (!ChildName.empty())
+		text_size = Render::Draw->GetTextSize(Render::Fonts::Tahombd, ChildName.c_str());
+	
+	Render::Draw->Text(ChildName.c_str(), window->Pos.x + 14, window->Pos.y + (text_size.y / -2) + 1, LEFT, Render::Fonts::Tahombd, false, D3DCOLOR_RGBA(0, 0, 0, g.MenuAlpha));
+	Render::Draw->Text(ChildName.c_str(), window->Pos.x + 13, window->Pos.y + (text_size.y / -2), LEFT, Render::Fonts::Tahombd, false, window->Dragging ? CMenu::get()->GetMenuColor() : D3DCOLOR_RGBA(205, 205, 205, g.MenuAlpha));
 
 	SetCurrentWindow(g.Windows.at(0));
 }
@@ -1285,7 +1299,7 @@ bool ui::KeyBind(const char* id, int* current_key, int* key_style) {
 	return 1;
 }
 
-void ui::Label(const char* label, GuiFlags flags) {
+void ui::Label(const char* label, bool special, GuiFlags flags) {
 	GuiContext& g = *Gui_Ctx;
 	GuiWindow* Window = GetCurrentWindow();
 	
@@ -1294,5 +1308,5 @@ void ui::Label(const char* label, GuiFlags flags) {
 
 	AddItemToWindow(Window, bb, GuiFlags_Label);
 	
-	Render::Draw->Text(label, bb.Min.x, bb.Min.y, LEFT, Render::Fonts::Verdana, false, D3DCOLOR_RGBA(205, 205, 205, g.MenuAlpha));
+	Render::Draw->Text(label, bb.Min.x, bb.Min.y, LEFT, Render::Fonts::Verdana, false, special ? D3DCOLOR_RGBA(182, 182, 101, g.MenuAlpha) : D3DCOLOR_RGBA(205, 205, 205, g.MenuAlpha));
 }
