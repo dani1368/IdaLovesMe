@@ -1,5 +1,4 @@
 ﻿#include "Menu.h"
-#include "../Framework/MenuFramework.h"
 #include "../../Backend/Utilities/Utilities.h"
 #include "../../Backend/Config/Settings.h"
 
@@ -184,7 +183,7 @@ void CMenu::Draw()
 		ui::EndChild();
 	}
 	else if (this->m_nCurrentTab == 2) {
-		ui::BeginChild("Weapon type", { Vec2(0,0), Vec2(9, 0) });
+		ui::BeginChild("Weapon type", { Vec2(0,0), Vec2(9, 0) }, GuiFlags_NoMove | GuiFlags_NoResize);
 		ui::EndChild();
 		ui::BeginChild("Aimbot#Legit", { Vec2(0, 2), Vec2(3, 8) });
 		ui::EndChild();

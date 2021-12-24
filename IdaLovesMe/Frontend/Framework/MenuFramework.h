@@ -130,7 +130,8 @@ namespace IdaLovesMe {
 		GuiFlags_Selectable		   = 1 << 13,
 		GuiFlags_SingleSelect	   = 1 << 14,
 		GuiFlags_ColorPicker	   = 1 << 15,
-		GuiFlags_Label             = 1 << 16
+		GuiFlags_Label             = 1 << 16,
+		GuiFlags_LegitTab		   = 1 << 17
 	};
 
 	struct GuiWindow {
@@ -144,7 +145,7 @@ namespace IdaLovesMe {
 		
 		GuiWindow*				 ParentWindow;
 		std::vector<GuiWindow*>  ChildWindows;
-		std::vector<GuiWindow*>   PopUpWindows;
+		std::vector<GuiWindow*>  PopUpWindows;
 
 		std::string				 SelectedItem;
 

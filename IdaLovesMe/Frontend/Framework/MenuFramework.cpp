@@ -543,7 +543,7 @@ void ui::HandleMoving(GuiWindow* Window, Rect Boundaries, Vec2* buffer) {
 			Window->Dragging = true;
 		}
 
-		else if (KeyDown(VK_LBUTTON) && Window->Dragging) {
+		else if (KeyDown(VK_LBUTTON) && Window->Dragging && !(Window->Flags & GuiFlags_NoMove)) {
 			Window->xPos = (int)round((g.MousePos.x - buffer->x - ClickPos.x) / Step.x);
 			Window->yPos = (int)round((g.MousePos.y - buffer->y) / Step.y);
 
@@ -578,7 +578,7 @@ void ui::HandleResize(GuiWindow* Window, Rect Boundaries, Vec2* buffer) {
 		if (IsInside(Window->Pos.x + Window->Size.x - 15, Window->Pos.y + Window->Size.y - 15, 15, 15) && KeyDown(VK_LBUTTON) && !Window->Resizing && !Window->Dragging && !Window->ParentWindow->Resizing && ui::ChildsAreStable(Window->ParentWindow) && NoItemsActive(Window))
 			Window->Resizing = true;
 
-		else if (KeyDown(VK_LBUTTON) && Window->Resizing) {
+		else if (KeyDown(VK_LBUTTON) && Window->Resizing && !(Window->Flags & GuiFlags_NoMove)) {
 			if (g.MousePos.x >= Window->Pos.x + Window->Size.x + Step.x)
 				Window->xSize = (int)round((g.MousePos.x - Window->Pos.x - MinSize.x) / Step.x);
 			else if (g.MousePos.x <= Window->Pos.x + Window->Size.x - Step.x)
