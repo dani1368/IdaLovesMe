@@ -16,7 +16,7 @@ bool Cheat::Initialize()
 
 	Interfaces::InterfaceLoader->Initialize();
 
-	oWndProc = (WNDPROC)SetWindowLongPtr(FindWindow("Valve001", 0), GWL_WNDPROC, (long)&Hooked::wndProc);
+	oWndProc = (WNDPROC)SetWindowLongPtr(FindWindow(L"Valve001", 0), GWL_WNDPROC, (long)&Hooked::wndProc);
 	if (!oWndProc) 
 		return false;
 	
@@ -30,7 +30,7 @@ void Cheat::Unload()
 
 	Cheat::unwrapgameoverlay();
 
-	SetWindowLongPtr(FindWindow("Valve001", 0), GWL_WNDPROC, (LONG)oWndProc);
+	SetWindowLongPtr(FindWindow(L"Valve001", 0), GWL_WNDPROC, (LONG)oWndProc);
 	Misc::Utilities->Console_Close();
 
 	IdaLovesMe::ui::DeleteContext(IdaLovesMe::Globals::Gui_Ctx);

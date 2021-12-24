@@ -285,16 +285,31 @@ static GuiWindow* ui::CreateNewWindow(const char*& name, Vec2 size, GuiFlags fla
 	return window;
 }
 
-void ui::GetInputFromWindow(const std::string& window_name) {
+std::string HWNDToString(HWND inputA)
+{
+	std::string s;
+	int len = GetWindowTextLength(inputA);
+	if (len > 0)
+	{
+		s.resize(len + 1);
+		len = GetWindowText(inputA, LPWSTR(&s[0]), s.size());
+		s.resize(len);
+	}
+	return s;
+}
+
+void ui::GetInputFromWindow(const std::string& window_name) {	
 	GuiContext& g = *Gui_Ctx;
+	
+	POINT p_mouse_pos;
+	GetCursorPos(&p_mouse_pos);
+	ScreenToClient(FindWindowA(nullptr, window_name.data()), &p_mouse_pos);
+
 	for (int i = 0; i < 256; i++) {
 		g.PrevKeyState[i] = g.KeyState[i];
 		g.KeyState[i] = GetAsyncKeyState(i);
 	}
-
-	POINT p_mouse_pos;
-	GetCursorPos(&p_mouse_pos);
-	ScreenToClient(FindWindowA(nullptr, window_name.data()), &p_mouse_pos);
+		
 	g.PrevMousePos = g.MousePos;
 	g.MousePos = Vec2{ (float)p_mouse_pos.x, (float)p_mouse_pos.y };
 }
@@ -356,21 +371,29 @@ Vec2 ui::GetWindowSize() {
 }
 
 bool ui::KeyPressed(const int key) {
+	if (!GetActiveWindow())
+		return false;
 	GuiContext& g = *Gui_Ctx;
 	return g.KeyState[key] && !g.PrevKeyState[key];
 }
 
 bool ui::KeyDown(const int key) {
+	if (!GetActiveWindow())
+		return false;
 	GuiContext& g = *Gui_Ctx;
 	return g.KeyState[key];
 }
 
 bool ui::KeyReleased(const int key) {
+	if (!GetActiveWindow())
+		return false;
 	GuiContext& g = *Gui_Ctx;
 	return !g.KeyState[key] && g.PrevKeyState[key];
 }
 
 bool ui::IsInside(const float x, const float y, const float w, const float h) {
+	if (!GetActiveWindow())
+		return false;
 	GuiContext& g = *Gui_Ctx;
 	return g.MousePos.x > x && g.MousePos.y > y && g.MousePos.x < w + x && g.MousePos.y < h + y;
 }
@@ -389,6 +412,16 @@ bool ui::ChildsAreStable(GuiWindow* Window) {
 		if (Window->ChildWindows[i]->Dragging || Window->ChildWindows[i]->Resizing || !NoItemsActive(Window->ChildWindows[i]))
 			return false;
 	}
+	return true;
+}
+
+bool ui::PopUpsAreClosed(GuiWindow* Window, GuiWindow* popup) {
+
+	for (std::size_t i = 0; i < Window->PopUpWindows.size(); i++) {
+		if (Window->PopUpWindows[i]->Opened)
+			return false;
+	}
+
 	return true;
 }
 
@@ -739,7 +772,7 @@ void ui::BeginChild(const char* Name, Vec2 default_pos, Vec2 default_size, GuiFl
 		parent_window->ChildWindows.push_back(FindWindowByName(Name));
 		child_window->Init = true;
 
-		if (child_window->Name == "B")
+		if (child_window->Name == "Other")
 			child_window->xPos = 6;
 	}
 
@@ -827,7 +860,7 @@ void ui::TabButton(const char* label, int* selected, int num, int total, const i
 	Render::Draw->Text(label, DrawPos.x + Size.x / 2 - label_size.x / 2, DrawPos.y + Size.y / 2 - label_size.y / 2 - 1, LEFT, Render::Fonts::TabIcons, false, textColor);
 }
 
-void ui::Checkbox(const char* label, bool* v) {
+bool ui::Checkbox(const char* label, bool* v, bool special) {
 	GuiContext& g = *Gui_Ctx;
 	GuiWindow* Window = GetCurrentWindow();
 	Vec2 label_size = Render::Draw->GetTextSize(Render::Fonts::Verdana, label);
@@ -841,7 +874,7 @@ void ui::Checkbox(const char* label, bool* v) {
 	bool hovered, held;
 	bool pressed = ButtonBehavior(Window, label, total_bb, hovered, held, GuiFlags_CheckBox);
 
-	if (pressed)
+	if (pressed && PopUpsAreClosed(Window))
 		*v = !*v;
 
 	if (*v)
@@ -853,7 +886,9 @@ void ui::Checkbox(const char* label, bool* v) {
 			Render::Draw->Gradient(DrawPos + Vec2(1, 1), Vec2(6, 6), D3DCOLOR_RGBA(77, 77, 77, std::clamp(255, 0, g.MenuAlpha)), D3DCOLOR_RGBA(47, 47, 47, std::clamp(255, 0, g.MenuAlpha)), true);
 
 	Render::Draw->Rect(DrawPos, Vec2(8, 8), 1, D3DCOLOR_RGBA(12, 12, 12, g.MenuAlpha));
-	Render::Draw->Text(label, DrawPos.x + 20, DrawPos.y - 3, LEFT, Render::Fonts::Verdana, false, D3DCOLOR_RGBA(205, 205, 205, g.MenuAlpha));
+	Render::Draw->Text(label, DrawPos.x + 20, DrawPos.y - 3, LEFT, Render::Fonts::Verdana, false, special ? D3DCOLOR_RGBA(182, 182, 101, g.MenuAlpha) : D3DCOLOR_RGBA(205, 205, 205, g.MenuAlpha));
+	
+	return *v;
 }
 
 bool ui::Button(const char* label, const Vec2& size) {
@@ -903,21 +938,15 @@ void ui::Slider(const char* label, T* v, T v_min, T v_max, const char* format, G
 	bool hovered, held;
 	bool slider_hovered = false;;
 
-	if (slider_hovered = SliderBehavior(label, slider_bb, v, &v_min, &v_max, flags))
-		bg_color = { D3DCOLOR_RGBA(72, 72, 72, g.MenuAlpha), D3DCOLOR_RGBA(92, 92, 92, g.MenuAlpha) };
+	if (PopUpsAreClosed(Window)) {
+		if (slider_hovered = SliderBehavior(label, slider_bb, v, &v_min, &v_max, flags))
+			bg_color = { D3DCOLOR_RGBA(72, 72, 72, g.MenuAlpha), D3DCOLOR_RGBA(92, 92, 92, g.MenuAlpha) };
+		if (ButtonBehavior(Window, label, Rect(slider_bb.Min - Vec2(7, 0), Vec2(7, 7)), hovered, held, GuiFlags_IntSlider) || (slider_hovered && KeyPressed(VK_LEFT)))
+			*v -= (float)*v - scale >= v_min ? scale : *v;
 
-	if (ButtonBehavior(Window, label, Rect(slider_bb.Min - Vec2(7, 0), Vec2(7, 7)), hovered, held, GuiFlags_IntSlider) || (slider_hovered && KeyPressed(VK_LEFT)))
-		*v -= (float)*v - scale >= v_min ? scale : *v;
-
-	if (hovered)
-		bg_color = { D3DCOLOR_RGBA(72, 72, 72, g.MenuAlpha), D3DCOLOR_RGBA(92, 92, 92, g.MenuAlpha) };
-
-	if (ButtonBehavior(Window, label, Rect(slider_bb.Min + slider_bb.Max - Vec2(0, 7), Vec2(7, 7)), hovered, held, GuiFlags_IntSlider) || (slider_hovered && KeyPressed(VK_RIGHT)))
-		*v += (float)*v + scale < v_max ? scale : v_max - *v;
-
-	if (hovered)
-		bg_color = { D3DCOLOR_RGBA(72, 72, 72, g.MenuAlpha), D3DCOLOR_RGBA(92, 92, 92, g.MenuAlpha) };
-
+		if (ButtonBehavior(Window, label, Rect(slider_bb.Min + slider_bb.Max - Vec2(0, 7), Vec2(7, 7)), hovered, held, GuiFlags_IntSlider) || (slider_hovered && KeyPressed(VK_RIGHT)))
+			*v += (float)*v + scale < v_max ? scale : v_max - *v;
+	}
 	const float rect_width = (static_cast<float>(*v) - v_min) / (v_max - v_min) * w - 1;
 
 	if (!format && flags & GuiFlags_IntSlider)
@@ -979,7 +1008,7 @@ bool ui::BeginCombo(const char* label, const char* preview_value, int items, Gui
 	Vec2 label_size = Render::Draw->GetTextSize(Render::Fonts::Verdana, label);
 	Vec2 preview_size = Render::Draw->GetTextSize(Render::Fonts::Verdana, preview_value);
 
-	Rect Fullbb = { Window->CursorPos + Vec2(20, 0), label_size + Vec2(0, 4 + 20) };
+	Rect Fullbb = { Window->CursorPos + Vec2(20,  - label_size.y / 3), label_size + Vec2(0, 4 + 20) };
 	Rect Framebb = { Fullbb.Min + Vec2(0, label_size.y + 4), Vec2(std::clamp(Window->Size.x - 90, 63.f, 200.f), 20) };
 
 	bool hovered, held;
@@ -1010,6 +1039,11 @@ bool ui::BeginCombo(const char* label, const char* preview_value, int items, Gui
 	GuiWindow* Popup = GetCurrentWindow();
 	Popup->ParentWindow = Window;
 
+	if (!Popup->Init) {
+		Window->PopUpWindows.push_back(Popup);
+		Popup->Init = true;
+	}
+
 	Popup->CursorPos += Vec2(1, 1);
 
 	opened = Popup->Opened;
@@ -1028,8 +1062,10 @@ bool ui::BeginCombo(const char* label, const char* preview_value, int items, Gui
 			return false;
 	}
 
-	if (pressed)
-		Popup->Opened = !Popup->Opened;
+	if (pressed && PopUpsAreClosed(Window))
+		Popup->Opened = true;
+	else if (pressed && Popup->Opened)
+		Popup->Opened = false;
 
 	return Popup->Opened;
 }
@@ -1113,6 +1149,11 @@ bool ui::ColorPicker(const char* label, int col[4], GuiFlags flags) {
 	Begin(label, flags);
 	GuiWindow* PickerWindow = GetCurrentWindow();
 	PickerWindow->ParentWindow = Window;
+
+	if (!PickerWindow->Init) {
+		Window->PopUpWindows.push_back(PickerWindow);
+		PickerWindow->Init = true;
+	}
 
 	Rect ColorRect = { PickerWindow->Pos + Vec2(5, 5), Vec2(150, 150) };
 	Rect AlphaRect = { PickerWindow->Pos + Vec2(5, 160), Vec2(150, 10) };
@@ -1242,4 +1283,16 @@ bool ui::KeyBind(const char* id, int* current_key, int* key_style) {
 	SetCurrentWindow(Window);
 
 	return 1;
+}
+
+void ui::Label(const char* label, GuiFlags flags) {
+	GuiContext& g = *Gui_Ctx;
+	GuiWindow* Window = GetCurrentWindow();
+	
+	Vec2 label_size = Render::Draw->GetTextSize(Render::Fonts::Verdana, label);
+	Rect bb = { Window->CursorPos + Vec2(20, - label_size.y / 3),  Vec2(label_size.x, label_size.y)};
+
+	AddItemToWindow(Window, bb, GuiFlags_Label);
+	
+	Render::Draw->Text(label, bb.Min.x, bb.Min.y, LEFT, Render::Fonts::Verdana, false, D3DCOLOR_RGBA(205, 205, 205, g.MenuAlpha));
 }

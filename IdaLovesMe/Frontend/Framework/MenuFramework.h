@@ -130,7 +130,7 @@ namespace IdaLovesMe {
 		GuiFlags_Selectable		   = 1 << 13,
 		GuiFlags_SingleSelect	   = 1 << 14,
 		GuiFlags_ColorPicker	   = 1 << 15,
-	
+		GuiFlags_Label             = 1 << 16
 	};
 
 	struct GuiWindow {
@@ -144,7 +144,7 @@ namespace IdaLovesMe {
 		
 		GuiWindow*				 ParentWindow;
 		std::vector<GuiWindow*>  ChildWindows;
-		std::vector<GuiWindow>   PopUpWindows;
+		std::vector<GuiWindow*>   PopUpWindows;
 
 		std::string				 SelectedItem;
 
@@ -173,7 +173,6 @@ namespace IdaLovesMe {
 	struct GuiContext {
 		bool					 Initialized;
 		std::vector<GuiWindow*>  Windows;
-		std::vector<GuiWindow*>	 WindowPopups;
 		std::vector<std::string> WindowsByName;
 		GuiWindow*				 CurrentWindow;
 		NextWindowInfo			 NextWindowInfo;
@@ -196,6 +195,7 @@ namespace IdaLovesMe {
 		bool					 KeyReleased(const int key);
 		bool					 ButtonBehavior(GuiWindow* Window, const char* label, Rect bb, bool& hovered, bool& held, GuiFlags flags = NULL);
 		bool					 ChildsAreStable(GuiWindow* Window);
+		bool					 PopUpsAreClosed(GuiWindow* Window, GuiWindow* PopUpWindow = nullptr);
 		void					 HandleMoving(GuiWindow* Window, Rect Constraints = Rect{}, Vec2* v = nullptr);
 		void					 HandleResize(GuiWindow* Window, Rect Constraints = Rect{}, Vec2* buffer = nullptr);
 		void					 AddItemToWindow(GuiWindow* Window, Rect size, GuiFlags flags = NULL);
@@ -233,7 +233,7 @@ namespace IdaLovesMe {
 		void					 EndChild();
 		//-------Controls-------//
 		void					 TabButton(const char* label, int* selected, int num, int total, const int flags);
-		void					 Checkbox(const char* label, bool* v);
+		bool					 Checkbox(const char* label, bool* v, bool special = false);
 		bool					 Button(const char* label, const Vec2& size = Vec2(0, 0));
 		void					 SliderInt(const char* label, int* v, int v_min, int v_max, const char* format = NULL);
 		void					 SliderFloat(const char* label, float* v, float v_min, float v_max, const char* format, float scale);
@@ -241,6 +241,7 @@ namespace IdaLovesMe {
 		bool					 MultiSelect(const char* label, std::unordered_map<int, bool>* data, std::vector<const char*> items);
 		bool					 ColorPicker(const char* label, int col[4], GuiFlags flags = NULL);
 		bool					 KeyBind(const char* label, int* current_key, int* keystyle);
+		void					 Label(const char* label, GuiFlags flags = NULL);
 		
 		template				 <typename T>
 		void					 Slider(const char* label, T* v, T v_min, T v_max, const char* format = NULL, GuiFlags flags = NULL, float scale = 1.f);
