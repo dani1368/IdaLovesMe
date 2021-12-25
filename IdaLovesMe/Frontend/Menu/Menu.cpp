@@ -26,6 +26,7 @@ void CConfig::LoadDefaults() {
 	cfg->i["rage_quick_peek_distance"] = 200;
 	cfg->i["rage_dt_hitchance"] = 50;
 	cfg->i["rage_dt_fakelag_limit"] = 2;
+	cfg->i["misc_menu_key"] = VK_INSERT;
 }
 
 void CMenu::Initialize() 
@@ -85,7 +86,7 @@ void CMenu::Draw()
 		ui::BeginChild("Aimbot", { Vec2(0, 0), Vec2(3, 10) }); {
 			ui::Checkbox("Enabled", &cfg->b["rage_enabled"]);
 			ui::KeyBind("rage_enabled_bind_label", &cfg->i["rage_enabled_bind"], &cfg->i["rage_enabled_bind_style"]);
-			ui::SingleSelect("Target selection", &cfg->i["rage_target_selection"], { "Highest Damage", "Cycle", "Cycle (2x)", "Near crosshair", "Best hit chance" });
+			ui::SingleSelect("Target selection", &cfg->i["rage_target_selection"], { "Highest damage", "Cycle", "Cycle (2x)", "Near crosshair", "Best hit chance" });
 			ui::MultiSelect("Target hitbox", &cfg->m["rage_target_hitbox"], { "Head", "Chest", "Stomach", "Arms", "Legs", "Feet" });
 			ui::MultiSelect("Multi-point", &cfg->m["rage_multi_point"], { "Head", "Chest", "Stomach", "Arms", "Legs", "Feet" });
 			ui::KeyBind("rage_multi_point_label", &cfg->i["rage_multi_point_bind"], &cfg->i["rage_multi_point_bind_style"]);
@@ -97,7 +98,7 @@ void CMenu::Draw()
 			ui::Checkbox("Automatic penetration", &cfg->b["rage_auto_penetration"]);
 			ui::Checkbox("Silent aim", &cfg->b["rage_silent_aim"]);
 			ui::SliderInt("Minimum hit chance", &cfg->i["rage_hitchance"], 0, 100, cfg->i["rage_hitchance"] < 1 ? "Off" : "%d%%");
-			ui::SliderInt("Minimum damage", &cfg->i["rage_mindmg"], 0, 126, cfg->i["rage_mindmg"] == 0 ? "Auto" : (cfg->i["rage_mindmg"] > 99 ? (cfg->i["rage_mindmg"] == 100 ? "HP" : "HP+%d") : "%dhp"));
+			ui::SliderInt("Minimum damage", &cfg->i["rage_mindmg"], 0, 126, cfg->i["rage_mindmg"] == 0 ? "Auto" : (cfg->i["rage_mindmg"] > 100 ? "HP+%d" : "%d"), (cfg->i["rage_mindmg"] > 100 ? 100 : 0));
 			ui::Checkbox("Automatic scope", &cfg->b["rage_autoscope"]);
 			ui::Checkbox("Reduce aim step", &cfg->b["rage_reduce_aimstep"]);
 			ui::SliderInt("Maximum FOV", &cfg->i["rage_fov"], 0, 180, "%d°");
@@ -122,7 +123,7 @@ void CMenu::Draw()
 			if (cfg->b["rage_quick_peek_assist"]) {
 				ui::MultiSelect("Quick peek assist mode", &cfg->m["rage_quick_peek_assist_mode"], { "Retreat on shot", "Retreat on key release" });
 				ui::ColorPicker("quick_peek_assist_colorpicker", cfg->c["quick_peek_assist_colorpicker"]);
-				ui::SliderInt("Quick peek assist distance", &cfg->i["rage_quick_peek_distance"], 16, 200, cfg->i["rage_quick_peek_distance"] == 200 ? "∞" : "%din");
+				ui::SliderInt("Quick peek assist distance", &cfg->i["rage_quick_peek_distance"], 16, 200, cfg->i["rage_quick_peek_distance"] == 200 ? "8" : "%din");
 			}
 
 			if (ui::Checkbox("Anti-aim correction", &cfg->b["rage_aa_correction"])) {
@@ -137,7 +138,6 @@ void CMenu::Draw()
 			ui::KeyBind("rage_fakeduck_bind", &cfg->i["rage_fakeduck_bind"], &cfg->i["rage_fakeduck_bind_style"]);
 			ui::Checkbox("Double tap", &cfg->b["rage_doubletap"], true);
 			ui::KeyBind("rage_doubletap_bind", &cfg->i["rage_doubletap_bind"], &cfg->i["rage_doubletap_bind_style"]);
-
 			if (cfg->b["rage_doubletap"]) {
 				ui::SingleSelect("Double tap mode", &cfg->i["rage_dooubletap_mode"], { "Offensive", "Defensive" });
 				ui::SliderInt("Double tap hit chance", &cfg->i["rage_dt_hitchance"], 0, 100, "%d%%");
@@ -157,7 +157,7 @@ void CMenu::Draw()
 			ui::SingleSelect("Body yaw", &cfg->i["aa_body_yaw"], {"Off", "Opposite", "Jitter", "Static"});
 			ui::Checkbox("Edge yaw", &cfg->b["aa_edge_yaw"]);
 			ui::KeyBind("aa_edge_yaw_bind", &cfg->i["aa_edge_yaw_bind"], &cfg->i["aa_edge_yaw_bind_style"]);
-			ui::SingleSelect("Freestanding", &cfg->i["aa_freestanding"], {"Default"});
+			ui::MultiSelect("Freestanding", &cfg->m["aa_freestanding"], {"Default"});
 		}
 		ui::EndChild();
 		
@@ -166,7 +166,7 @@ void CMenu::Draw()
 			ui::KeyBind("aa_fakelag_bind", &cfg->i["aa_fakelag_bind"], &cfg->i["aa_fakelag_bind_style"]);
 			ui::SingleSelect("Amount", &cfg->i["aa_fakelag_amount"], { "Dynamic", "Maximum", "Fluctuate"});
 			ui::SliderInt("Variance", &cfg->i["aa_fakelag_variance"], 0, 100, "%d%%");
-			ui::SliderInt("Maximum FOV", &cfg->i["aa_fakelag_limit"], 0, 15, "%d");
+			ui::SliderInt("Limit", &cfg->i["aa_fakelag_limit"], 0, 15, "%d");
 		}
 		ui::EndChild();
 
@@ -208,6 +208,16 @@ void CMenu::Draw()
 		ui::BeginChild("Movement", { Vec2(6, 0), Vec2(3, 4) });
 		ui::EndChild();
 		ui::BeginChild("Settings", { Vec2(6, 6), Vec2(3, 4) });
+		ui::Label("Menu key");
+		ui::KeyBind("misc_menu_key", &cfg->i["menu_key"], &cfg->i["misc_menu_keystyle"]);
+		ui::Label("Menu color");
+		ui::ColorPicker("MenuColor", cfg->c["MenuColor"]);
+		ui::SingleSelect("DPI scale", &cfg->i["menu_scale"], { "100%", "125%", "150%", "175%", "200%" });
+		ui::Checkbox("Anti-untrusted", &cfg->b["misc_anti_untrusted"]);
+		ui::Checkbox("Hide from OBS", &cfg->b["misc_hide_from_obs"]);
+		ui::Checkbox("Low FPS warning", &cfg->b["misc_low_fps_warning"]);
+		ui::Checkbox("Lock menu layout", &cfg->b["misc_lock_menu_layout"]);
+		ui::Button("Reset menu layout");
 		if (ui::Button("Unload"))
 			Settings->UnloadCheat = true;
 		ui::EndChild();

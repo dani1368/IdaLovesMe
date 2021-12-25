@@ -191,19 +191,20 @@ namespace IdaLovesMe {
 	namespace ui {
 		//-------Helpers-------//
 		bool					 IsInside(float x, float y, float w, float h);
+		bool					 IsInsideWindow(GuiWindow* Window = 0);
 		bool					 KeyPressed(const int key);
 		bool					 KeyDown(const int key);
 		bool					 KeyReleased(const int key);
 		bool					 ButtonBehavior(GuiWindow* Window, const char* label, Rect bb, bool& hovered, bool& held, GuiFlags flags = NULL);
 		bool					 ChildsAreStable(GuiWindow* Window);
-		bool					 PopUpsAreClosed(GuiWindow* Window, GuiWindow* PopUpWindow = nullptr);
+		bool					 PopUpsAreClosed(GuiWindow* Window);
 		void					 HandleMoving(GuiWindow* Window, Rect Constraints = Rect{}, Vec2* v = nullptr);
 		void					 HandleResize(GuiWindow* Window, Rect Constraints = Rect{}, Vec2* buffer = nullptr);
 		void					 AddItemToWindow(GuiWindow* Window, Rect size, GuiFlags flags = NULL);
 		bool					 NoItemsActive(GuiWindow* Window);
 		template				 <typename T>
 		bool					 SliderBehavior(const char* item_id, Rect bb, T value, T min_value, T max_value, GuiFlags flags);
-		HSV						 ColorPickerBehavior(GuiWindow* PickerWindow, Rect& RcColor, Rect& RcAlpha, Rect& RcHue, int col[4]);
+		HSV						 ColorPickerBehavior(GuiWindow* PickerWindow, Rect& RcColor, Rect& RcAlpha, Rect& RcHue, int col[4], bool reset = false);
 		//-------Context-------//
 		void					 Shutdown(GuiContext* context);
 		void					 Init(GuiContext* context);
@@ -236,7 +237,7 @@ namespace IdaLovesMe {
 		void					 TabButton(const char* label, int* selected, int num, int total, const int flags);
 		bool					 Checkbox(const char* label, bool* v, bool special = false);
 		bool					 Button(const char* label, const Vec2& size = Vec2(0, 0));
-		void					 SliderInt(const char* label, int* v, int v_min, int v_max, const char* format = NULL);
+		void					 SliderInt(const char* label, int* v, int v_min, int v_max, const char* format = NULL, int remove = 0);
 		void					 SliderFloat(const char* label, float* v, float v_min, float v_max, const char* format, float scale);
 		bool					 SingleSelect(const char* label, int* current_item, std::vector<const char*> items);
 		bool					 MultiSelect(const char* label, std::unordered_map<int, bool>* data, std::vector<const char*> items);
@@ -245,7 +246,7 @@ namespace IdaLovesMe {
 		void					 Label(const char* label, bool special = false, GuiFlags flags = NULL);
 		
 		template				 <typename T>
-		void					 Slider(const char* label, T* v, T v_min, T v_max, const char* format = NULL, GuiFlags flags = NULL, float scale = 1.f);
+		void					 Slider(const char* label, T* v, T v_min, T v_max, const char* format = NULL, GuiFlags flags = NULL, float scale = 1.f, int remove = 0.f);
 		bool					 Selectable(const char* label, bool selected = false, GuiFlags flags = NULL, const Vec2& size_arg = Vec2(0, 0));
 		bool					 BeginCombo(const char* label, const char* preview_value, int items, GuiFlags flags = NULL);
 		void					 EndCombo();
