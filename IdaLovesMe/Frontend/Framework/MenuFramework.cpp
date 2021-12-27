@@ -654,6 +654,7 @@ void ui::Begin(const char* Name, GuiFlags flags) {
 	//Scroll bar
 	/*int scroll_height = Window->Size.y / ((Window->CursorPos.y - Window->Pos.y) / (Window->Size.y));
 	int offset = (Window->Size.y - scroll_height) * Window->ScrollRatio;*/
+
 	int offset = (int)Window->PrevCursorPos.y - (int)((int)Window->Pos.y + (int)Window->Size.y);
 
 	Window->CursorPos.y -= !(Window->PrevCursorPos.y > Window->Pos.y + Window->Size.y) ? 0 : (int)(offset * Window->ScrollRatio);
@@ -814,8 +815,10 @@ void ui::EndChild() {
 
 	Render::Draw->GetD3dDevice()->SetRenderState(D3DRS_SCISSORTESTENABLE, FALSE);
 
-	if (window->PrevCursorPos.y > window->Pos.y + window->Size.y) {
-		
+	if (window->PrevCursorPos.y > window->Pos.y + window->Size.y && (window->ScrollRatio >= 0.f || (!window->ParentWindow->Dragging || !ChildsAreStable(window->ParentWindow)))) {
+		if (window->ScrollRatio == -1.f)
+			window->ScrollRatio = 0.f;
+
 		int scroll_height = window->Size.y / ((window->PrevCursorPos.y - window->Pos.y) / (window->Size.y));
 		int offset = (window->Size.y - scroll_height) * window->ScrollRatio;
 
@@ -823,7 +826,7 @@ void ui::EndChild() {
 		Render::Draw->FilledRect(Vec2(window->Pos.x + window->Size.x - 6, window->Pos.y + 3 + offset), Vec2(4, scroll_height - 6), D3DCOLOR_RGBA(65, 65, 65, g.MenuAlpha));
 
 		if (IsInside(window->Pos.x, window->Pos.y, window->Size.x, window->Size.y))
-			window->ScrollRatio = std::clamp(window->ScrollRatio - g.MouseWheel / 2.f, 0.f, 1.f);
+			window->ScrollRatio = std::clamp(window->ScrollRatio - g.MouseWheel * (20.f / ((int)window->PrevCursorPos.y - (int)((int)window->Pos.y + (int)window->Size.y))), 0.f, 1.f);
 
 		if (window->ScrollRatio > 0.0f) {
 			Render::Draw->Gradient(window->Pos + Vec2(2, 2), Vec2(window->Size.x - 9, 22), D3DCOLOR_RGBA(23, 23, 23, g.MenuAlpha), D3DCOLOR_RGBA(23, 23, 23, 0), true);
@@ -834,8 +837,10 @@ void ui::EndChild() {
 			Render::Draw->Triangle(Vec2((int)window->Pos.x, (int)window->Pos.y + (int)window->Size.y) + Vec2((int)window->Size.x - 17, -11), Vec2((int)window->Pos.x, (int)window->Pos.y + (int)window->Size.y) + Vec2((int)window->Size.x - 15, -8), Vec2((int)window->Pos.x, (int)window->Pos.y + (int)window->Size.y) + Vec2((int)window->Size.x - 12, -11), D3DCOLOR_RGBA(157, 157, 157, g.MenuAlpha));
 		}
 	}
-	else
-		window->ScrollRatio = 0.f;
+	else {
+		window->ScrollRatio = -1.f;
+	}
+		
 
 	int offset = (int)window->PrevCursorPos.y - (int)((int)window->Pos.y + (int)window->Size.y);
 	window->CursorPos.y += !(window->PrevCursorPos.y > (int)window->Pos.y + (int)window->Size.y) ? 0 : (int)(offset * window->ScrollRatio);
