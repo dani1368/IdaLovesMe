@@ -33,9 +33,9 @@ namespace IdaLovesMe {
 	struct Vec2 {
 		float x, y;
 
-		Vec2() { x = y = 0.0f; }
+		Vec2() { x = y = 0; }
 		Vec2(float _x, float _y) { x = _x; y = _y; }
-
+		
 		Vec2& operator+=(const Vec2& other)
 		{
 			x += other.x;
@@ -56,6 +56,10 @@ namespace IdaLovesMe {
 		Vec2 operator-(const Vec2& other)
 		{
 			return Vec2(x - other.x, y - other.y);
+		}
+
+		bool operator==(const Vec2& other) const {
+			return x == other.x && y == other.y;
 		}
 	};
 
@@ -131,7 +135,8 @@ namespace IdaLovesMe {
 		GuiFlags_SingleSelect	   = 1 << 14,
 		GuiFlags_ColorPicker	   = 1 << 15,
 		GuiFlags_Label             = 1 << 16,
-		GuiFlags_LegitTab		   = 1 << 17
+		GuiFlags_LegitTab		   = 1 << 17,
+		GuiFlags_Listbox		   = 1 << 18
 	};
 
 	struct GuiWindow {
@@ -234,7 +239,7 @@ namespace IdaLovesMe {
 		void					 BeginChild(const char* id, Rect X = { Vec2(0, 0), Vec2(3,10) }, GuiFlags flags = NULL);
 		void					 EndChild();
 		//-------Controls-------//
-		void					 TabButton(const char* label, int* selected, int num, int total, const int flags);
+		void					 TabButton(const char* label, int* selected, int num, int total, GuiFlags flags = NULL);
 		bool					 Checkbox(const char* label, bool* v, bool special = false);
 		bool					 Button(const char* label, const Vec2& size = Vec2(0, 0));
 		void					 SliderInt(const char* label, int* v, int v_min, int v_max, const char* format = NULL, int remove = 0);
@@ -247,9 +252,12 @@ namespace IdaLovesMe {
 		
 		template				 <typename T>
 		void					 Slider(const char* label, T* v, T v_min, T v_max, const char* format = NULL, GuiFlags flags = NULL, float scale = 1.f, int remove = 0.f);
-		bool					 Selectable(const char* label, bool selected = false, GuiFlags flags = NULL, const Vec2& size_arg = Vec2(0, 0));
+		bool					 ComboSelectable(const char* label, bool selected = false, GuiFlags flags = NULL, const Vec2& size_arg = Vec2(0, 0));
+		bool					 Selectable(const char* label, bool activated, const Vec2& size_arg = Vec2());
 		bool					 BeginCombo(const char* label, const char* preview_value, int items, GuiFlags flags = NULL);
 		void					 EndCombo();
+		bool					 BeginListbox(const char* id, const Vec2 Size = Vec2(), GuiFlags flags = NULL);
+		void					 EndListbox();
 	}
 
 	namespace Globals {

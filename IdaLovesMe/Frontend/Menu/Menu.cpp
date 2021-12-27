@@ -13,12 +13,16 @@ void CConfig::LoadDefaults() {
 	cfg->c["MenuColor"][2] = 31;
 	cfg->c["MenuColor"][3] = 255;
 
+	// RAGE AIMBOT
 	cfg->i["rage_target_selection"] = 1;
 	cfg->m["rage_target_hitbox"][0] = true;
+	cfg->i["rage_multi_point_amount"] = 2;
+	cfg->i["rage_multi_point_scale"] = 90;
 	cfg->i["rage_hitchance"] = 50;
 	cfg->i["rage_mindmg"] = 10;
 	cfg->i["rage_fov"] = 180;
 	cfg->b["rage_log_misses"] = true;
+	// RAGE OTHER
 	cfg->c["quick_peek_assist_colorpicker"][0] = 255;
 	cfg->c["quick_peek_assist_colorpicker"][3] = 255;
 	cfg->m["rage_quick_peek_assist_mode"][0] = true;
@@ -26,6 +30,13 @@ void CConfig::LoadDefaults() {
 	cfg->i["rage_quick_peek_distance"] = 200;
 	cfg->i["rage_dt_hitchance"] = 50;
 	cfg->i["rage_dt_fakelag_limit"] = 2;
+	// AA
+	cfg->i["aa_yaw_180"] = 8;
+	cfg->i["aa_yaw_spin"] = 80;
+	cfg->i["aa_fake_yaw_limit"] = 60;
+	//AA OTHER
+	cfg->i["aa_fakelag_limit"] = 13;
+	//MISC
 	cfg->i["misc_menu_key"] = VK_INSERT;
 }
 
@@ -69,14 +80,14 @@ void CMenu::Draw()
 	ui::SetNextWindowSize({ 660,560 });
 	ui::Begin("Main", GuiFlags_None);
 
-	ui::TabButton("A", &this->m_nCurrentTab, 0, 7, false);
-	ui::TabButton("G", &this->m_nCurrentTab, 1, 7, false);
-	ui::TabButton("B", &this->m_nCurrentTab, 2, 7, false);
-	ui::TabButton("C", &this->m_nCurrentTab, 3, 7, false);
-	ui::TabButton("D", &this->m_nCurrentTab, 4, 7, false);
-	ui::TabButton("E", &this->m_nCurrentTab, 5, 7, false);
-	ui::TabButton("F", &this->m_nCurrentTab, 6, 7, false);
-	ui::TabButton("H", &this->m_nCurrentTab, 7, 7, false);
+	ui::TabButton("A", &this->m_nCurrentTab, 0, 7);
+	ui::TabButton("G", &this->m_nCurrentTab, 1, 7);
+	ui::TabButton("B", &this->m_nCurrentTab, 2, 7);
+	ui::TabButton("C", &this->m_nCurrentTab, 3, 7);
+	ui::TabButton("D", &this->m_nCurrentTab, 4, 7);
+	ui::TabButton("E", &this->m_nCurrentTab, 5, 7);
+	ui::TabButton("F", &this->m_nCurrentTab, 6, 7);
+	ui::TabButton("H", &this->m_nCurrentTab, 7, 7);
 	//if (ui::GetWindowSize().y > 560.f)
 		//ui::TabButton("I", &this->m_nCurrentTab, 8, 7, false);
 	
@@ -89,6 +100,11 @@ void CMenu::Draw()
 			ui::SingleSelect("Target selection", &cfg->i["rage_target_selection"], { "Highest damage", "Cycle", "Cycle (2x)", "Near crosshair", "Best hit chance" });
 			ui::MultiSelect("Target hitbox", &cfg->m["rage_target_hitbox"], { "Head", "Chest", "Stomach", "Arms", "Legs", "Feet" });
 			ui::MultiSelect("Multi-point", &cfg->m["rage_multi_point"], { "Head", "Chest", "Stomach", "Arms", "Legs", "Feet" });
+
+			if (std::find_if(std::begin(cfg->m["rage_multi_point"]), std::end(cfg->m["rage_multi_point"]), [](auto p) { return p.second == true; }) != std::end(cfg->m["rage_multi_point"])) {
+				ui::SingleSelect("", &cfg->i["rage_multi_point_amount"], {"Low", "Medium", "High"});
+				ui::SliderInt("Multi-point scale", &cfg->i["rage_multi_point_scale"], 24, 100, cfg->i["rage_multi_point_scale"] == 24 ? "Auto" : "%d%%");
+			}
 			ui::KeyBind("rage_multi_point_label", &cfg->i["rage_multi_point_bind"], &cfg->i["rage_multi_point_bind_style"]);
 			ui::Checkbox("Prefer safe point", &cfg->b["rage_prefer_safe_point"]);
 			ui::Label("Force safe point");
@@ -131,6 +147,10 @@ void CMenu::Draw()
 				ui::KeyBind("rage_correction_override_bind", &cfg->i["rage_correction_override_bind"], &cfg->i["rage_correction_override_bind_style"]);
 			}
 
+			if (cfg->m["rage_target_hitbox"][1] || cfg->m["rage_target_hitbox"][2])
+				if (ui::Checkbox("Prefer body aim", &cfg->b["rage_prefer_body_aim"]))
+					ui::MultiSelect("Prefer body aim disablers", &cfg->m["rage_other_baim_disablers"], { "Low inaccuray", "Target shot fired", "Target resolved", "Safe point headshot", "Low damage" });
+
 			ui::Label("Force body aim");
 			ui::KeyBind("rage_baim_bind", &cfg->i["rage_baim_bind"], &cfg->i["rage_baim_bind_style"]);
 			ui::Checkbox("Force body aim on peek", &cfg->b["rage_force_baim"]);
@@ -152,9 +172,39 @@ void CMenu::Draw()
 			ui::Checkbox("Enabled", &cfg->b["aa_enabled"]);
 			ui::SingleSelect("Pitch", &cfg->i["aa_pitch"], {"Off", "Default", "Up", "Down", "Minimal", "Random"});
 			ui::SingleSelect("Yaw base", &cfg->i["aa_yaw_base"], {"Local view", "At targets"});
+			
 			ui::SingleSelect("Yaw", &cfg->i["aa_yaw"], {"Off", "180", "Spin", "Static", "180 Z", "Crosshair"});
-			ui::SingleSelect("Yaw jitter", &cfg->i["aa_yaw_jitter"], {"Off", "Offset", "Center", "Random"});
+			
+			switch (cfg->i["aa_yaw"]) {
+			case 1:
+				ui::SliderInt("", &cfg->i["aa_yaw_180"], -180, 180, "%d°"); break;
+			case 2:
+				ui::SliderInt("", &cfg->i["aa_yaw_spin"], -180, 180, "%d°"); break;
+			case 3: 
+				ui::SliderInt("", &cfg->i["aa_yaw_static"], -180, 180, "%d°"); break;
+			case 4:
+				ui::SliderInt("", &cfg->i["aa_yaw_180Z"], -180, 180, "%d°"); break;
+			case 5:
+				ui::SliderInt("", &cfg->i["aa_yaw_Crosshair"], -180, 180, "%d°"); break;
+			}
+
+			if (cfg->i["aa_yaw"] != 0) {
+				ui::SingleSelect("Yaw jitter", &cfg->i["aa_yaw_jitter"], { "Off", "Offset", "Center", "Random" });
+				if (cfg->i["aa_yaw_jitter"] != 0)
+					ui::SliderInt("a", &cfg->i["aa_yaw_jitter_amount"], -180, 180, "%d°");
+			}
 			ui::SingleSelect("Body yaw", &cfg->i["aa_body_yaw"], {"Off", "Opposite", "Jitter", "Static"});
+
+			switch (cfg->i["aa_body_yaw"]) {
+			case 2:	ui::SliderInt("", &cfg->i["aa_body_yaw_jitter_amount"], -180, 180, "%d°"); break;
+			case 3: ui::SliderInt("", &cfg->i["aa_body_yaw_static_amount"], -180, 180, "%d°"); break;
+			}
+
+			if (cfg->i["aa_body_yaw"] != 0) {
+				ui::Checkbox("Freestanding body yaw", &cfg->b["aa_freestanding_body_yaw"]);
+				ui::SliderInt("", &cfg->i["aa_fake_yaw_limit"], 0, 60, "%d°");
+			}
+
 			ui::Checkbox("Edge yaw", &cfg->b["aa_edge_yaw"]);
 			ui::KeyBind("aa_edge_yaw_bind", &cfg->i["aa_edge_yaw_bind"], &cfg->i["aa_edge_yaw_bind_style"]);
 			ui::MultiSelect("Freestanding", &cfg->m["aa_freestanding"], {"Default"});
@@ -184,6 +234,12 @@ void CMenu::Draw()
 	}
 	else if (this->m_nCurrentTab == 2) {
 		ui::BeginChild("Weapon type", { Vec2(0,0), Vec2(9, 0) }, GuiFlags_NoMove | GuiFlags_NoResize);
+		ui::TabButton("G", &this->m_nCurrentLegitTab, 0, 6, GuiFlags_LegitTab);
+		ui::TabButton("P", &this->m_nCurrentLegitTab, 1, 6, GuiFlags_LegitTab);
+		ui::TabButton("W", &this->m_nCurrentLegitTab, 2, 6, GuiFlags_LegitTab);
+		ui::TabButton("d", &this->m_nCurrentLegitTab, 3, 6, GuiFlags_LegitTab);
+		ui::TabButton("f", &this->m_nCurrentLegitTab, 4, 6, GuiFlags_LegitTab);
+		ui::TabButton("a", &this->m_nCurrentLegitTab, 5, 6, GuiFlags_LegitTab);
 		ui::EndChild();
 		ui::BeginChild("Aimbot#Legit", { Vec2(0, 2), Vec2(3, 8) });
 		ui::EndChild();
@@ -236,6 +292,19 @@ void CMenu::Draw()
 	}
 	else if (this->m_nCurrentTab == 7) {
 		ui::BeginChild("Presets", { Vec2(0,0), Vec2(3, 10) });
+
+		if (ui::BeginListbox("ConfigsList")) {
+			ui::Selectable("KAKI", false);
+			ui::Selectable("KAKIasdsda", false);
+		}
+		ui::EndListbox();
+		ui::Button("Load");
+		ui::Button("Save");
+		ui::Button("Delete");
+		ui::Button("Reset");
+		ui::Button("Import from clipboard");
+		ui::Button("Export to clipboard");
+
 		ui::EndChild();
 		ui::BeginChild("Lua", { Vec2(6, 0), Vec2(3, 10) });
 		ui::EndChild();
