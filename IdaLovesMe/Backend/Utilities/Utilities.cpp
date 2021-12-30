@@ -42,7 +42,7 @@ void CUtilities::Console_Log(const char* text, ...)
 	va_start(va_args, text);
 	_vsnprintf_s(buffer, sizeof(buffer), text, va_args);
 	va_end(va_args);
-	std::cout << "FUCKNIGGERSENSE";
+	std::cout << "[ IdaLovesMe ] ";
 	std::cout << ": " << buffer << std::endl;
 }
 
@@ -184,5 +184,16 @@ LRESULT CUtilities::WndProcHandler(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lP
 }
 
 float CUtilities::GetDeltaTime() {
-	return Interfaces::Globals ? Interfaces::Globals->frametime : 0;
+	return Interfaces::Globals ? Interfaces::Globals->frametime : 0.f;
+}
+
+int CUtilities::GetFrameCount() {
+	return Interfaces::Globals ? Interfaces::Globals->framecount : 0;
+}
+
+bool CUtilities::GetInterval(float time) {
+	if (!Interfaces::Globals)
+		return false;
+
+	return Interfaces::Globals->framecount % (int)(time / Interfaces::Globals->frametime) == 0;
 }

@@ -191,6 +191,8 @@ namespace IdaLovesMe {
 		Vec2					 MousePos;
 		Vec2					 PrevMousePos;
 		float					 MouseWheel = 0.f;
+		bool					 AwaitingInput = false;
+		int						 LastInput = 0;
 	};
 
 	namespace ui {

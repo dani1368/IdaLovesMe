@@ -4,6 +4,7 @@
 #include "../Renderer/color.h"
 #include "../Menu/Menu.h"
 #include "../../Backend/Config/Settings.h"
+#include <chrono>
 
 #pragma warning(disable : 4244)
 
@@ -1406,14 +1407,44 @@ void ui::InputText(const char* id, char* buffer, GuiFlags flags) {
 	bool hovered, held;
 	bool pressed = ButtonBehavior(Window, id, Framebb, hovered, held, flags);
 
-	if (pressed)
+	if (pressed) {
 		selected_id = id;
-	else if (!hovered && selected_id && KeyPressed(VK_LBUTTON))
+		g.AwaitingInput = true;
+	}	
+	else if (!hovered && selected_id && KeyPressed(VK_LBUTTON)) {
 		selected_id = "";
+		g.AwaitingInput = false;
+		g.LastInput = 0;
+	}
+
+	bool is_selected = selected_id == id;
+
+	if (is_selected) {
+		for (int i = 0x20; i <= 0x5A; i++) {
+			if ((i == VK_SPACE || i >= 0x30) && /*((g.LastInput + 1) < std::time(0) ? (KeyDown(i) && Misc::Utilities->GetInterval(0.05f)) : KeyPressed(i))*/KeyPressed(i)) {
+
+				char c[2] = { char(MapVirtualKeyA(i, 2)), 0 };
+
+				if (i > 0x3A)
+					c[0] += (KeyDown(VK_SHIFT) ? 0 : 32);
+				
+				if (strlen(buffer) < 63)
+					strcat_s(buffer, 64, (char*)c);
+
+				if (g.LastInput == 0)
+					g.LastInput = std::time(0);
+
+				break;
+			}
+		}
+
+		if (KeyPressed(VK_BACK) && strlen(buffer) > 0)
+			buffer[strlen(buffer) - 1] = '\0';
+	}
 
 	const int colors[3] = { 12, 50, 16 };
 
-	D3DCOLOR text_col = selected_id == id ? CMenu::get()->GetMenuColor() : D3DCOLOR_RGBA(205, 205, 205, g.MenuAlpha);
+	D3DCOLOR text_col = is_selected ? CMenu::get()->GetMenuColor() : D3DCOLOR_RGBA(205, 205, 205, g.MenuAlpha);
 	
 	for (int i = 0; i < 3; i++)
 		Render::Draw->Rect(Framebb.Min + Vec2(i, i), Framebb.Max - Vec2(i * 2, i * 2), 1, D3DCOLOR_RGBA(colors[i], colors[i], colors[i], g.MenuAlpha));
@@ -1421,5 +1452,5 @@ void ui::InputText(const char* id, char* buffer, GuiFlags flags) {
 	std::string out_str = std::string(buffer) + '_';
 	
 	Vec2 label_size = Render::Draw->GetTextSize(Render::Fonts::Verdana, out_str.c_str());
-	Render::Draw->Text(out_str.c_str(), Framebb.Min.x + 5, Framebb.Min.y + ((Framebb.Max.y / 2) - label_size.y / 2), LEFT, Render::Fonts::Verdana, false, text_col);
+	Render::Draw->Text(out_str.c_str(), Framebb.Min.x + 5, Framebb.Min.y + ((Framebb.Max.y / 2) - label_size.y / 2), LEFT, Render::Fonts::Verdana, false, text_col, Framebb.Min + Framebb.Max - Vec2(4, 0));
 }

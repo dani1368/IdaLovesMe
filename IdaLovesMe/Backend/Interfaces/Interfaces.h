@@ -1,6 +1,6 @@
 #pragma once
 #include "../GlobalIncludes.h"
-#include "../ValveSDK/Convar.h"
+#include "../ValveSDK/ICvar.h"
 #include "../ValveSDK/CGlobalVars.h"
 #include "../ValveSDK/IClient.h"
 

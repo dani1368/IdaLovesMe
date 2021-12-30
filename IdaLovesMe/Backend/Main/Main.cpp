@@ -11,6 +11,18 @@ std::uintptr_t present_pattern = *reinterpret_cast<std::uintptr_t*>(Misc::Utilit
 bool Cheat::Initialize() 
 {
 	Misc::Utilities->Console_Create("IdaLovesMe");
+	/*Misc::Utilities->Console_Log("loading...");
+	Misc::Utilities->Console_Log("resolving imports...");
+	Misc::Utilities->Console_Log("fixing crypt (1)...");
+	Misc::Utilities->Console_Log("fixing crypt (2)...");
+	Misc::Utilities->Console_Log("patching memory (1)...");
+	Misc::Utilities->Console_Log("setting up hooks...");
+	Misc::Utilities->Console_Log("patching memory (2)...");
+	Misc::Utilities->Console_Log("fixing crypt (3)...");
+	Misc::Utilities->Console_Log("calling entry point...");
+	Misc::Utilities->Console_Log("finished...");
+	Misc::Utilities->Console_Log("prevented exit (1)");
+	Misc::Utilities->Console_Log("prevented exit (1)");*/
 
 	Cheat::wrapgameoverlay();
 

@@ -20,6 +20,10 @@ namespace Misc {
 		bool IsAnyMouseDown();
 
 		float GetDeltaTime();
+		int GetFrameCount();
+		bool GetInterval(float time);
+
+		std::string GetCurrentDirectory();
 	private:
 		bool dwLastTime = 0;
 		bool MouseDown[5];	

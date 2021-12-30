@@ -29,6 +29,9 @@ namespace Hooked
 
 			if ((wParam & VK_LBUTTON || wParam & VK_RBUTTON) && IdaLovesMe::ui::IsInsideWindow())
 				return true;
+
+			if (g->AwaitingInput)
+				return true;
 		}
 
 		return CallWindowProcA(oWndProc, window, msg, wParam, lParam);

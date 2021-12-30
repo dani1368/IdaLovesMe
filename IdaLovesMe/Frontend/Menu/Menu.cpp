@@ -1,44 +1,11 @@
 ﻿#include "Menu.h"
 #include "../../Backend/Utilities/Utilities.h"
 #include "../../Backend/Config/Settings.h"
+#include "../../Backend/Config/Config.h"
 
 #include <algorithm>
 
 using namespace IdaLovesMe;
-
-void CConfig::LoadDefaults() {
-	CConfig* cfg = CConfig::get();
-	cfg->c["MenuColor"][0] = 163;
-	cfg->c["MenuColor"][1] = 212;
-	cfg->c["MenuColor"][2] = 31;
-	cfg->c["MenuColor"][3] = 255;
-
-	// RAGE AIMBOT
-	cfg->i["rage_target_selection"] = 1;
-	cfg->m["rage_target_hitbox"][0] = true;
-	cfg->i["rage_multi_point_amount"] = 2;
-	cfg->i["rage_multi_point_scale"] = 90;
-	cfg->i["rage_hitchance"] = 50;
-	cfg->i["rage_mindmg"] = 10;
-	cfg->i["rage_fov"] = 180;
-	cfg->b["rage_log_misses"] = true;
-	// RAGE OTHER
-	cfg->c["quick_peek_assist_colorpicker"][0] = 255;
-	cfg->c["quick_peek_assist_colorpicker"][3] = 255;
-	cfg->m["rage_quick_peek_assist_mode"][0] = true;
-	cfg->m["rage_quick_peek_assist_mode"][1] = true;
-	cfg->i["rage_quick_peek_distance"] = 200;
-	cfg->i["rage_dt_hitchance"] = 50;
-	cfg->i["rage_dt_fakelag_limit"] = 2;
-	// AA
-	cfg->i["aa_yaw_180"] = 8;
-	cfg->i["aa_yaw_spin"] = 80;
-	cfg->i["aa_fake_yaw_limit"] = 60;
-	//AA OTHER
-	cfg->i["aa_fakelag_limit"] = 13;
-	//MISC
-	cfg->i["misc_menu_key"] = VK_INSERT;
-}
 
 void CMenu::Initialize() 
 {
@@ -63,7 +30,7 @@ void CMenu::Draw()
 	CConfig* cfg = CConfig::get();
 
 	static float alpha = 0;
-	float fc = Misc::Utilities->GetDeltaTime() * 255 * 8;
+	float fc = Misc::Utilities->GetDeltaTime() * 255 * 10;
 	if (!this->m_bIsOpened && alpha > 0.f)
 		alpha = std::clamp(alpha - fc / 255.f, 0.f, 1.f);
 
@@ -294,19 +261,31 @@ void CMenu::Draw()
 		ui::BeginChild("Presets", { Vec2(0,0), Vec2(3, 10) });
 
 		if (ui::BeginListbox("ConfigsList")) {
-			ui::Selectable("KAKI", false);
-			ui::Selectable("KAKIasdsda", false);
+			/*ui::Selectable("KAKI", false);
+			ui::Selectable("KAKIasdsda", false);*/
+			for (auto config : CConfig::get()->List) {
+				if (ui::Selectable(config.c_str(), CConfig::get()->Current == config.c_str()))
+					strcpy_s(cfg->s["config_name"], config.c_str());
+			}
 		}
 		ui::EndListbox();
 
-		char niga[64] = {'A', 'B', 0};
+		//static char niga[64];
 
-		ui::InputText("cfg_input", niga);
+		ui::InputText("cfg_input", cfg->s["config_name"]);
 
-		ui::Button("Load");
-		ui::Button("Save");
-		ui::Button("Delete");
-		ui::Button("Reset");
+		if (ui::Button("Load"))
+			CConfig::get()->Load();
+
+		if (ui::Button("Save"))
+			CConfig::get()->Save();
+		
+		if (ui::Button("Delete"))
+			CConfig::get()->Delete();
+
+		if (ui::Button("Reset"))
+			CConfig::get()->LoadDefaults();
+
 		ui::Button("Import from clipboard");
 		ui::Button("Export to clipboard");
 
