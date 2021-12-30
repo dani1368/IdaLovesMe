@@ -88,10 +88,6 @@ void CMenu::Draw()
 	ui::TabButton("E", &this->m_nCurrentTab, 5, 7);
 	ui::TabButton("F", &this->m_nCurrentTab, 6, 7);
 	ui::TabButton("H", &this->m_nCurrentTab, 7, 7);
-	//if (ui::GetWindowSize().y > 560.f)
-		//ui::TabButton("I", &this->m_nCurrentTab, 8, 7, false);
-	
-	auto child_size = Vec2(ui::GetWindowSize().x / 2 - 74, ui::GetWindowSize().y - 54);
 	
 	if (this->m_nCurrentTab == 0) {
 		ui::BeginChild("Aimbot", { Vec2(0, 0), Vec2(3, 10) }); {
@@ -273,7 +269,11 @@ void CMenu::Draw()
 		ui::Checkbox("Hide from OBS", &cfg->b["misc_hide_from_obs"]);
 		ui::Checkbox("Low FPS warning", &cfg->b["misc_low_fps_warning"]);
 		ui::Checkbox("Lock menu layout", &cfg->b["misc_lock_menu_layout"]);
-		ui::Button("Reset menu layout");
+		if (ui::Button("Reset menu layout"))
+			Settings->ResetLayout = true;
+		else
+			Settings->ResetLayout = false;
+
 		if (ui::Button("Unload"))
 			Settings->UnloadCheat = true;
 		ui::EndChild();
@@ -298,6 +298,11 @@ void CMenu::Draw()
 			ui::Selectable("KAKIasdsda", false);
 		}
 		ui::EndListbox();
+
+		char niga[64] = {'A', 'B', 0};
+
+		ui::InputText("cfg_input", niga);
+
 		ui::Button("Load");
 		ui::Button("Save");
 		ui::Button("Delete");

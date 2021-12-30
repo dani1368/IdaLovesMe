@@ -1,6 +1,7 @@
 #pragma once
 #include "../../Backend/Globalincludes.h"
 #include "../../Frontend/Framework/MenuFramework.h"
+#include <memory>
 
 #define get_a(col) (((col)&0xff000000)>>24)
 #define get_r(col) (((col)&0x00ff0000)>>16)
@@ -16,9 +17,9 @@ struct vertex
     DWORD color;
 };
 
-namespace Render {
-
-    using namespace IdaLovesMe;
+namespace Render 
+{
+    using IdaLovesMe::Vec2;
 
     namespace Fonts
     {
@@ -77,5 +78,5 @@ namespace Render {
         bool Initialized = false;
     };
 
-    extern CDraw* Draw;
+    extern std::unique_ptr<CDraw> Draw;
 }

@@ -249,6 +249,7 @@ namespace IdaLovesMe {
 		bool					 ColorPicker(const char* label, int col[4], GuiFlags flags = NULL);
 		bool					 KeyBind(const char* label, int* current_key, int* keystyle);
 		void					 Label(const char* label, bool special = false, GuiFlags flags = NULL);
+		void					 InputText(const char* id, char* buffer, GuiFlags flags = NULL);
 		
 		template				 <typename T>
 		void					 Slider(const char* label, T* v, T v_min, T v_max, const char* format = NULL, GuiFlags flags = NULL, float scale = 1.f, int remove = 0.f);

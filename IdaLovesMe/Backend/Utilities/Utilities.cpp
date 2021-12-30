@@ -9,7 +9,7 @@
 #define get_bits(x) (in_range((x & (~0x20)), 'A', 'F') ? ((x & (~0x20)) - 'A' + 0xA): (in_range(x, '0', '9') ? x - '0': 0))
 #define get_byte(x) (get_bits(x[0]) << 4 | get_bits(x[1]))
 
-Misc::CUtilities* Misc::Utilities = new Misc::CUtilities();
+std::unique_ptr<Misc::CUtilities> Misc::Utilities = std::make_unique<Misc::CUtilities>();
 
 using namespace Misc;
 

@@ -28,15 +28,11 @@ void Cheat::Unload()
 	if (CMenu::get()->IsMenuOpened())
 		CMenu::get()->SetMenuOpened(false);
 
-	Cheat::unwrapgameoverlay();
-
-	SetWindowLongPtr(FindWindow(L"Valve001", 0), GWL_WNDPROC, (LONG)oWndProc);
-	Misc::Utilities->Console_Close();
-
 	IdaLovesMe::ui::DeleteContext(IdaLovesMe::Globals::Gui_Ctx);
+	Cheat::unwrapgameoverlay();
+	Misc::Utilities->Console_Close();
 	Interfaces::InterfaceLoader->Free();
-	delete Misc::Utilities, Settings;
-	
+	SetWindowLongPtr(FindWindow(L"Valve001", 0), GWL_WNDPROC, (LONG)oWndProc);
 }
 
 void Cheat::wrapgameoverlay() 

@@ -1,8 +1,9 @@
 #include "Settings.h"
 
-CSettings* Settings = new CSettings();
+std::unique_ptr<CSettings> Settings = std::make_unique<CSettings>();
 
 void CSettings::LoadDefaults()
 {
 	this->UnloadCheat = false;
+	this->ResetLayout = false;
 }

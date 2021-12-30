@@ -2,13 +2,15 @@
 #include "../../Backend/Misc/Fonts/Fonts.h"
 #include "../../Backend/Misc/Textures/Textures.h"
 
-Render::CDraw* Render::Draw = new Render::CDraw();
+std::unique_ptr<Render::CDraw> Render::Draw = std::make_unique<Render::CDraw>();
 
 using namespace Render;
 using namespace IdaLovesMe;
 
-namespace Render {
-    namespace Fonts {
+namespace Render 
+{
+    namespace Fonts 
+    {
         LPD3DXFONT TabIcons;
         LPD3DXFONT LegitTabIcons;
         LPD3DXFONT Verdana;
@@ -60,8 +62,6 @@ void CDraw::ReleaseObjects()
         Fonts::LegitTabIcons->Release();
         RemoveFontMemResourceEx(this->m_LegitTabFont);
     }
-
-    delete Render::Draw;
 }
 
 void CDraw::Init(LPDIRECT3DDEVICE9 D3dDevice)
@@ -134,6 +134,7 @@ void CDraw::FilledRect(Vec2 Pos, Vec2 Size, D3DCOLOR Color, bool Antialias)
         { Pos.x + Size.x, Pos.y + Size.y, 0.0f, 1.0f, Color },
         { Pos.x + Size.x, Pos.y, 0.0f, 1.0f, Color }
     };
+
     m_Device->SetFVF(D3DFVF_XYZRHW | D3DFVF_DIFFUSE);
     m_Device->SetTexture(0, nullptr);
 

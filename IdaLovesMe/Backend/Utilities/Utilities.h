@@ -28,5 +28,5 @@ namespace Misc {
 		FILE* m_pOutputFile = nullptr;
 		HANDLE m_hOldOutput = NULL, m_hOutput = NULL;
 	};
-	extern CUtilities* Utilities;
+	extern std::unique_ptr<CUtilities> Utilities;
 }

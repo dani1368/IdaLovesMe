@@ -3,6 +3,7 @@
 #include "../../Backend/Utilities/Utilities.h"
 #include "../Renderer/color.h"
 #include "../Menu/Menu.h"
+#include "../../Backend/Config/Settings.h"
 
 #pragma warning(disable : 4244)
 
@@ -486,6 +487,7 @@ bool ui::SliderBehavior(const char* item_id, Rect bb, T value, T min_value, T ma
 	}
 
 	else if (!KeyDown(VK_LBUTTON) && current_window->ItemActive[item_id]) {
+		Misc::Utilities->Game_Msg("slider_niggaaaa");
 		current_window->ParentWindow->SelectedItem = "";
 		current_window->ItemActive[item_id] = false;
 	}
@@ -1389,4 +1391,35 @@ bool ui::BeginListbox(const char* id, const Vec2 Size, GuiFlags flags) {
 void ui::EndListbox() {
 	GuiWindow* ListBoxWnd = GetCurrentWindow();
 	SetCurrentWindow(ListBoxWnd->ParentWindow);
+}
+
+void ui::InputText(const char* id, char* buffer, GuiFlags flags) {
+	GuiContext& g = *Gui_Ctx;
+	GuiWindow* Window = GetCurrentWindow();
+
+	Rect Framebb = { Window->CursorPos + Vec2(20, 0), Vec2(std::clamp(Window->Size.x - 101, 63.f, 200.f), 20) };
+	
+	AddItemToWindow(Window, Framebb);
+	
+	static const char* selected_id = "";
+
+	bool hovered, held;
+	bool pressed = ButtonBehavior(Window, id, Framebb, hovered, held, flags);
+
+	if (pressed)
+		selected_id = id;
+	else if (!hovered && selected_id && KeyPressed(VK_LBUTTON))
+		selected_id = "";
+
+	const int colors[3] = { 12, 50, 16 };
+
+	D3DCOLOR text_col = selected_id == id ? CMenu::get()->GetMenuColor() : D3DCOLOR_RGBA(205, 205, 205, g.MenuAlpha);
+	
+	for (int i = 0; i < 3; i++)
+		Render::Draw->Rect(Framebb.Min + Vec2(i, i), Framebb.Max - Vec2(i * 2, i * 2), 1, D3DCOLOR_RGBA(colors[i], colors[i], colors[i], g.MenuAlpha));
+
+	std::string out_str = std::string(buffer) + '_';
+	
+	Vec2 label_size = Render::Draw->GetTextSize(Render::Fonts::Verdana, out_str.c_str());
+	Render::Draw->Text(out_str.c_str(), Framebb.Min.x + 5, Framebb.Min.y + ((Framebb.Max.y / 2) - label_size.y / 2), LEFT, Render::Fonts::Verdana, false, text_col);
 }
