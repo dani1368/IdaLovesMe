@@ -3,9 +3,11 @@
 #include "../Hooks/EndScene.hpp"
 #include "../Hooks/WndProc.hpp"
 #include "../Hooks/PaintTraverse.hpp"
+#include "../Hooks/SceneEnd.hpp"
 #include "../../Frontend/Framework/MenuFramework.h"
 #include "../Interfaces/Interfaces.h"
 #include "../Features/Visuals/ESP.h"
+#include "../ValveSDK/NetVar.h"
 
 std::uintptr_t reset_pattern = *reinterpret_cast<std::uintptr_t*>(Misc::Utilities->Memory_PatternScan("gameoverlayrenderer.dll", "C7 45 ? ? ? ? ? FF 15 ? ? ? ? 8B D8") + 9);
 std::uintptr_t present_pattern = *reinterpret_cast<std::uintptr_t*>(Misc::Utilities->Memory_PatternScan("gameoverlayrenderer.dll", "FF 15 ? ? ? ? 8B F0 85 FF") + 2);
@@ -33,12 +35,23 @@ bool Cheat::Initialize()
 	Misc::Utilities->Console_Log("initializating interfaces...");
 	Interfaces::InterfaceLoader->Initialize();
 
+	Misc::Utilities->Console_Log("initializating netvars...");
+	Cheat::NetVarManager = new Cheat::CNetVarManager();
+	Cheat::NetVarManager->Init();
+
 	Misc::Utilities->Console_Log("hooking panel manager");
 	VmtHook* PanelManager = new VmtHook();
 	Hooks.push_back(PanelManager);
 	PanelManager->Init(Interfaces::GuiPanel);
 	PanelManager->HookAt(41, &Hooked::PaintTraverse);
 	oPaintTraverse = PanelManager->GetOriginal<fnPaintTraverse>(41);
+
+	Misc::Utilities->Console_Log("hooking renderview manager");
+	VmtHook* RenderViewManager = new VmtHook();
+	Hooks.push_back(RenderViewManager);
+	RenderViewManager->Init(Interfaces::RenderView);
+	RenderViewManager->HookAt(9, &Hooked::SceneEnd);
+	oSceneEnd = RenderViewManager->GetOriginal<fnSceneEnd>(9);
 
 	Misc::Utilities->Console_Log("hooking wndproc");
 	oWndProc = (WNDPROC)SetWindowLongPtr(FindWindow(L"Valve001", 0), GWL_WNDPROC, (long)&Hooked::wndProc);

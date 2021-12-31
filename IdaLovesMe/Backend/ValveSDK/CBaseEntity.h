@@ -2,6 +2,8 @@
 #include "../Globalincludes.h"
 #include "vfunc.h"
 #include "RecvData.h"
+#include "Vector.h"
+#include "NetVar.h"
 
 class CBaseEntity {
 public:
@@ -9,14 +11,57 @@ public:
 		return this != nullptr;
 	}
 
+	template <typename T>
+	T getProp(const char* prop) {
+		auto offs = Cheat::NetVarManager->GetOffs(this->GetClientClass()->m_pNetworkName, prop);
+		int* v1 = (int*)(uintptr_t(this) + offs);
+		if (v1)
+			return (T)v1;
+
+		bool* v2 = (bool*)(uintptr_t(this) + offs);
+		if (v2)
+			return (T)v2;
+
+		float* v3 = (float*)(uintptr_t(this) + offs);
+		if (v3)
+			return (T)v3;
+
+		Vector* v4 = (Vector*)(uintptr_t(this) + offs);
+		if (v4)
+			return (T)v4;
+
+		return nullptr;
+	}
+
 	int GetHealth()
 	{
-		return this->IsValid() ? *reinterpret_cast<int*>(uintptr_t(this) + 0x100) : 0;
+		return this->IsValid() ? *reinterpret_cast<int*>(uintptr_t(this) + Cheat::NetVarManager->GetOffs(this->GetClientClass()->m_pNetworkName, "m_iHealth")) : 0;
 	}
 
 	int GetIndex()
 	{
 		return this->IsValid() ? *reinterpret_cast<int*>(uintptr_t(this) + 0x64) : 0;
+	}
+
+	Vector GetVecMins() {
+		return this->IsValid() ? *reinterpret_cast<Vector*>(uintptr_t(this) + Cheat::NetVarManager->GetOffs(this->GetClientClass()->m_pNetworkName, "m_vecMins")) : Vector(0, 0, 0);
+	}
+
+	Vector GetVecMaxs() {
+		return this->IsValid() ? *reinterpret_cast<Vector*>(uintptr_t(this) + Cheat::NetVarManager->GetOffs(this->GetClientClass()->m_pNetworkName, "m_vecMaxs")) : Vector(0, 0, 0);
+	}
+
+	/*Vector GetAbsOrigin() {
+		return this->IsValid() ? *reinterpret_cast<Vector*>(uintptr_t(this) + Cheat::NetVarManager->GetOffs(this->GetClientClass()->m_pNetworkName, "m_vecAbsOrigin")) : Vector(0, 0, 0);
+	}*/
+
+	Vector GetAbsOrigin()
+	{
+		if (!this)
+			return Vector(0, 0, 0);
+
+		typedef Vector& (__thiscall* OriginalFn)(void*);
+		return ((OriginalFn)vfunc<OriginalFn>(this, 10))(this);
 	}
 
 	ClientClass* GetClientClass()

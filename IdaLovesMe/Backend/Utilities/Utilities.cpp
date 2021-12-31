@@ -1,6 +1,7 @@
 #include "Utilities.h"
 #include "../Interfaces/Interfaces.h"
 #include "../Features/Visuals/EventLogger.h"
+#include "../Definitions.h"
 
 #include <Psapi.h>
 #include <iostream>
@@ -181,6 +182,63 @@ LRESULT CUtilities::WndProcHandler(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lP
 		return false;
 	}
 	return 0;
+}
+
+inline RECT viewport() {
+	RECT viewport = { 0, 0, 0, 0 };
+
+	int width, height;
+	Interfaces::Engine->GetScreenSize(width, height);
+	viewport.right = width;
+	viewport.bottom = height;
+
+	return viewport;
+}
+
+bool CUtilities::WorldToScreen(const Vector& world, Vector& screen)
+{
+
+	auto find_point = [](Vector& point, int screen_w, int screen_h, int degrees) -> void {
+		float x2 = screen_w * 0.5f;
+		float y2 = screen_h * 0.5f;
+
+		float d = sqrt(pow((point.x - x2), 2) + (pow((point.y - y2), 2))); //Distance
+		float r = degrees / d; //Segment ratio
+
+		point.x = r * point.x + (1 - r) * x2; //find point that divides the segment
+		point.y = r * point.y + (1 - r) * y2; //into the ratio (1-r):r
+	};
+	float w = G::Matrix[3][0] * world.x + G::Matrix[3][1] * world.y + G::Matrix[3][2] * world.z + G::Matrix[3][3];
+	auto
+		screen_width = viewport().right,
+		screen_height = viewport().bottom;
+
+	float inverse_width = -1.0f / w;
+	bool behind = true;
+
+	if (w > 0.01) {
+		inverse_width = 1.0f / w;
+		behind = false;
+	}
+
+	screen.x = (float)((screen_width / 2) + (0.5 * ((G::Matrix[0][0] * world.x
+		+ G::Matrix[0][1] * world.y
+		+ G::Matrix[0][2] * world.z
+		+ G::Matrix[0][3]) * inverse_width) * screen_width + 0.5));
+
+	screen.y = (float)((screen_height / 2) - (0.5 * ((G::Matrix[1][0] * world.x
+		+ G::Matrix[1][1] * world.y
+		+ G::Matrix[1][2] * world.z
+		+ G::Matrix[1][3]) * inverse_width) * screen_height + 0.5));
+
+	if (screen.x > screen_width || screen.x < 0 || screen.y > screen_height || screen.y < 0 || behind) {
+		find_point(screen, screen_width, screen_height, screen_height / 2);
+		return false;
+	}
+
+	return !(behind);
+	return true;
+
 }
 
 float CUtilities::GetDeltaTime() {

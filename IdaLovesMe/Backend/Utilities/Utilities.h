@@ -1,5 +1,6 @@
 #pragma once
 #include "../Globalincludes.h"
+#include "../ValveSDK/Vector.h"
 
 namespace Misc {
 	class CUtilities 
@@ -18,6 +19,8 @@ namespace Misc {
 		DWORD Memory_PatternScan(std::string moduleName, std::string pattern);
 		LRESULT WndProcHandler(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 		bool IsAnyMouseDown();
+
+		bool WorldToScreen(const Vector& origin, Vector& screen);
 
 		float GetDeltaTime();
 		int GetFrameCount();

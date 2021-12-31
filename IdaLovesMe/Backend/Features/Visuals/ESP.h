@@ -5,6 +5,7 @@ namespace Features
 {
 	class CVisuals {
 	public:
+		bool GetBoundingBox(CBaseEntity* ent, Vector& min, Vector& max);
 		void Run();
 	};
 

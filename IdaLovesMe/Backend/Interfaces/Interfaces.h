@@ -45,4 +45,5 @@ namespace Interfaces
 	extern IEngine* Engine;
 	extern IEntityList* EntityList;
 	extern IPanel* GuiPanel;
+	extern void* RenderView;
 }
