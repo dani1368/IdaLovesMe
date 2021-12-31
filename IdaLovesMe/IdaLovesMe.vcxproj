@@ -19,20 +19,29 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Backend\Config\Config.h" />
     <ClInclude Include="Backend\Config\Settings.h" />
+    <ClInclude Include="Backend\Features\Visuals\ESP.h" />
     <ClInclude Include="Backend\Features\Visuals\EventLogger.h" />
     <ClInclude Include="Backend\Globalincludes.h" />
     <ClInclude Include="Backend\Hooks\EndScene.hpp" />
+    <ClInclude Include="Backend\Hooks\PaintTraverse.hpp" />
     <ClInclude Include="Backend\Hooks\WndProc.hpp" />
     <ClInclude Include="Backend\Interfaces\Interfaces.h" />
     <ClInclude Include="Backend\Main\Main.h" />
+    <ClInclude Include="Backend\Main\Memory.h" />
     <ClInclude Include="Backend\Misc\Fonts\Fonts.h" />
     <ClInclude Include="Backend\Misc\Textures\Textures.h" />
     <ClInclude Include="Backend\Utilities\Utilities.h" />
+    <ClInclude Include="Backend\ValveSDK\CBaseEntity.h" />
     <ClInclude Include="Backend\ValveSDK\CGlobalVars.h" />
     <ClInclude Include="Backend\ValveSDK\color.h" />
-    <ClInclude Include="Backend\ValveSDK\Convar.h" />
+    <ClInclude Include="Backend\ValveSDK\ICvar.h" />
     <ClInclude Include="Backend\ValveSDK\IClient.h" />
+    <ClInclude Include="Backend\ValveSDK\IEngine.h" />
+    <ClInclude Include="Backend\ValveSDK\IEntityList.h" />
+    <ClInclude Include="Backend\ValveSDK\IPanel.h" />
+    <ClInclude Include="Backend\ValveSDK\RecvData.h" />
     <ClInclude Include="Backend\ValveSDK\vfunc.h" />
     <ClInclude Include="Frontend\Framework\MenuFramework.h" />
     <ClInclude Include="Frontend\Menu\Menu.h" />
@@ -41,11 +50,14 @@
     <ClInclude Include="Backend\Misc\singleton.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Backend\Config\Config.cpp" />
     <ClCompile Include="Backend\Config\Settings.cpp" />
+    <ClCompile Include="Backend\Features\Visuals\ESP.cpp" />
     <ClCompile Include="Backend\Features\Visuals\EventLogger.cpp" />
     <ClCompile Include="Backend\Globalincludes.cpp" />
     <ClCompile Include="Backend\Interfaces\Interfaces.cpp" />
     <ClCompile Include="Backend\Main\Main.cpp" />
+    <ClCompile Include="Backend\Main\Memory.cpp" />
     <ClCompile Include="Backend\Misc\Fonts\Fonts.cpp" />
     <ClCompile Include="Backend\Misc\Textures\Textures.cpp" />
     <ClCompile Include="Backend\Utilities\Utilities.cpp" />
@@ -117,6 +129,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
+    <IncludePath>D:\Programs\DirectX\Include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
@@ -162,8 +175,9 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;IDALOVESME_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

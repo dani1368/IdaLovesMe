@@ -1,5 +1,7 @@
 #pragma once
 #include "../Globalincludes.h"
+#include "Memory.h"
+#include <vector>
 
 namespace Cheat 
 {
@@ -7,5 +9,6 @@ namespace Cheat
 	void wrapgameoverlay();
 	void unwrapgameoverlay();
 	void Unload();
+	std::vector<VmtHook*> Hooks;
 };
 

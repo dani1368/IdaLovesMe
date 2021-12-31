@@ -2,8 +2,10 @@
 #include "../Utilities/Utilities.h"
 #include "../Hooks/EndScene.hpp"
 #include "../Hooks/WndProc.hpp"
+#include "../Hooks/PaintTraverse.hpp"
 #include "../../Frontend/Framework/MenuFramework.h"
 #include "../Interfaces/Interfaces.h"
+#include "../Features/Visuals/ESP.h"
 
 std::uintptr_t reset_pattern = *reinterpret_cast<std::uintptr_t*>(Misc::Utilities->Memory_PatternScan("gameoverlayrenderer.dll", "C7 45 ? ? ? ? ? FF 15 ? ? ? ? 8B D8") + 9);
 std::uintptr_t present_pattern = *reinterpret_cast<std::uintptr_t*>(Misc::Utilities->Memory_PatternScan("gameoverlayrenderer.dll", "FF 15 ? ? ? ? 8B F0 85 FF") + 2);
@@ -23,11 +25,22 @@ bool Cheat::Initialize()
 	Misc::Utilities->Console_Log("finished...");
 	Misc::Utilities->Console_Log("prevented exit (1)");
 	Misc::Utilities->Console_Log("prevented exit (1)");*/
+	Misc::Utilities->Console_Log("loading...");
 
+	Misc::Utilities->Console_Log("hooking game overlay...");
 	Cheat::wrapgameoverlay();
 
+	Misc::Utilities->Console_Log("initializating interfaces...");
 	Interfaces::InterfaceLoader->Initialize();
 
+	Misc::Utilities->Console_Log("hooking panel manager");
+	VmtHook* PanelManager = new VmtHook();
+	Hooks.push_back(PanelManager);
+	PanelManager->Init(Interfaces::GuiPanel);
+	PanelManager->HookAt(41, &Hooked::PaintTraverse);
+	oPaintTraverse = PanelManager->GetOriginal<fnPaintTraverse>(41);
+
+	Misc::Utilities->Console_Log("hooking wndproc");
 	oWndProc = (WNDPROC)SetWindowLongPtr(FindWindow(L"Valve001", 0), GWL_WNDPROC, (long)&Hooked::wndProc);
 	if (!oWndProc) 
 		return false;
@@ -42,6 +55,11 @@ void Cheat::Unload()
 
 	IdaLovesMe::ui::DeleteContext(IdaLovesMe::Globals::Gui_Ctx);
 	Cheat::unwrapgameoverlay();
+
+	for (auto& hook : Hooks) {
+		hook->Restore();
+	}
+
 	Misc::Utilities->Console_Close();
 	Interfaces::InterfaceLoader->Free();
 	SetWindowLongPtr(FindWindow(L"Valve001", 0), GWL_WNDPROC, (LONG)oWndProc);
@@ -68,6 +86,8 @@ void __stdcall MainThread(LPVOID lpParam)
 	Cheat::Initialize();
 
 	while (true) {
+		//Features::Visuals->Run();
+
 		if (Settings->UnloadCheat)
 			break;
 		Sleep(1000);

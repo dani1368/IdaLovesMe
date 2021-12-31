@@ -2,6 +2,7 @@
 #include "../../Backend/Utilities/Utilities.h"
 #include "../../Backend/Config/Settings.h"
 #include "../../Backend/Config/Config.h"
+#include "../../Backend/Features/Visuals/ESP.h"
 
 #include <algorithm>
 
@@ -212,7 +213,9 @@ void CMenu::Draw()
 		ui::EndChild();
 	}
 	else if (this->m_nCurrentTab == 3) {
-		ui::BeginChild("Player ESP", { Vec2(0,0), Vec2(3, 6) });
+		ui::BeginChild("Player ESP", { Vec2(0,0), Vec2(3, 6) }); {
+			ui::Checkbox("Bounding box", &cfg->b["visuals_player_esp_bounding_box"]);
+		};
 		ui::EndChild();
 		ui::BeginChild("Colored models", { Vec2(0, 8), Vec2(3, 2) });
 		ui::EndChild();

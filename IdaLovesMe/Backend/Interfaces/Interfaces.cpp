@@ -38,21 +38,32 @@ T* CInterfaceManager::BruteInterface(std::string szInterfaceVersion)
 }
 
 void CInterfaces::Initialize() {
+	EngineManager = new CInterfaceManager("engine.dll");
 	ClientManager = new CInterfaceManager("client.dll");
 	VSTDLibManager = new CInterfaceManager("vstdlib.dll");
+	VGUIManager = new CInterfaceManager("vgui2.dll");
 
+	Engine = EngineManager->BruteInterface<IEngine>("VEngineClient");
 	Client = ClientManager->BruteInterface<IClient>("VClient");
 	Var = VSTDLibManager->BruteInterface<ICvar>("VEngineCvar");
+	EntityList = ClientManager->BruteInterface<IEntityList>("VClientEntityList");
+	GuiPanel = VGUIManager->BruteInterface<IPanel>("VGUI_Panel");
 
 	Globals = **(CGlobalVars***)((*(DWORD**)(Client))[0] + 0x1F);
 }
 
 void CInterfaces::Free()
 {
+	delete EngineManager;
+	delete ClientManager;
 	delete VSTDLibManager;
+	delete VGUIManager;
 	delete Interfaces::InterfaceLoader;
 }
 
+IEngine* Interfaces::Engine = nullptr;
 IClient* Interfaces::Client = nullptr;
 ICvar* Interfaces::Var = nullptr;
 CGlobalVars* Interfaces::Globals = nullptr;
+IEntityList* Interfaces::EntityList = nullptr;
+IPanel* Interfaces::GuiPanel = nullptr;

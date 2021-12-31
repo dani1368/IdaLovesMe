@@ -3,6 +3,9 @@
 #include "../ValveSDK/ICvar.h"
 #include "../ValveSDK/CGlobalVars.h"
 #include "../ValveSDK/IClient.h"
+#include "../ValveSDK/IEngine.h"
+#include "../ValveSDK/IEntityList.h"
+#include "../ValveSDK/IPanel.h"
 
 typedef void* (*CreateInterfaceFn)(const char* pName, int* pReturnCode);
 
@@ -26,7 +29,9 @@ namespace Interfaces
 	{
 	protected:
 		CInterfaceManager* ClientManager,
-			* VSTDLibManager;
+						 * VSTDLibManager,
+						 * VGUIManager,
+						 * EngineManager;
 	public:
 		void Initialize();
 		void Free();
@@ -37,4 +42,7 @@ namespace Interfaces
 	extern IClient* Client;
 	extern ICvar* Var;
 	extern CGlobalVars* Globals;
+	extern IEngine* Engine;
+	extern IEntityList* EntityList;
+	extern IPanel* GuiPanel;
 }
