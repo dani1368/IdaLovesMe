@@ -557,7 +557,7 @@ void ui::HandleMoving(GuiWindow* Window, Rect Boundaries, Vec2* buffer) {
 		Vec2 MinSize = Vec2((Boundaries.Max.x - 2.f) * (22.4f / 100.f), (Boundaries.Max.y - 2.f) * (13.4f / 100.f));
 		Vec2 Step = Vec2((Boundaries.Max.x - MinSize.x - 2.f) / 9, (Boundaries.Max.y - MinSize.y - 2) / 10);
 
-		if (IsInside(Window->Pos.x, Window->Pos.y, Window->Size.x, 17) && KeyDown(VK_LBUTTON) && !Window->Dragging && !Window->Resizing && !Window->ParentWindow->Resizing && ui::ChildsAreStable(Window->ParentWindow) && NoItemsActive(Window)) {
+		if (IsInside(Window->Pos.x, Window->Pos.y, Window->Size.x, 17) && KeyDown(VK_LBUTTON) && !Window->Dragging && !Window->Resizing && !Window->ParentWindow->Resizing && !Window->ParentWindow->Dragging && ui::ChildsAreStable(Window->ParentWindow) && NoItemsActive(Window)) {
 			ClickPos.x = g.MousePos.x - Window->Pos.x;
 			Window->Dragging = true;
 		}
@@ -648,10 +648,10 @@ void ui::Begin(const char* Name, GuiFlags flags) {
 		Window->Block = false;
 
 	//Handle Resize and Moving
-	if (!Window->Block && !(flags & GuiFlags_ChildWindow) && !(Window->Flags & GuiFlags_PopUp) && !(Window->Flags & GuiFlags_Listbox)) {
+	/*if (!Window->Block && !(flags & GuiFlags_ChildWindow) && !(Window->Flags & GuiFlags_PopUp) && !(Window->Flags & GuiFlags_Listbox)) {
 		HandleMoving(Window, Rect{Vec2(0 - Window->Size.x / 2, 0 - Window->Size.y / 2), Vec2(Render::Draw->Screen.Width + Window->Size.x / 2, Render::Draw->Screen.Height + Window->Size.y / 2) } );
 		HandleResize(Window, Rect{ Vec2(660, 560), Vec2(1920, 1080) });
-	}
+	}*/
 
 	Window->CursorPos = Window->Pos;
 	//Scroll bar
@@ -738,6 +738,8 @@ void ui::Begin(const char* Name, GuiFlags flags) {
 
 void ui::End() {
 	GuiContext& g = *Gui_Ctx;
+	GuiWindow* Window = GetCurrentWindow();
+	GuiFlags flags = Window->Flags;
 
 	if (GetCurrentWindow()->Flags == GuiFlags_None) {
 		for (const auto obj : DrawList::Drawlist) {
@@ -755,6 +757,10 @@ void ui::End() {
 		g.MouseWheel = 0.f;
 	}
 
+	if (!Window->Block && !(flags & GuiFlags_ChildWindow) && !(Window->Flags & GuiFlags_PopUp) && !(Window->Flags & GuiFlags_Listbox)) {
+		HandleMoving(Window, Rect{ Vec2(0 - Window->Size.x / 2, 0 - Window->Size.y / 2), Vec2(Render::Draw->Screen.Width + Window->Size.x / 2, Render::Draw->Screen.Height + Window->Size.y / 2) });
+		HandleResize(Window, Rect{ Vec2(660, 560), Vec2(1920, 1080) });
+	}
 }
 
 void ui::BeginChild(const char* Name, Rect X, GuiFlags flags) {

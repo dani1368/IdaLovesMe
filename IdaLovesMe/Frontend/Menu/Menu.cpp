@@ -57,35 +57,6 @@ void CMenu::Draw()
 	ui::TabButton("H", &this->m_nCurrentTab, 7, 7);
 	
 	if (this->m_nCurrentTab == 0) {
-		ui::BeginChild("Aimbot", { Vec2(0, 0), Vec2(3, 10) }); {
-			ui::Checkbox("Enabled", &cfg->b["rage_enabled"]);
-			ui::KeyBind("rage_enabled_bind_label", &cfg->i["rage_enabled_bind"], &cfg->i["rage_enabled_bind_style"]);
-			ui::SingleSelect("Target selection", &cfg->i["rage_target_selection"], { "Highest damage", "Cycle", "Cycle (2x)", "Near crosshair", "Best hit chance" });
-			ui::MultiSelect("Target hitbox", &cfg->m["rage_target_hitbox"], { "Head", "Chest", "Stomach", "Arms", "Legs", "Feet" });
-			ui::MultiSelect("Multi-point", &cfg->m["rage_multi_point"], { "Head", "Chest", "Stomach", "Arms", "Legs", "Feet" });
-
-			if (std::find_if(std::begin(cfg->m["rage_multi_point"]), std::end(cfg->m["rage_multi_point"]), [](auto p) { return p.second == true; }) != std::end(cfg->m["rage_multi_point"])) {
-				ui::SingleSelect("", &cfg->i["rage_multi_point_amount"], {"Low", "Medium", "High"});
-				ui::SliderInt("Multi-point scale", &cfg->i["rage_multi_point_scale"], 24, 100, cfg->i["rage_multi_point_scale"] == 24 ? "Auto" : "%d%%");
-			}
-			ui::KeyBind("rage_multi_point_label", &cfg->i["rage_multi_point_bind"], &cfg->i["rage_multi_point_bind_style"]);
-			ui::Checkbox("Prefer safe point", &cfg->b["rage_prefer_safe_point"]);
-			ui::Label("Force safe point");
-			ui::KeyBind("rage_prefer_safe_point_label", &cfg->i["rage_prefer_safe_point_bind"], &cfg->i["rage_prefer_safe_point_bind_style"]);
-			ui::MultiSelect("Avoid unsafe hitboxes", &cfg->m["rage_avoid_unsafe_hitboxes"], { "Head", "Chest", "Stomach", "Arms", "Legs", "Feet" });
-			ui::Checkbox("Automatic fire", &cfg->b["rage_autofire"]);
-			ui::Checkbox("Automatic penetration", &cfg->b["rage_auto_penetration"]);
-			ui::Checkbox("Silent aim", &cfg->b["rage_silent_aim"]);
-			ui::SliderInt("Minimum hit chance", &cfg->i["rage_hitchance"], 0, 100, cfg->i["rage_hitchance"] < 1 ? "Off" : "%d%%");
-			ui::SliderInt("Minimum damage", &cfg->i["rage_mindmg"], 0, 126, cfg->i["rage_mindmg"] == 0 ? "Auto" : (cfg->i["rage_mindmg"] > 100 ? "HP+%d" : "%d"), (cfg->i["rage_mindmg"] > 100 ? 100 : 0));
-			ui::Checkbox("Automatic scope", &cfg->b["rage_autoscope"]);
-			ui::Checkbox("Reduce aim step", &cfg->b["rage_reduce_aimstep"]);
-			ui::SliderInt("Maximum FOV", &cfg->i["rage_fov"], 0, 180, "%d°");
-			ui::Checkbox("Log misses due to spread", &cfg->b["rage_log_misses"]);
-			ui::MultiSelect("Low FPS mitigations", &cfg->m["rage_fps_mitigations"], { "Force low accuracy boost", "Disable multipoint: feet", "Disable multipoint: arms", "Disable multipoint: legs", "Disable hitbox: feet", "Force low multipoint", "Lower hit chance precision", "Limit targets per tick" });
-		}
-		ui::EndChild();
-
 		ui::BeginChild("Other#Rage", { Vec2(6, 0), Vec2(3, 10) }); {
 			ui::Checkbox("Remove recoil", &cfg->b["rage_remove_recoil"]);
 			ui::SingleSelect("Accuracy boost", &cfg->i["rage_accuracy_boost"], { "Low", "Medium", "High", "Maximum" });
@@ -127,6 +98,35 @@ void CMenu::Draw()
 				ui::SliderInt("Double tap fake lag limit", &cfg->i["rage_dt_fakelag_limit"], 0, 10, "%d");
 				ui::MultiSelect("Double tap quick stop", &cfg->m["rage_dt_quick_stop"], { "Slow motion", "Duck", "Move between shots" });
 			}
+		}
+		ui::EndChild();
+
+		ui::BeginChild("Aimbot", { Vec2(0, 0), Vec2(3, 10) }); {
+			ui::Checkbox("Enabled", &cfg->b["rage_enabled"]);
+			ui::KeyBind("rage_enabled_bind_label", &cfg->i["rage_enabled_bind"], &cfg->i["rage_enabled_bind_style"]);
+			ui::SingleSelect("Target selection", &cfg->i["rage_target_selection"], { "Highest damage", "Cycle", "Cycle (2x)", "Near crosshair", "Best hit chance" });
+			ui::MultiSelect("Target hitbox", &cfg->m["rage_target_hitbox"], { "Head", "Chest", "Stomach", "Arms", "Legs", "Feet" });
+			ui::MultiSelect("Multi-point", &cfg->m["rage_multi_point"], { "Head", "Chest", "Stomach", "Arms", "Legs", "Feet" });
+
+			if (std::find_if(std::begin(cfg->m["rage_multi_point"]), std::end(cfg->m["rage_multi_point"]), [](auto p) { return p.second == true; }) != std::end(cfg->m["rage_multi_point"])) {
+				ui::SingleSelect("", &cfg->i["rage_multi_point_amount"], {"Low", "Medium", "High"});
+				ui::SliderInt("Multi-point scale", &cfg->i["rage_multi_point_scale"], 24, 100, cfg->i["rage_multi_point_scale"] == 24 ? "Auto" : "%d%%");
+			}
+			ui::KeyBind("rage_multi_point_label", &cfg->i["rage_multi_point_bind"], &cfg->i["rage_multi_point_bind_style"]);
+			ui::Checkbox("Prefer safe point", &cfg->b["rage_prefer_safe_point"]);
+			ui::Label("Force safe point");
+			ui::KeyBind("rage_prefer_safe_point_label", &cfg->i["rage_prefer_safe_point_bind"], &cfg->i["rage_prefer_safe_point_bind_style"]);
+			ui::MultiSelect("Avoid unsafe hitboxes", &cfg->m["rage_avoid_unsafe_hitboxes"], { "Head", "Chest", "Stomach", "Arms", "Legs", "Feet" });
+			ui::Checkbox("Automatic fire", &cfg->b["rage_autofire"]);
+			ui::Checkbox("Automatic penetration", &cfg->b["rage_auto_penetration"]);
+			ui::Checkbox("Silent aim", &cfg->b["rage_silent_aim"]);
+			ui::SliderInt("Minimum hit chance", &cfg->i["rage_hitchance"], 0, 100, cfg->i["rage_hitchance"] < 1 ? "Off" : "%d%%");
+			ui::SliderInt("Minimum damage", &cfg->i["rage_mindmg"], 0, 126, cfg->i["rage_mindmg"] == 0 ? "Auto" : (cfg->i["rage_mindmg"] > 100 ? "HP+%d" : "%d"), (cfg->i["rage_mindmg"] > 100 ? 100 : 0));
+			ui::Checkbox("Automatic scope", &cfg->b["rage_autoscope"]);
+			ui::Checkbox("Reduce aim step", &cfg->b["rage_reduce_aimstep"]);
+			ui::SliderInt("Maximum FOV", &cfg->i["rage_fov"], 0, 180, "%d°");
+			ui::Checkbox("Log misses due to spread", &cfg->b["rage_log_misses"]);
+			ui::MultiSelect("Low FPS mitigations", &cfg->m["rage_fps_mitigations"], { "Force low accuracy boost", "Disable multipoint: feet", "Disable multipoint: arms", "Disable multipoint: legs", "Disable hitbox: feet", "Force low multipoint", "Lower hit chance precision", "Limit targets per tick" });
 		}
 		ui::EndChild();
 	}
