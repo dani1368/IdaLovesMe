@@ -13,7 +13,7 @@ namespace Hooked {
 		const char* panel_name = Interfaces::GuiPanel->GetName(vguiPanel);
 
 		oPaintTraverse(thisptr, vguiPanel, forceRepaint, allowForce);
-
+	
 		if (strstr(panel_name, "FocusOverlayPanel"))
 		{
 			if (Interfaces::Engine->IsInGame() && Interfaces::Engine->IsConnected()) {
