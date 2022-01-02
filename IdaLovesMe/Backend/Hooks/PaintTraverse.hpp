@@ -17,11 +17,11 @@ namespace Hooked {
 		if (strstr(panel_name, "FocusOverlayPanel"))
 		{
 			if (Interfaces::Engine->IsInGame() && Interfaces::Engine->IsConnected()) {
-				for (int i = 0; i < 4; i++)
-					for (int j = 0; j < 4; j++)
+				for (int i = 0; i <= 3; i++)
+					for (int j = 0; j <= 3; j++)
 						G::Matrix[i][j] = Interfaces::Engine->WorldToScreenMatrix()[i][j];
 
-				Features::Visuals->Run();
+				//Features::Visuals->Run();
 			}
 		}
 

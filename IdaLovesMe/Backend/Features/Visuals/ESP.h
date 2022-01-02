@@ -7,6 +7,9 @@ namespace Features
 	public:
 		bool GetBoundingBox(CBaseEntity* ent, Vector& min, Vector& max);
 		void Run();
+		void DrawBox(CBaseEntity* ent, Vector min, Vector max);
+		void DrawName(CBaseEntity* ent, Vector min, Vector max);
+		void DrawHealth(CBaseEntity* ent, Vector min, Vector max);
 	};
 
 	extern CVisuals* Visuals;

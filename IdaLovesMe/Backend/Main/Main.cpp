@@ -3,6 +3,7 @@
 #include "../Hooks/EndScene.hpp"
 #include "../Hooks/WndProc.hpp"
 #include "../Hooks/PaintTraverse.hpp"
+#include "../Hooks/LockCursor.hpp"
 //#include "../Hooks/Present.hpp"
 #include "../../Frontend/Framework/MenuFramework.h"
 #include "../Interfaces/Interfaces.h"
@@ -46,12 +47,19 @@ bool Cheat::Initialize()
 	PanelManager->HookAt(41, &Hooked::PaintTraverse);
 	oPaintTraverse = PanelManager->GetOriginal<fnPaintTraverse>(41);
 
+	Misc::Utilities->Console_Log("hooking surface");
+	VmtHook* SurfaceManager = new VmtHook();
+	Hooks.push_back(SurfaceManager);
+	SurfaceManager->Init(Interfaces::Surface);
+	SurfaceManager->HookAt(67, &Hooked::LockCursor);
+	oLockCursor = SurfaceManager->GetOriginal<fnLockCursor>(67);
+
 	/*VmtHook* DirectXManager = new VmtHook();
 	Hooks.push_back(DirectXManager);
 	DirectXManager->Init(**reinterpret_cast<void***>((Misc::Utilities->Memory_PatternScan("shaderapidx9.dll", "A1 ? ? ? ? 50 8B 08 FF 51 0C") + 1)));
-	DirectXManager->HookAt(17, &Hooked::Aboba);
-	oAboba = DirectXManager->GetOriginal<fnAboba>(17);
-	DirectXManager->HookAt(16, &Hooked::Amogus);
+	DirectXManager->HookAt(42, &Hooked::Aboba);
+	oAboba = DirectXManager->GetOriginal<fnAboba>(42);*/
+	/*DirectXManager->HookAt(16, &Hooked::Amogus);
 	oAmogus = DirectXManager->GetOriginal<fnAmogus>(16);*/
 
 	Misc::Utilities->Console_Log("hooking wndproc");

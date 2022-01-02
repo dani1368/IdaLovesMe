@@ -13,8 +13,10 @@ using namespace Features;
 CVisuals* Features::Visuals = new CVisuals();
 
 bool CVisuals::GetBoundingBox(CBaseEntity* ent, Vector& min, Vector& max) {
-	Vector VecMins = ent->GetVecMins();
-	Vector VecMaxs = ent->GetVecMaxs();
+	//Vector VecMins = ent->GetVecMins();
+	//Vector VecMaxs = ent->GetVecMaxs();
+	Vector VecMins = Vector(0, 0, 0);
+	Vector VecMaxs = Vector(16, 16, 72);
 	Vector Origin = ent->GetAbsOrigin();
 	Vector Center;
 	Origin.VectorCopy(Origin, Center);
@@ -56,6 +58,8 @@ bool CVisuals::GetBoundingBox(CBaseEntity* ent, Vector& min, Vector& max) {
 	return true;
 }
 
+using namespace IdaLovesMe;
+
 void CVisuals::Run() {
 	if (!Interfaces::Engine->IsConnected() || !Interfaces::Engine->IsInGame())
 		return;
@@ -69,19 +73,31 @@ void CVisuals::Run() {
 		if (ent->GetClientClass()->m_ClassID != 40)
 			continue;
 
-		PlayerInfo info;
-		Interfaces::Engine->GetPlayerInfo(ent->GetIndex(), &info);
+		if (ent->IsDormant())
+			continue;
+
+		
 
 		Vector min, max;
-		GetBoundingBox(ent, min, max);
 
-		IdaLovesMe::DrawList::AddText("Dani", (min.x + max.x) / 2 + 1, min.y - 10, D3DCOLOR_RGBA(0, 0, 0, 200), Render::Fonts::Verdana);
+		if (!GetBoundingBox(ent, min, max))
+			continue;
+
+		/*IdaLovesMe::DrawList::AddText("Dani", (min.x + max.x) / 2 + 1, min.y - 10, D3DCOLOR_RGBA(0, 0, 0, 200), Render::Fonts::Verdana);
 		IdaLovesMe::DrawList::AddText("Dani", (min.x + max.x) / 2, min.y - 11, D3DCOLOR_RGBA(255, 255, 255, 200), Render::Fonts::Verdana);
 		IdaLovesMe::DrawList::AddRect(IdaLovesMe::Vec2(min.x-1, min.y-1), IdaLovesMe::Vec2(max.x - min.x+2, max.y - min.y+2), D3DCOLOR_RGBA(0, 0, 0, 60));
 		IdaLovesMe::DrawList::AddRect(IdaLovesMe::Vec2(min.x, min.y), IdaLovesMe::Vec2(max.x - min.x, max.y - min.y), D3DCOLOR_RGBA(255, 0, 0, 140));
-		IdaLovesMe::DrawList::AddRect(IdaLovesMe::Vec2(min.x+1, min.y+1), IdaLovesMe::Vec2(max.x - min.x-2, max.y - min.y-2), D3DCOLOR_RGBA(0, 0, 0, 60));
-		/*CSRender::CSDraw->Text(info.szName, (min.x + max.x) / 2 + 1, min.y - 10, 1, CSRender::Fonts::Verdana, false, D3DCOLOR_RGBA(0, 0, 0, 180));
-		CSRender::CSDraw->Text(info.szName, (min.x + max.x) / 2, min.y - 11, 1, CSRender::Fonts::Verdana, false, D3DCOLOR_RGBA(255, 255, 255, 200));*/
+		IdaLovesMe::DrawList::AddRect(IdaLovesMe::Vec2(min.x+1, min.y+1), IdaLovesMe::Vec2(max.x - min.x-2, max.y - min.y-2), D3DCOLOR_RGBA(0, 0, 0, 60));*/
+		//CSRender::CSDraw->Text(info.szName, (min.x + max.x) / 2 + 1, min.y - 10, 1, CSRender::Fonts::Verdana, false, D3DCOLOR_RGBA(0, 0, 0, 165));
+		//CSRender::CSDraw->Text(info.szName, (min.x + max.x) / 2, min.y - 11, 1, CSRender::Fonts::Verdana, false, D3DCOLOR_RGBA(255, 255, 255, 220));
+
+		DrawBox(ent, min, max);
+		DrawName(ent, min, max);
+		DrawHealth(ent, min, max);
+
+		//char buffer[255];
+		//sprintf_s(buffer, "frame: %i ; i: %i", Interfaces::Globals->framecount, i);
+		//Misc::Utilities->Game_Msg(buffer);
 		/*Render::Draw->Text(info.szName, (min.x + max.x) / 2 + 1, min.y - 10, 1, Render::Fonts::Verdana, false, D3DCOLOR_RGBA(0, 0, 0, 180));
 		Render::Draw->Text(info.szName, (min.x + max.x) / 2, min.y - 11, 1, Render::Fonts::Verdana, false, D3DCOLOR_RGBA(255, 255, 255, 200));*/
 
@@ -90,4 +106,32 @@ void CVisuals::Run() {
 
 		
 	}
+}
+
+void CVisuals::DrawBox(CBaseEntity* ent, Vector min, Vector max) {
+	Render::Draw->Rect(Vec2(min.x, min.y), Vec2(max.x - min.x, max.y - min.y), 1, D3DCOLOR_RGBA(0, 0, 0, 130));
+	Render::Draw->Rect(Vec2(min.x + 1, min.y + 1), Vec2(max.x - min.x - 2, max.y - min.y - 2), 1, D3DCOLOR_RGBA(255, 255, 255, 130));
+	Render::Draw->Rect(Vec2(min.x + 2, min.y + 2), Vec2(max.x - min.x - 4, max.y - min.y - 4), 1, D3DCOLOR_RGBA(0, 0, 0, 130));
+}
+
+void CVisuals::DrawName(CBaseEntity* ent, Vector min, Vector max) {
+	PlayerInfo info;
+	Interfaces::Engine->GetPlayerInfo(ent->GetIndex(), &info);
+
+	Render::Draw->Text(info.szName, (min.x + max.x) / 2 + 1, min.y - 10, 1, Render::Fonts::Verdana, false, D3DCOLOR_RGBA(0, 0, 0, int(200 / 1.5f)));
+	Render::Draw->Text(info.szName, (min.x + max.x) / 2, min.y - 11, 1, Render::Fonts::Verdana, false, D3DCOLOR_RGBA(255, 255, 255, 200));
+}
+
+void CVisuals::DrawHealth(CBaseEntity* ent, Vector min, Vector max) {
+	int health = ent->GetHealth();
+	int max_health = 100;
+	float health_ratio = health / (float)max_health;
+
+	int offset = max.y - min.y - 2;
+	offset -= (offset * health_ratio);
+
+	D3DCOLOR color = D3DCOLOR_RGBA(int(244 - (116 * health_ratio)), int(100 + (144 * health_ratio)), 66, 200);
+
+	Render::Draw->FilledRect(Vec2(min.x - 5, min.y), Vec2(4, max.y - min.y), D3DCOLOR_RGBA(0, 0, 0, 130));
+	Render::Draw->FilledRect(Vec2(min.x - 4, min.y + 1 + offset), Vec2(2, max.y - min.y - 2 - offset), color);
 }

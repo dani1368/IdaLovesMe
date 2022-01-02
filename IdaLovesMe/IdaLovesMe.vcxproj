@@ -24,10 +24,11 @@
     <ClInclude Include="Backend\Definitions.h" />
     <ClInclude Include="Backend\Features\Visuals\ESP.h" />
     <ClInclude Include="Backend\Features\Visuals\EventLogger.h" />
+    <ClInclude Include="Backend\Features\Visuals\Render.h" />
     <ClInclude Include="Backend\Globalincludes.h" />
     <ClInclude Include="Backend\Hooks\EndScene.hpp" />
+    <ClInclude Include="Backend\Hooks\LockCursor.hpp" />
     <ClInclude Include="Backend\Hooks\PaintTraverse.hpp" />
-    <ClInclude Include="Backend\Hooks\SceneEnd.hpp" />
     <ClInclude Include="Backend\Hooks\WndProc.hpp" />
     <ClInclude Include="Backend\Interfaces\Interfaces.h" />
     <ClInclude Include="Backend\Main\Main.h" />
@@ -43,6 +44,7 @@
     <ClInclude Include="Backend\ValveSDK\IEngine.h" />
     <ClInclude Include="Backend\ValveSDK\IEntityList.h" />
     <ClInclude Include="Backend\ValveSDK\IPanel.h" />
+    <ClInclude Include="Backend\ValveSDK\ISurface.h" />
     <ClInclude Include="Backend\ValveSDK\NetVar.h" />
     <ClInclude Include="Backend\ValveSDK\RecvData.h" />
     <ClInclude Include="Backend\ValveSDK\Vector.h" />
@@ -60,6 +62,7 @@
     <ClCompile Include="Backend\Definitions.cpp" />
     <ClCompile Include="Backend\Features\Visuals\ESP.cpp" />
     <ClCompile Include="Backend\Features\Visuals\EventLogger.cpp" />
+    <ClCompile Include="Backend\Features\Visuals\Render.cpp" />
     <ClCompile Include="Backend\Globalincludes.cpp" />
     <ClCompile Include="Backend\Interfaces\Interfaces.cpp" />
     <ClCompile Include="Backend\Main\Main.cpp" />
