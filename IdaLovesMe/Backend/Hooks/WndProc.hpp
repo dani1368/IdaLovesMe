@@ -30,7 +30,7 @@ namespace Hooked
 			if ((wParam & VK_LBUTTON || wParam & VK_RBUTTON) && IdaLovesMe::ui::IsInsideWindow())
 				return true;
 
-			if (g->AwaitingInput)
+			if (g && g->AwaitingInput)
 				return true;
 		}
 

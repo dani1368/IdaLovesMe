@@ -21,9 +21,9 @@ namespace Hooked {
 					for (int j = 0; j < 4; j++)
 						G::Matrix[i][j] = Interfaces::Engine->WorldToScreenMatrix()[i][j];
 
-				//Features::Visuals->Run();
+				Features::Visuals->Run();
 			}
 		}
-		
+
 	}
 }
