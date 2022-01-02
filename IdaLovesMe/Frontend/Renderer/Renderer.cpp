@@ -33,7 +33,7 @@ void CDraw::CreateObjects()
     this->m_TabFont = AddFontMemResourceEx((void*)(FontsData::TabIcons), (DWORD)5192, nullptr, &nFonts);
     D3DXCreateFontA(m_Device, 47, 0, 0, 0, 0, ANSI_CHARSET, OUT_DEFAULT_PRECIS, DRAFT_QUALITY, DEFAULT_PITCH, "gamesense", &Fonts::TabIcons);
 
-    this->m_LegitTabFont = AddFontMemResourceEx((void*)(FontsData::TabIcons), (DWORD)5192, nullptr, &nFonts);
+    this->m_LegitTabFont = AddFontMemResourceEx((void*)(FontsData::LegitTabIcons), (DWORD)47320, nullptr, &nFonts);
     D3DXCreateFontA(m_Device, 32, 0, 0, 0, 0, ANSI_CHARSET, OUT_DEFAULT_PRECIS, DRAFT_QUALITY, DEFAULT_PITCH, "undefeated", &Fonts::LegitTabIcons);
 
     D3DXCreateTextureFromFileInMemoryEx(m_Device, TexturesData::BgTexture, 424852, 4096, 4096, D3DX_DEFAULT, NULL,

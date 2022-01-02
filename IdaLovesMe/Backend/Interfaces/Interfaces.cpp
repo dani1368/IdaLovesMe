@@ -42,12 +42,14 @@ void CInterfaces::Initialize() {
 	ClientManager = new CInterfaceManager("client.dll");
 	VSTDLibManager = new CInterfaceManager("vstdlib.dll");
 	VGUIManager = new CInterfaceManager("vgui2.dll");
+	VGUIMatManager = new CInterfaceManager("vguimatsurface.dll");
 
 	Engine = EngineManager->BruteInterface<IEngine>("VEngineClient");
 	Client = ClientManager->BruteInterface<IClient>("VClient");
 	Var = VSTDLibManager->BruteInterface<ICvar>("VEngineCvar");
 	EntityList = ClientManager->BruteInterface<IEntityList>("VClientEntityList");
 	GuiPanel = VGUIManager->BruteInterface<IPanel>("VGUI_Panel");
+	Surface = VGUIMatManager->BruteInterface<ISurface>("VGUI_Surface");
 	RenderView = EngineManager->BruteInterface<IPanel>("VEngineRenderView");
 
 	Globals = **(CGlobalVars***)((*(DWORD**)(Client))[0] + 0x1F);
@@ -68,4 +70,5 @@ ICvar* Interfaces::Var = nullptr;
 CGlobalVars* Interfaces::Globals = nullptr;
 IEntityList* Interfaces::EntityList = nullptr;
 IPanel* Interfaces::GuiPanel = nullptr;
+ISurface* Interfaces::Surface = nullptr;
 void* Interfaces::RenderView = nullptr;

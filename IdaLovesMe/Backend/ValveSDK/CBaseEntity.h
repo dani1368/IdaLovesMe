@@ -43,6 +43,11 @@ public:
 		return this->IsValid() ? *reinterpret_cast<int*>(uintptr_t(this) + 0x64) : 0;
 	}
 
+	bool IsDormant()
+	{
+		return this->IsValid() ? *reinterpret_cast<bool*>(uintptr_t(this) + 0xED) : true;
+	}
+
 	Vector GetVecMins() {
 		return this->IsValid() ? *reinterpret_cast<Vector*>(uintptr_t(this) + Cheat::NetVarManager->GetOffs(this->GetClientClass()->m_pNetworkName, "m_vecMins")) : Vector(0, 0, 0);
 	}

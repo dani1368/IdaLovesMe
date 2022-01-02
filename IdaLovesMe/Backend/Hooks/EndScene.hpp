@@ -15,7 +15,7 @@ fnPresent2 oPresent;
 typedef HRESULT(__stdcall* fnReset2)(IDirect3DDevice9*, D3DPRESENT_PARAMETERS*);
 fnReset2 oReset;
 
-typedef long(__stdcall* fnAboba)(IDirect3DDevice9*, RECT*, RECT*, HWND, RGNDATA*);
+typedef long(__stdcall* fnAboba)(IDirect3DDevice9*);
 fnAboba oAboba = nullptr;
 
 typedef long(__stdcall* fnAmogus)(IDirect3DDevice9*, D3DPRESENT_PARAMETERS*);
@@ -42,6 +42,9 @@ namespace Hooked {
 			Render::Draw->Reset();
 
 			CMenu::get()->Initialize();
+
+			Features::Visuals->Run();
+
 			CMenu::get()->Draw();
 
 			Features::EventLogger->Draw();
@@ -64,41 +67,5 @@ namespace Hooked {
 		}
 
 		return oReset(device, params);
-	}
-
-	static HRESULT D3DAPI Aboba(IDirect3DDevice9* pDevice, RECT* pSourceRect, RECT* pDestRect, HWND hDestWindowOverride, RGNDATA* pDirtyRegion)
-	{
-		IDirect3DStateBlock9* PixelState = NULL;
-		IDirect3DVertexDeclaration9* vertDec;
-		IDirect3DVertexShader9* vertShader;
-
-		pDevice->CreateStateBlock(D3DSBT_PIXELSTATE, &PixelState);
-		pDevice->GetVertexDeclaration(&vertDec);
-		pDevice->GetVertexShader(&vertShader);
-
-		static auto wanted_ret_address = _ReturnAddress();
-		if (_ReturnAddress() == wanted_ret_address)
-		{
-			CSRender::CSDraw->Init(pDevice);
-			CSRender::CSDraw->Reset();
-
-			//Features::Visuals->Run();
-		}
-		PixelState->Apply();
-		PixelState->Release();
-
-		pDevice->SetVertexDeclaration(vertDec);
-		pDevice->SetVertexShader(vertShader);
-
-		return oAboba(pDevice, pSourceRect, pDestRect, hDestWindowOverride, pDirtyRegion);
-	}
-	
-	static HRESULT D3DAPI Amogus(IDirect3DDevice9* pDevice, D3DPRESENT_PARAMETERS* pParams)
-	{
-		CSRender::CSDraw->ReleaseObjects();
-		auto result = oReset(pDevice, pParams);
-		CSRender::CSDraw->CreateObjects();
-
-		return result;
 	}
 }

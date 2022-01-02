@@ -6,6 +6,7 @@
 #include "../ValveSDK/IEngine.h"
 #include "../ValveSDK/IEntityList.h"
 #include "../ValveSDK/IPanel.h"
+#include "../ValveSDK/ISurface.h"
 
 typedef void* (*CreateInterfaceFn)(const char* pName, int* pReturnCode);
 
@@ -31,6 +32,7 @@ namespace Interfaces
 		CInterfaceManager* ClientManager,
 						 * VSTDLibManager,
 						 * VGUIManager,
+						 * VGUIMatManager,
 						 * EngineManager;
 	public:
 		void Initialize();
@@ -45,5 +47,6 @@ namespace Interfaces
 	extern IEngine* Engine;
 	extern IEntityList* EntityList;
 	extern IPanel* GuiPanel;
+	extern ISurface* Surface;
 	extern void* RenderView;
 }

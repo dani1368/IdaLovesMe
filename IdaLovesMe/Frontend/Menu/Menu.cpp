@@ -43,7 +43,7 @@ void CMenu::Draw()
 	if (!this->m_bIsOpened && alpha == 0.f)
 		return;
 
-	ui::GetInputFromWindow("Counter-Strike: Global Offensive");
+	ui::GetInputFromWindow("Counter-Strike: Global Offensive - Direct3D 9");
 
 	ui::SetNextWindowSize({ 660,560 });
 	ui::Begin("Main", GuiFlags_None);
