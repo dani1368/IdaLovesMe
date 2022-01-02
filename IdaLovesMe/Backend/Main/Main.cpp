@@ -3,10 +3,10 @@
 #include "../Hooks/EndScene.hpp"
 #include "../Hooks/WndProc.hpp"
 #include "../Hooks/PaintTraverse.hpp"
-#include "../Hooks/SceneEnd.hpp"
+//#include "../Hooks/Present.hpp"
 #include "../../Frontend/Framework/MenuFramework.h"
 #include "../Interfaces/Interfaces.h"
-#include "../Features/Visuals/ESP.h"
+//#include "../Features/Visuals/ESP.h"
 #include "../ValveSDK/NetVar.h"
 
 std::uintptr_t reset_pattern = *reinterpret_cast<std::uintptr_t*>(Misc::Utilities->Memory_PatternScan("gameoverlayrenderer.dll", "C7 45 ? ? ? ? ? FF 15 ? ? ? ? 8B D8") + 9);
@@ -46,12 +46,13 @@ bool Cheat::Initialize()
 	PanelManager->HookAt(41, &Hooked::PaintTraverse);
 	oPaintTraverse = PanelManager->GetOriginal<fnPaintTraverse>(41);
 
-	Misc::Utilities->Console_Log("hooking renderview manager");
-	VmtHook* RenderViewManager = new VmtHook();
-	Hooks.push_back(RenderViewManager);
-	RenderViewManager->Init(Interfaces::RenderView);
-	RenderViewManager->HookAt(9, &Hooked::SceneEnd);
-	oSceneEnd = RenderViewManager->GetOriginal<fnSceneEnd>(9);
+	/*VmtHook* DirectXManager = new VmtHook();
+	Hooks.push_back(DirectXManager);
+	DirectXManager->Init(**reinterpret_cast<void***>((Misc::Utilities->Memory_PatternScan("shaderapidx9.dll", "A1 ? ? ? ? 50 8B 08 FF 51 0C") + 1)));
+	DirectXManager->HookAt(17, &Hooked::Aboba);
+	oAboba = DirectXManager->GetOriginal<fnAboba>(17);
+	DirectXManager->HookAt(16, &Hooked::Amogus);
+	oAmogus = DirectXManager->GetOriginal<fnAmogus>(16);*/
 
 	Misc::Utilities->Console_Log("hooking wndproc");
 	oWndProc = (WNDPROC)SetWindowLongPtr(FindWindow(L"Valve001", 0), GWL_WNDPROC, (long)&Hooked::wndProc);

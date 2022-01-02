@@ -3,6 +3,7 @@
 #include "../../Utilities/Utilities.h"
 #include "../../Config/Config.h"
 #include "../../ValveSDK/Vector.h"
+//#include "Render.h"
 #include "../../../Frontend/Framework/MenuFramework.h"
 #include "../../../Frontend/Renderer/Renderer.h"
 #include <string>
@@ -79,6 +80,8 @@ void CVisuals::Run() {
 		IdaLovesMe::DrawList::AddRect(IdaLovesMe::Vec2(min.x-1, min.y-1), IdaLovesMe::Vec2(max.x - min.x+2, max.y - min.y+2), D3DCOLOR_RGBA(0, 0, 0, 60));
 		IdaLovesMe::DrawList::AddRect(IdaLovesMe::Vec2(min.x, min.y), IdaLovesMe::Vec2(max.x - min.x, max.y - min.y), D3DCOLOR_RGBA(255, 0, 0, 140));
 		IdaLovesMe::DrawList::AddRect(IdaLovesMe::Vec2(min.x+1, min.y+1), IdaLovesMe::Vec2(max.x - min.x-2, max.y - min.y-2), D3DCOLOR_RGBA(0, 0, 0, 60));
+		/*CSRender::CSDraw->Text(info.szName, (min.x + max.x) / 2 + 1, min.y - 10, 1, CSRender::Fonts::Verdana, false, D3DCOLOR_RGBA(0, 0, 0, 180));
+		CSRender::CSDraw->Text(info.szName, (min.x + max.x) / 2, min.y - 11, 1, CSRender::Fonts::Verdana, false, D3DCOLOR_RGBA(255, 255, 255, 200));*/
 		/*Render::Draw->Text(info.szName, (min.x + max.x) / 2 + 1, min.y - 10, 1, Render::Fonts::Verdana, false, D3DCOLOR_RGBA(0, 0, 0, 180));
 		Render::Draw->Text(info.szName, (min.x + max.x) / 2, min.y - 11, 1, Render::Fonts::Verdana, false, D3DCOLOR_RGBA(255, 255, 255, 200));*/
 
