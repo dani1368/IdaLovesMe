@@ -373,29 +373,29 @@ Vec2 ui::GetWindowSize() {
 }
 
 bool ui::KeyPressed(const int key) {
-	if (!GetActiveWindow())
-		return false;
+	/*if (!GetActiveWindow())
+		return false;*/
 	GuiContext& g = *Gui_Ctx;
 	return g.KeyState[key] && !g.PrevKeyState[key];
 }
 
 bool ui::KeyDown(const int key) {
-	if (!GetActiveWindow())
-		return false;
+	/*if (!GetActiveWindow())
+		return false;*/
 	GuiContext& g = *Gui_Ctx;
 	return g.KeyState[key];
 }
 
 bool ui::KeyReleased(const int key) {
-	if (!GetActiveWindow())
-		return false;
+	/*if (!GetActiveWindow())
+		return false;*/
 	GuiContext& g = *Gui_Ctx;
 	return !g.KeyState[key] && g.PrevKeyState[key];
 }
 
 bool ui::IsInside(const float x, const float y, const float w, const float h) {
-	if (!GetActiveWindow())
-		return false;
+	/*if (!GetActiveWindow())
+		return false;*/
 	GuiContext& g = *Gui_Ctx;
 	return g.MousePos.x > x && g.MousePos.y > y && g.MousePos.x < w + x && g.MousePos.y < h + y;
 }
@@ -567,7 +567,7 @@ void ui::HandleMoving(GuiWindow* Window, Rect Boundaries, Vec2* buffer) {
 			Window->yPos = (int)round((g.MousePos.y - buffer->y) / Step.y);
 
 			Window->xPos = std::clamp(Window->xPos, 0, 9 - Window->xSize);
-			Window->yPos = std::clamp(Window->yPos, 0, 10 - Window->ySize);
+			Window->yPos = std::clamp(Window->yPos, strstr(Window->Name.c_str(), "#Legit") ? 2 : 0, 10 - Window->ySize);
 		}
 
 		else if (!KeyDown(VK_LBUTTON) && Window->Dragging)

@@ -4,6 +4,7 @@
 #include "RecvData.h"
 #include "Vector.h"
 #include "NetVar.h"
+#include <array>
 
 class CBaseEntity {
 public:
@@ -43,6 +44,11 @@ public:
 		return this->IsValid() ? *reinterpret_cast<int*>(uintptr_t(this) + 0x64) : 0;
 	}
 
+	int GetTeam()
+	{
+		return this->IsValid() ? *reinterpret_cast<int*>(uintptr_t(this) + 0xF4) : -1;
+	}
+
 	bool IsDormant()
 	{
 		return this->IsValid() ? *reinterpret_cast<bool*>(uintptr_t(this) + 0xED) : true;
@@ -75,6 +81,12 @@ public:
 		typedef ClientClass* (__thiscall* OriginalFn)(void*);
 
 		return this->IsValid() ? vfunc<OriginalFn>(Networkable, 2)(Networkable) : 0;
+	}
+
+	std::array<float, 24>& GetPoseParameter()
+	{
+		static int _m_flPoseParameter = Cheat::NetVarManager->GetOffs("CBaseAnimating", "m_flPoseParameter");
+		return *(std::array<float, 24>*)((uintptr_t)this + _m_flPoseParameter);
 	}
 };
 

@@ -96,6 +96,16 @@ void CConfig::LoadDefaults() {
 	cfg->i["aa_fake_yaw_limit"] = 60;
 	//AA OTHER
 	cfg->i["aa_fakelag_limit"] = 13;
+	//VISUALS
+	cfg->c["visuals_player_esp_bounding_box_color"][0] = 255;
+	cfg->c["visuals_player_esp_bounding_box_color"][1] = 255;
+	cfg->c["visuals_player_esp_bounding_box_color"][2] = 255;
+	cfg->c["visuals_player_esp_bounding_box_color"][3] = 130;
+
+	cfg->c["visuals_player_esp_name_color"][0] = 255;
+	cfg->c["visuals_player_esp_name_color"][1] = 255;
+	cfg->c["visuals_player_esp_name_color"][2] = 255;
+	cfg->c["visuals_player_esp_name_color"][3] = 200;
 	//MISC
 	cfg->i["misc_menu_key"] = VK_INSERT;
 }
@@ -177,5 +187,20 @@ void CConfig::Refresh() {
 			if (filename != "tempbuffer")
 				this->List.push_back(filename.substr(0, filename.length() - 4));
 		}
+	}
+}
+
+bool CConfig::IsBindActive(std::string key) {
+	switch (this->i[key + "style"]) {
+	case 0:
+		return true;
+	case 1:
+		return GetAsyncKeyState(this->i[key]);
+	case 2:
+		return LOWORD(GetKeyState(this->i[key]));
+	case 3:
+		return !GetAsyncKeyState(this->i[key]);
+	default:
+		return true;
 	}
 }

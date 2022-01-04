@@ -18,6 +18,11 @@ public:
 		typedef bool(__thiscall* Fn)(void*, int, PlayerInfo*);
 		return vfunc<Fn>(this, 8)(this, index, pinfo);
 	}
+	int GetLocalPlayerIndex()
+	{
+		typedef int(__thiscall* Fn)(void*);
+		return vfunc<Fn>(this, 12)(this);
+	}
 	bool IsInGame()
 	{
 		typedef bool(__thiscall* Fn)(void*);

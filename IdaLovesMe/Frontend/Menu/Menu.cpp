@@ -197,7 +197,7 @@ void CMenu::Draw()
 		ui::EndChild();
 	}
 	else if (this->m_nCurrentTab == 2) {
-		ui::BeginChild("Weapon type", { Vec2(0,0), Vec2(9, 0) }, GuiFlags_NoMove | GuiFlags_NoResize);
+		ui::BeginChild("Weapon type#Legit", { Vec2(0,0), Vec2(9, 0) }, GuiFlags_NoMove | GuiFlags_NoResize);
 		ui::TabButton("G", &this->m_nCurrentLegitTab, 0, 6, GuiFlags_LegitTab);
 		ui::TabButton("P", &this->m_nCurrentLegitTab, 1, 6, GuiFlags_LegitTab);
 		ui::TabButton("W", &this->m_nCurrentLegitTab, 2, 6, GuiFlags_LegitTab);
@@ -207,14 +207,23 @@ void CMenu::Draw()
 		ui::EndChild();
 		ui::BeginChild("Aimbot#Legit", { Vec2(0, 2), Vec2(3, 8) });
 		ui::EndChild();
-		ui::BeginChild("Triggerbot", { Vec2(6, 2), Vec2(3, 5) });
+		ui::BeginChild("Triggerbot#Legit", { Vec2(6, 2), Vec2(3, 5) });
 		ui::EndChild();
 		ui::BeginChild("Other#Legit", { Vec2(6, 9), Vec2(3, 1) });
 		ui::EndChild();
 	}
 	else if (this->m_nCurrentTab == 3) {
 		ui::BeginChild("Player ESP", { Vec2(0,0), Vec2(3, 6) }); {
+			ui::Label("Activation type");
+			ui::KeyBind("visuals_player_esp_activation_type", &cfg->i["visuals_player_esp_activation_type_key"], &cfg->i["visuals_player_esp_activation_type_keystyle"]);
+			ui::Checkbox("Teammates", &cfg->b["visuals_player_esp_teammates"]);
+			ui::Checkbox("Dormant", &cfg->b["visuals_player_esp_dormant"]);
 			ui::Checkbox("Bounding box", &cfg->b["visuals_player_esp_bounding_box"]);
+			ui::ColorPicker("visuals_player_esp_bounding_box_color", cfg->c["visuals_player_esp_bounding_box_color"]);
+			ui::Checkbox("Health bar", &cfg->b["visuals_player_esp_health_bar"]);
+			ui::Checkbox("Name", &cfg->b["visuals_player_esp_name"]);
+			ui::ColorPicker("visuals_player_esp_name_color", cfg->c["visuals_player_esp_name_color"]);
+			ui::Checkbox("Flags", &cfg->b["visuals_player_esp_flags"]);
 		};
 		ui::EndChild();
 		ui::BeginChild("Colored models", { Vec2(0, 8), Vec2(3, 2) });
