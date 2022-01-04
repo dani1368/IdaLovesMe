@@ -1,5 +1,6 @@
 #pragma once
 #include "../../Backend/Misc/singleton.h"
+#include "../../Frontend/Framework/MenuFramework.h"
 #include <unordered_map>
 class CConfig : public singleton<CConfig> {
 
@@ -11,6 +12,7 @@ public:
 	void Save();
 	void Delete();
 	void Refresh();
+	bool IsBindActive(std::string key);
 
 	std::unordered_map<std::string, bool> b;
 	std::unordered_map<std::string, int> i;
