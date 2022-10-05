@@ -13,168 +13,206 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Core">
+      <UniqueIdentifier>{78ca8dd9-2015-4548-b7a9-490f7ffcd362}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Renderer">
+      <UniqueIdentifier>{0d3cc5ab-cc3b-42d1-80d2-24aa27d1234d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Drawing">
+      <UniqueIdentifier>{ad686eb4-08bb-4efd-b438-3cad7438dd8e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Utility">
+      <UniqueIdentifier>{abfd7856-9aef-4b63-935b-76cec905b9cc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Dependencies">
+      <UniqueIdentifier>{68efde0b-0e96-4043-921e-b3eb49fc2a97}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Dependencies\SDK">
+      <UniqueIdentifier>{f285fc6b-d385-4377-9d69-a9f7c4c9592c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Miscellaneous">
+      <UniqueIdentifier>{224fedad-6bc6-45e4-87d9-220a9ebf32a2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Frontend">
+      <UniqueIdentifier>{768f6b0a-f3a4-457f-a1cf-90bda15a9c9e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\ILM">
+      <UniqueIdentifier>{078ceb81-992d-48b7-a5be-da41cb523745}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Hooking">
+      <UniqueIdentifier>{5769412c-f590-4913-8cfa-12033c05419b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Dependencies\Hooks">
+      <UniqueIdentifier>{d6e83bc6-5e26-4dba-ae3f-6c5545e9a246}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Dependencies\Maths">
+      <UniqueIdentifier>{505a4b21-733f-4ade-9d29-a366ecc5d12f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Dependencies\Maths\Vectors">
+      <UniqueIdentifier>{51861930-da91-4c18-9c58-751950968fc0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Dependencies\Maths\Matrix">
+      <UniqueIdentifier>{050294d2-47bf-4293-89d2-569337a11e5c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Backend\Globalincludes.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Backend\Config\Settings.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Backend\Utilities\Utilities.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Backend\Main\Main.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Backend\Hooks\EndScene.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Backend\Hooks\WndProc.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Frontend\Menu\Menu.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Backend\Misc\singleton.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Backend\Misc\Fonts\Fonts.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Backend\Misc\Textures\Textures.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Frontend\Framework\MenuFramework.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Frontend\Renderer\Renderer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Backend\Interfaces\Interfaces.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Backend\ValveSDK\ICvar.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Backend\ValveSDK\color.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Backend\ValveSDK\vfunc.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Backend\Features\Visuals\EventLogger.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Backend\ValveSDK\CGlobalVars.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Backend\ValveSDK\IClient.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Frontend\Renderer\color.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Backend\Config\Config.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Backend\ValveSDK\CBaseEntity.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Backend\ValveSDK\IEntityList.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Backend\Features\Visuals\ESP.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Backend\ValveSDK\IEngine.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Backend\Hooks\PaintTraverse.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Backend\ValveSDK\IPanel.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Backend\ValveSDK\RecvData.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Backend\Main\Memory.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Backend\ValveSDK\Vector.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Backend\ValveSDK\NetVar.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Backend\Definitions.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Backend\ValveSDK\VMatrix.h">
-      <Filter>Header Files</Filter>
+      <Filter>Core\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="Backend\Features\Visuals\Render.h">
-      <Filter>Header Files</Filter>
+      <Filter>Core\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Frontend\Menu\Menu.h">
+      <Filter>Core\Frontend</Filter>
+    </ClInclude>
+    <ClInclude Include="Frontend\Framework\MenuFramework.h">
+      <Filter>Core\ILM</Filter>
+    </ClInclude>
+    <ClInclude Include="Backend\Features\Visuals\ESP.h">
+      <Filter>Miscellaneous</Filter>
+    </ClInclude>
+    <ClInclude Include="Backend\Features\Visuals\EventLogger.h">
+      <Filter>Miscellaneous</Filter>
+    </ClInclude>
+    <ClInclude Include="Backend\Misc\Fonts\Fonts.h">
+      <Filter>Core\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="Backend\Misc\Textures\Textures.h">
+      <Filter>Core\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="Backend\ValveSDK\color.h">
+      <Filter>Dependencies\SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="Frontend\Renderer\color.h">
+      <Filter>Core\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="Backend\Globalincludes.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Backend\Utilities\Utilities.h">
+      <Filter>Core\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="Backend\Config\Settings.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Backend\Hooks\EndScene.hpp">
+      <Filter>Core\Hooking</Filter>
+    </ClInclude>
+    <ClInclude Include="Backend\Hooks\WndProc.hpp">
+      <Filter>Core\Hooking</Filter>
+    </ClInclude>
+    <ClInclude Include="Backend\Config\Config.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Backend\Main\Memory.h">
+      <Filter>Dependencies\Hooks</Filter>
+    </ClInclude>
+    <ClInclude Include="Backend\ValveSDK\VMatrix.h">
+      <Filter>Dependencies\Maths\Matrix</Filter>
+    </ClInclude>
+    <ClInclude Include="Backend\ValveSDK\Vector.h">
+      <Filter>Dependencies\Maths\Vectors</Filter>
+    </ClInclude>
+    <ClInclude Include="Backend\ValveSDK\IEntityList.h">
+      <Filter>Dependencies\SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="Backend\ValveSDK\vfunc.h">
+      <Filter>Dependencies\SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="Backend\Interfaces\Interfaces.h">
+      <Filter>Dependencies\Hooks</Filter>
+    </ClInclude>
+    <ClInclude Include="Backend\ValveSDK\IPanel.h">
+      <Filter>Dependencies\Hooks</Filter>
     </ClInclude>
     <ClInclude Include="Backend\ValveSDK\ISurface.h">
-      <Filter>Header Files</Filter>
+      <Filter>Dependencies\Hooks</Filter>
     </ClInclude>
     <ClInclude Include="Backend\Hooks\LockCursor.hpp">
-      <Filter>Header Files</Filter>
+      <Filter>Dependencies\Hooks</Filter>
+    </ClInclude>
+    <ClInclude Include="Backend\Hooks\PaintTraverse.hpp">
+      <Filter>Dependencies\Hooks</Filter>
+    </ClInclude>
+    <ClInclude Include="Backend\ValveSDK\IEngine.h">
+      <Filter>Dependencies\Hooks</Filter>
+    </ClInclude>
+    <ClInclude Include="Backend\ValveSDK\ICvar.h">
+      <Filter>Dependencies\Hooks</Filter>
+    </ClInclude>
+    <ClInclude Include="Backend\ValveSDK\IClient.h">
+      <Filter>Dependencies\Hooks</Filter>
+    </ClInclude>
+    <ClInclude Include="Backend\ValveSDK\CGlobalVars.h">
+      <Filter>Dependencies\Hooks</Filter>
+    </ClInclude>
+    <ClInclude Include="Backend\ValveSDK\CBaseEntity.h">
+      <Filter>Dependencies\Hooks</Filter>
+    </ClInclude>
+    <ClInclude Include="Backend\Main\Main.h" />
+    <ClInclude Include="Backend\Definitions.h">
+      <Filter>Dependencies\SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="Backend\ValveSDK\NetVar.h">
+      <Filter>Dependencies\SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="Backend\ValveSDK\RecvData.h">
+      <Filter>Dependencies\SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="Backend\Misc\singleton.h">
+      <Filter>Dependencies</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Backend\Config\Settings.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Backend\Utilities\Utilities.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Backend\Main\Main.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Frontend\Menu\Menu.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Backend\Misc\Fonts\Fonts.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Backend\Misc\Textures\Textures.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Frontend\Framework\MenuFramework.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Frontend\Renderer\Renderer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Backend\Globalincludes.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Backend\Interfaces\Interfaces.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Backend\Features\Visuals\EventLogger.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Backend\Config\Config.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Backend\Features\Visuals\ESP.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Backend\Main\Memory.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Backend\ValveSDK\NetVar.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Backend\Definitions.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Backend\Features\Visuals\Render.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="Backend\Utilities\Utilities.cpp">
+      <Filter>Core\Utility</Filter>
     </ClCompile>
+    <ClCompile Include="Backend\Config\Settings.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Backend\ValveSDK\NetVar.cpp">
+      <Filter>Dependencies\SDK</Filter>
+    </ClCompile>
+    <ClCompile Include="Backend\Config\Config.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Backend\Interfaces\Interfaces.cpp">
+      <Filter>Dependencies\SDK</Filter>
+    </ClCompile>
+    <ClCompile Include="Backend\Features\Visuals\Render.cpp">
+      <Filter>Core\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="Frontend\Renderer\Renderer.cpp">
+      <Filter>Core\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="Backend\Globalincludes.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Frontend\Menu\Menu.cpp">
+      <Filter>Core\Frontend</Filter>
+    </ClCompile>
+    <ClCompile Include="Frontend\Framework\MenuFramework.cpp">
+      <Filter>Core\ILM</Filter>
+    </ClCompile>
+    <ClCompile Include="Backend\Features\Visuals\EventLogger.cpp">
+      <Filter>Miscellaneous</Filter>
+    </ClCompile>
+    <ClCompile Include="Backend\Features\Visuals\ESP.cpp">
+      <Filter>Miscellaneous</Filter>
+    </ClCompile>
+    <ClCompile Include="Backend\Misc\Fonts\Fonts.cpp">
+      <Filter>Core\Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="Backend\Misc\Textures\Textures.cpp">
+      <Filter>Core\Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="Backend\Main\Main.cpp" />
   </ItemGroup>
 </Project>
