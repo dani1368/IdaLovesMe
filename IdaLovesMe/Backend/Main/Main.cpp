@@ -9,6 +9,7 @@
 #include "../Interfaces/Interfaces.h"
 //#include "../Features/Visuals/ESP.h"
 #include "../ValveSDK/NetVar.h"
+#include <iostream>
 
 std::uintptr_t reset_pattern = *reinterpret_cast<std::uintptr_t*>(Misc::Utilities->Memory_PatternScan("gameoverlayrenderer.dll", "C7 45 ? ? ? ? ? FF 15 ? ? ? ? 8B D8") + 9);
 std::uintptr_t present_pattern = *reinterpret_cast<std::uintptr_t*>(Misc::Utilities->Memory_PatternScan("gameoverlayrenderer.dll", "FF 15 ? ? ? ? 8B F0 85 FF") + 2);
@@ -28,7 +29,9 @@ bool Cheat::Initialize()
 	Misc::Utilities->Console_Log("finished...");
 	Misc::Utilities->Console_Log("prevented exit (1)");
 	Misc::Utilities->Console_Log("prevented exit (1)");*/
-	Misc::Utilities->Console_Log("loading...");
+
+
+	std::cout << "[gamesense] "; (Misc::CUtilities::ConsoleColor::GREEN);
 
 	Misc::Utilities->Console_Log("hooking game overlay...");
 	Cheat::wrapgameoverlay();
