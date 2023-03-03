@@ -16,7 +16,7 @@ std::uintptr_t present_pattern = *reinterpret_cast<std::uintptr_t*>(Misc::Utilit
 
 bool Cheat::Initialize() 
 {
-	Misc::Utilities->Console_Create("IdaLovesMe");
+	Misc::Utilities->Console_Create("gamesense BETA [admin]");
 	/*Misc::Utilities->Console_Log("loading...");
 	Misc::Utilities->Console_Log("resolving imports...");
 	Misc::Utilities->Console_Log("fixing crypt (1)...");
@@ -31,24 +31,24 @@ bool Cheat::Initialize()
 	Misc::Utilities->Console_Log("prevented exit (1)");*/
 
 
-	Misc::Utilities->Console_Log("hooking game overlay...");
+	Misc::Utilities->Console_Log("hooking interfaces...");
 	Cheat::wrapgameoverlay();
 
-	Misc::Utilities->Console_Log("connecting...");
+	Misc::Utilities->Console_Log("connecting to api...");
 	Interfaces::InterfaceLoader->Initialize();
 
 	Misc::Utilities->Console_Log("initializating netvars...");
 	Cheat::NetVarManager = new Cheat::CNetVarManager();
 	Cheat::NetVarManager->Init();
 
-	Misc::Utilities->Console_Log("hooking panel manager");
+	Misc::Utilities->Console_Log("loading d3dx9...");
 	VmtHook* PanelManager = new VmtHook();
 	Hooks.push_back(PanelManager);
 	PanelManager->Init(Interfaces::GuiPanel);
 	PanelManager->HookAt(41, &Hooked::PaintTraverse);
 	oPaintTraverse = PanelManager->GetOriginal<fnPaintTraverse>(41);
 
-	Misc::Utilities->Console_Log("hooking surface");
+	Misc::Utilities->Console_Log("connection provided with api!");
 	VmtHook* SurfaceManager = new VmtHook();
 	Hooks.push_back(SurfaceManager);
 	SurfaceManager->Init(Interfaces::Surface);
@@ -63,7 +63,7 @@ bool Cheat::Initialize()
 	/*DirectXManager->HookAt(16, &Hooked::Amogus);
 	oAmogus = DirectXManager->GetOriginal<fnAmogus>(16);*/
 
-	Misc::Utilities->Console_Log("hooking wndproc");
+	Misc::Utilities->Console_Log("[debug] gamesense loaded!");
 	oWndProc = (WNDPROC)SetWindowLongPtr(FindWindow(L"Valve001", 0), GWL_WNDPROC, (long)&Hooked::wndProc);
 	if (!oWndProc) 
 		return false;

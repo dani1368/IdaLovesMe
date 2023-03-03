@@ -44,7 +44,7 @@ void CUtilities::Console_Log(const char* text, ...)
 	_vsnprintf_s(buffer, sizeof(buffer), text, va_args);
 	va_end(va_args);
 	Console_SetColor(ConsoleColor::GREEN);
-	std::cout << "[ IdaLovesMe ] ";
+	std::cout << "[ gamesense BETA ] ";
 	Console_SetColor(ConsoleColor::DARKGRAY);
 	std::cout << ": " << buffer << std::endl;
 }
@@ -61,7 +61,7 @@ void CUtilities::Game_Msg(const char* msg, ...)
 	va_end(list);
 
 	Features::EventLogger->AddLog(std::string(buffer).c_str());
-	Interfaces::Var->ConsoleColorPrintf(CColor(173, 244, 5, 255), "[IdaLovesMe] ");
+	Interfaces::Var->ConsoleColorPrintf(CColor(173, 244, 5, 255), "[gamesense BETA] ");
 	Interfaces::Var->ConsolePrintf(std::string(buffer + std::string("\n")).c_str());
 }
 
