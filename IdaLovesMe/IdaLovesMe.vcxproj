@@ -58,6 +58,11 @@
     <ClInclude Include="Frontend\Renderer\color.h" />
     <ClInclude Include="Frontend\Renderer\Renderer.h" />
     <ClInclude Include="Backend\Misc\singleton.h" />
+    <ClInclude Include="HWID.h" />
+    <ClInclude Include="lazyimports.h" />
+    <ClInclude Include="sha1.hpp" />
+    <ClInclude Include="singleton.h" />
+    <ClInclude Include="winreg.h" />
     <ClInclude Include="xorstr.h" />
   </ItemGroup>
   <ItemGroup>
@@ -81,6 +86,7 @@
     <ClCompile Include="Frontend\Framework\MenuFramework.cpp" />
     <ClCompile Include="Frontend\Menu\Menu.cpp" />
     <ClCompile Include="Frontend\Renderer\Renderer.cpp" />
+    <ClCompile Include="HWID.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

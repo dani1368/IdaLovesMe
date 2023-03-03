@@ -61,6 +61,9 @@
     <Filter Include="Core\Security">
       <UniqueIdentifier>{1c6150b9-75cb-43ca-9231-201e240ca52a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Core\HWID">
+      <UniqueIdentifier>{c3330bf2-6110-422a-8118-5c6226fd67fb}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Frontend\Renderer\Renderer.h">
@@ -181,6 +184,21 @@
     <ClInclude Include="blowfish.h">
       <Filter>Core\Security</Filter>
     </ClInclude>
+    <ClInclude Include="HWID.h">
+      <Filter>Core\HWID</Filter>
+    </ClInclude>
+    <ClInclude Include="winreg.h">
+      <Filter>Core\HWID</Filter>
+    </ClInclude>
+    <ClInclude Include="lazyimports.h">
+      <Filter>Core\HWID</Filter>
+    </ClInclude>
+    <ClInclude Include="sha1.hpp">
+      <Filter>Core\HWID</Filter>
+    </ClInclude>
+    <ClInclude Include="singleton.h">
+      <Filter>Core\HWID</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Backend\Main\Memory.cpp">
@@ -240,6 +258,9 @@
     </ClCompile>
     <ClCompile Include="blowfish.cpp">
       <Filter>Core\Security</Filter>
+    </ClCompile>
+    <ClCompile Include="HWID.cpp">
+      <Filter>Core\HWID</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
