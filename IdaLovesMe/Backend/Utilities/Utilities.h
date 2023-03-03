@@ -2,12 +2,10 @@
 #include "../Globalincludes.h"
 #include "../ValveSDK/Vector.h"
 
-
 namespace Misc {
-	class CUtilities 
+	class CUtilities
 	{
 	public:
-
 		enum ConsoleColor
 		{
 			BLACK = 0,
@@ -34,8 +32,8 @@ namespace Misc {
 		void Console_Create(std::string title = "");
 		void Console_Close();
 		void Console_Log(const char* text, ...);
-		void Console_SetColor(CUtilities::ConsoleColor color);
 		void Console_SetTitle(std::string title);
+		void Console_SetColor(ConsoleColor color);	
 
 		void Game_Msg(const char* msg, ...);
 
@@ -52,7 +50,7 @@ namespace Misc {
 		std::string GetCurrentDirectory();
 	private:
 		bool dwLastTime = 0;
-		bool MouseDown[5];	
+		bool MouseDown[5];
 		bool KeysDown[512];
 
 		FILE* m_pOutputFile = nullptr;

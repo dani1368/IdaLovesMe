@@ -55,6 +55,9 @@
     <Filter Include="Dependencies\Maths\Matrix">
       <UniqueIdentifier>{050294d2-47bf-4293-89d2-569337a11e5c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Core\Hashing">
+      <UniqueIdentifier>{c92f9fcc-34b3-4e13-afbf-bd40c0436813}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Frontend\Renderer\Renderer.h">
@@ -163,6 +166,9 @@
     <ClInclude Include="Backend\Misc\singleton.h">
       <Filter>Dependencies</Filter>
     </ClInclude>
+    <ClInclude Include="xorstr.h">
+      <Filter>Core\Hashing</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Backend\Main\Memory.cpp">
@@ -214,5 +220,8 @@
       <Filter>Core\Utility</Filter>
     </ClCompile>
     <ClCompile Include="Backend\Main\Main.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="cpp.hint" />
   </ItemGroup>
 </Project>

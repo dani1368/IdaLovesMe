@@ -43,6 +43,7 @@ void CUtilities::Console_Log(const char* text, ...)
 	va_start(va_args, text);
 	_vsnprintf_s(buffer, sizeof(buffer), text, va_args);
 	va_end(va_args);
+	Console_SetColor(ConsoleColor::MAGENTA);
 	std::cout << "[ IdaLovesMe ] ";
 	std::cout << ": " << buffer << std::endl;
 }
@@ -66,6 +67,11 @@ void CUtilities::Game_Msg(const char* msg, ...)
 void CUtilities::Console_SetTitle(std::string title)
 {
 	SetConsoleTitleA(title.c_str());
+}
+
+void CUtilities::Console_SetColor(CUtilities::ConsoleColor color)
+{
+	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), (WORD)color);
 }
 
 bool CUtilities::IsAnyMouseDown()

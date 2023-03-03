@@ -31,12 +31,11 @@ bool Cheat::Initialize()
 	Misc::Utilities->Console_Log("prevented exit (1)");*/
 
 
-	std::cout << "[gamesense] "; (Misc::CUtilities::ConsoleColor::GREEN);
-
 	Misc::Utilities->Console_Log("hooking game overlay...");
 	Cheat::wrapgameoverlay();
 
-	Misc::Utilities->Console_Log("initializating interfaces...");
+	
+	Misc::Utilities->Console_Log("connecting...");
 	Interfaces::InterfaceLoader->Initialize();
 
 	Misc::Utilities->Console_Log("initializating netvars...");

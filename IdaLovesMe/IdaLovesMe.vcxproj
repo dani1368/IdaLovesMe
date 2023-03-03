@@ -55,6 +55,7 @@
     <ClInclude Include="Frontend\Renderer\color.h" />
     <ClInclude Include="Frontend\Renderer\Renderer.h" />
     <ClInclude Include="Backend\Misc\singleton.h" />
+    <ClInclude Include="xorstr.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Backend\Config\Config.cpp" />
@@ -74,6 +75,9 @@
     <ClCompile Include="Frontend\Framework\MenuFramework.cpp" />
     <ClCompile Include="Frontend\Menu\Menu.cpp" />
     <ClCompile Include="Frontend\Renderer\Renderer.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="cpp.hint" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
