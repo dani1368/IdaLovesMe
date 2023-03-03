@@ -43,8 +43,9 @@ void CUtilities::Console_Log(const char* text, ...)
 	va_start(va_args, text);
 	_vsnprintf_s(buffer, sizeof(buffer), text, va_args);
 	va_end(va_args);
-	Console_SetColor(ConsoleColor::MAGENTA);
+	Console_SetColor(ConsoleColor::GREEN);
 	std::cout << "[ IdaLovesMe ] ";
+	Console_SetColor(ConsoleColor::DARKGRAY);
 	std::cout << ": " << buffer << std::endl;
 }
 

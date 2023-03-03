@@ -34,7 +34,6 @@ bool Cheat::Initialize()
 	Misc::Utilities->Console_Log("hooking game overlay...");
 	Cheat::wrapgameoverlay();
 
-	
 	Misc::Utilities->Console_Log("connecting...");
 	Interfaces::InterfaceLoader->Initialize();
 
