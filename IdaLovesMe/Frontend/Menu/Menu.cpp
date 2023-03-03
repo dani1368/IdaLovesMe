@@ -24,7 +24,7 @@ void CMenu::Initialize()
 
 	CConfig::get()->LoadDefaults();
 
-	Misc::Utilities->Game_Msg("Cheat Initialized!");
+	Misc::Utilities->Game_Msg("Logged in as admin!");
 
 	this->m_bIsOpened = true;
 	this->m_bInitialized = true;
@@ -54,7 +54,7 @@ void CMenu::Draw()
 	ui::GetInputFromWindow("Counter-Strike: Global Offensive - Direct3D 9");
 
 	ui::SetNextWindowSize({ 660,560 });
-	ui::Begin("Main", GuiFlags_None);
+	ui::Begin("GS BETA", GuiFlags_None);
 
 	ui::TabButton("A", &this->m_nCurrentTab, 0, 7);
 	ui::TabButton("G", &this->m_nCurrentTab, 1, 7);
