@@ -187,15 +187,6 @@
     <ClInclude Include="HWID.h">
       <Filter>Core\HWID</Filter>
     </ClInclude>
-    <ClInclude Include="lazyimports.h">
-      <Filter>Core\HWID</Filter>
-    </ClInclude>
-    <ClInclude Include="sha1.hpp">
-      <Filter>Core\HWID</Filter>
-    </ClInclude>
-    <ClInclude Include="singleton.h">
-      <Filter>Core\HWID</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Backend\Main\Memory.cpp">

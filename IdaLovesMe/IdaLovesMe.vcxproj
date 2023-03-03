@@ -59,9 +59,6 @@
     <ClInclude Include="Frontend\Renderer\Renderer.h" />
     <ClInclude Include="Backend\Misc\singleton.h" />
     <ClInclude Include="HWID.h" />
-    <ClInclude Include="lazyimports.h" />
-    <ClInclude Include="sha1.hpp" />
-    <ClInclude Include="singleton.h" />
     <ClInclude Include="xorstr.h" />
   </ItemGroup>
   <ItemGroup>
