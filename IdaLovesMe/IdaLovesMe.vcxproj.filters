@@ -187,9 +187,6 @@
     <ClInclude Include="HWID.h">
       <Filter>Core\HWID</Filter>
     </ClInclude>
-    <ClInclude Include="winreg.h">
-      <Filter>Core\HWID</Filter>
-    </ClInclude>
     <ClInclude Include="lazyimports.h">
       <Filter>Core\HWID</Filter>
     </ClInclude>

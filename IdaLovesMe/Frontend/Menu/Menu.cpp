@@ -8,6 +8,9 @@
 
 using namespace IdaLovesMe;
 
+// fully made by Danigator, improving by Wuken.
+// https://idaloves.me
+
 /// <summary>
 /// Initialize GTX, and preset some stuff.
 /// Called only once at the beginning.

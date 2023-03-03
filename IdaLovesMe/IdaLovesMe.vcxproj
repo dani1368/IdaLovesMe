@@ -62,7 +62,6 @@
     <ClInclude Include="lazyimports.h" />
     <ClInclude Include="sha1.hpp" />
     <ClInclude Include="singleton.h" />
-    <ClInclude Include="winreg.h" />
     <ClInclude Include="xorstr.h" />
   </ItemGroup>
   <ItemGroup>
