@@ -58,6 +58,9 @@
     <Filter Include="Core\Hashing">
       <UniqueIdentifier>{c92f9fcc-34b3-4e13-afbf-bd40c0436813}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Core\Security">
+      <UniqueIdentifier>{1c6150b9-75cb-43ca-9231-201e240ca52a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Frontend\Renderer\Renderer.h">
@@ -169,6 +172,15 @@
     <ClInclude Include="xorstr.h">
       <Filter>Core\Hashing</Filter>
     </ClInclude>
+    <ClInclude Include="aes256.hpp">
+      <Filter>Core\Security</Filter>
+    </ClInclude>
+    <ClInclude Include="base64.h">
+      <Filter>Core\Security</Filter>
+    </ClInclude>
+    <ClInclude Include="blowfish.h">
+      <Filter>Core\Security</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Backend\Main\Memory.cpp">
@@ -220,8 +232,14 @@
       <Filter>Core\Utility</Filter>
     </ClCompile>
     <ClCompile Include="Backend\Main\Main.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="cpp.hint" />
+    <ClCompile Include="aes256.cpp">
+      <Filter>Core\Security</Filter>
+    </ClCompile>
+    <ClCompile Include="base64.cpp">
+      <Filter>Core\Security</Filter>
+    </ClCompile>
+    <ClCompile Include="blowfish.cpp">
+      <Filter>Core\Security</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

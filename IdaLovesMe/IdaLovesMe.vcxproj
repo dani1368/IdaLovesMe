@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="aes256.hpp" />
     <ClInclude Include="Backend\Config\Config.h" />
     <ClInclude Include="Backend\Config\Settings.h" />
     <ClInclude Include="Backend\Definitions.h" />
@@ -50,6 +51,8 @@
     <ClInclude Include="Backend\ValveSDK\Vector.h" />
     <ClInclude Include="Backend\ValveSDK\vfunc.h" />
     <ClInclude Include="Backend\ValveSDK\VMatrix.h" />
+    <ClInclude Include="base64.h" />
+    <ClInclude Include="blowfish.h" />
     <ClInclude Include="Frontend\Framework\MenuFramework.h" />
     <ClInclude Include="Frontend\Menu\Menu.h" />
     <ClInclude Include="Frontend\Renderer\color.h" />
@@ -58,6 +61,7 @@
     <ClInclude Include="xorstr.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="aes256.cpp" />
     <ClCompile Include="Backend\Config\Config.cpp" />
     <ClCompile Include="Backend\Config\Settings.cpp" />
     <ClCompile Include="Backend\Definitions.cpp" />
@@ -72,12 +76,11 @@
     <ClCompile Include="Backend\Misc\Textures\Textures.cpp" />
     <ClCompile Include="Backend\Utilities\Utilities.cpp" />
     <ClCompile Include="Backend\ValveSDK\NetVar.cpp" />
+    <ClCompile Include="base64.cpp" />
+    <ClCompile Include="blowfish.cpp" />
     <ClCompile Include="Frontend\Framework\MenuFramework.cpp" />
     <ClCompile Include="Frontend\Menu\Menu.cpp" />
     <ClCompile Include="Frontend\Renderer\Renderer.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="cpp.hint" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
