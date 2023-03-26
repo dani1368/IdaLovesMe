@@ -488,7 +488,7 @@ bool ui::SliderBehavior(const char* item_id, Rect bb, T value, T min_value, T ma
 	}
 
 	else if (!KeyDown(VK_LBUTTON) && current_window->ItemActive[item_id]) {
-		Misc::Utilities->Game_Msg("slider_niggaaaa");
+		/*Misc::Utilities->Game_Msg("slider_niggaaaa");*/
 		current_window->ParentWindow->SelectedItem = "";
 		current_window->ItemActive[item_id] = false;
 	}

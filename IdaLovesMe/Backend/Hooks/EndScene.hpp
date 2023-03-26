@@ -43,7 +43,7 @@ namespace Hooked {
 
 			CMenu::get()->Initialize();
 
-			/*Features::Visuals->Run();*/
+			Features::Visuals->Run();
 
 			CMenu::get()->Draw();
 
