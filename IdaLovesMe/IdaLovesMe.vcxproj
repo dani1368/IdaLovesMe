@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="aes256.hpp" />
     <ClInclude Include="Backend\Config\Config.h" />
     <ClInclude Include="Backend\Config\Settings.h" />
     <ClInclude Include="Backend\Definitions.h" />
@@ -50,13 +51,18 @@
     <ClInclude Include="Backend\ValveSDK\Vector.h" />
     <ClInclude Include="Backend\ValveSDK\vfunc.h" />
     <ClInclude Include="Backend\ValveSDK\VMatrix.h" />
+    <ClInclude Include="base64.h" />
+    <ClInclude Include="blowfish.h" />
     <ClInclude Include="Frontend\Framework\MenuFramework.h" />
     <ClInclude Include="Frontend\Menu\Menu.h" />
     <ClInclude Include="Frontend\Renderer\color.h" />
     <ClInclude Include="Frontend\Renderer\Renderer.h" />
     <ClInclude Include="Backend\Misc\singleton.h" />
+    <ClInclude Include="HWID.h" />
+    <ClInclude Include="xorstr.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="aes256.cpp" />
     <ClCompile Include="Backend\Config\Config.cpp" />
     <ClCompile Include="Backend\Config\Settings.cpp" />
     <ClCompile Include="Backend\Definitions.cpp" />
@@ -71,41 +77,44 @@
     <ClCompile Include="Backend\Misc\Textures\Textures.cpp" />
     <ClCompile Include="Backend\Utilities\Utilities.cpp" />
     <ClCompile Include="Backend\ValveSDK\NetVar.cpp" />
+    <ClCompile Include="base64.cpp" />
+    <ClCompile Include="blowfish.cpp" />
     <ClCompile Include="Frontend\Framework\MenuFramework.cpp" />
     <ClCompile Include="Frontend\Menu\Menu.cpp" />
     <ClCompile Include="Frontend\Renderer\Renderer.cpp" />
+    <ClCompile Include="HWID.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
     <ProjectGuid>{b6318685-5e0b-4ccf-9e87-2afde1979b97}</ProjectGuid>
     <RootNamespace>IdaLovesMe</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.18362.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
@@ -133,6 +142,7 @@
     <LibraryPath>$(DXSDK_DIR)Lib\$(PlatformShortName);$(LibraryPath)</LibraryPath>
     <IntDir>$(SolutionDir)$(Configuration)\</IntDir>
     <OutDir>$(SolutionDir)DLL\$(Configuration)\</OutDir>
+    <TargetName>csgo x86</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>

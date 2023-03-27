@@ -116,12 +116,6 @@ void CVisuals::Run() {
 		
 		if (cfg->b["visuals_player_esp_bounding_box"])
 			DrawBox(Info[ent->GetIndex()]);
-		if (cfg->b["visuals_player_esp_health_bar"])
-			DrawHealth(Info[ent->GetIndex()]);
-		if (cfg->b["visuals_player_esp_name"])
-			DrawName(Info[ent->GetIndex()]);
-		if (cfg->b["visuals_player_esp_flags"])
-			DrawSideInfo(Info[ent->GetIndex()]);
 	}
 }
 
@@ -138,47 +132,4 @@ void CVisuals::DrawBox(ESPInfo inf) {
 	Render::Draw->Rect(Vec2(inf.x, inf.y), Vec2(inf.w, inf.h), 1, D3DCOLOR_RGBA(0, 0, 0, int(130 * inf.alpha)));
 	Render::Draw->Rect(Vec2(inf.x + 1, inf.y + 1), Vec2(inf.w - 2, inf.h - 2), 1, color);
 	Render::Draw->Rect(Vec2(inf.x + 2, inf.y + 2), Vec2(inf.w - 4, inf.h - 4), 1, D3DCOLOR_RGBA(0, 0, 0, int(130 * inf.alpha)));
-}
-
-void CVisuals::DrawName(ESPInfo inf) {
-	PlayerInfo info;
-	Interfaces::Engine->GetPlayerInfo(inf.ent->GetIndex(), &info);
-	//D3DCOLOR color = inf.dormant ? D3DCOLOR_RGBA(150, 150, 150, int(160 * inf.alpha)) : D3DCOLOR_RGBA(255, 255, 255, int(200 * inf.alpha));
-	D3DCOLOR color = inf.dormant ? D3DCOLOR_RGBA(150, 150, 150, int(160 * inf.alpha)) : GetColor("visuals_player_esp_name_color", inf.alpha);
-
-	Render::Draw->Text(info.szName, (inf.x + inf.w / 2) + 1, inf.y - 11, 1, Render::Fonts::Verdana, false, D3DCOLOR_RGBA(0, 0, 0, int((200 / 1.5f) * inf.alpha)));
-	Render::Draw->Text(info.szName, (inf.x + inf.w / 2), inf.y - 12, 1, Render::Fonts::Verdana, false, color);
-}
-
-void CVisuals::DrawHealth(ESPInfo inf) {
-	int health = inf.ent->GetHealth();
-	int max_health = 100;
-	float health_ratio = health / (float)max_health;
-
-	int offset = inf.h - 2;
-	offset -= (offset * health_ratio);
-
-	D3DCOLOR color = inf.dormant ? D3DCOLOR_RGBA(150, 150, 150, int(200 * inf.alpha)) : D3DCOLOR_RGBA(int(244 - (116 * health_ratio)), int(100 + (144 * health_ratio)), 66, int(220 * inf.alpha));
-
-	Render::Draw->FilledRect(Vec2(inf.x - 5, inf.y), Vec2(4, inf.h), D3DCOLOR_RGBA(0, 0, 0, int(130 * inf.alpha)));
-	Render::Draw->FilledRect(Vec2(inf.x - 4, inf.y + 1 + offset), Vec2(2, inf.h - 2 - offset), color);
-
-	if (health_ratio < 0.95)
-		Render::Draw->Text(std::to_string(health).c_str(), inf.x - 6, inf.y + offset, 0, Render::Fonts::SmallFont, true, D3DCOLOR_RGBA(255, 255, 255, int(200 * inf.alpha)));
-}
-
-void CVisuals::DrawSideInfo(ESPInfo inf) {
-	std::vector<SideInfo> info;
-
-	info.push_back(SideInfo("$1337", D3DCOLOR_RGBA(110, 170, 40, 220)));
-	info.push_back(SideInfo("HK", D3DCOLOR_RGBA(255, 255, 255, 220)));
-	info.push_back(SideInfo("ZOOM", D3DCOLOR_RGBA(65, 169, 244, 220)));
-	info.push_back(SideInfo("C4", D3DCOLOR_RGBA(255, 0, 0, 220)));
-
-	for (size_t i = 0; i < info.size(); i++) {
-		SideInfo flag = info.at(i);
-		D3DCOLOR color = inf.dormant ? D3DCOLOR_RGBA(150, 150, 150, int(200 * inf.alpha)) : flag.color;
-
-		Render::Draw->Text(flag.text.c_str(), inf.x + inf.w + 2, inf.y + 2 + 10 * i, 0, Render::Fonts::SmallFont, true, color);
-	}
 }

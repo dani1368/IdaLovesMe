@@ -43,7 +43,9 @@ void CUtilities::Console_Log(const char* text, ...)
 	va_start(va_args, text);
 	_vsnprintf_s(buffer, sizeof(buffer), text, va_args);
 	va_end(va_args);
-	std::cout << "[ IdaLovesMe ] ";
+	Console_SetColor(ConsoleColor::GREEN);
+	std::cout << "[ gamesense BETA ] ";
+	Console_SetColor(ConsoleColor::DARKGRAY);
 	std::cout << ": " << buffer << std::endl;
 }
 
@@ -59,13 +61,18 @@ void CUtilities::Game_Msg(const char* msg, ...)
 	va_end(list);
 
 	Features::EventLogger->AddLog(std::string(buffer).c_str());
-	Interfaces::Var->ConsoleColorPrintf(CColor(173, 244, 5, 255), "[IdaLovesMe] ");
+	Interfaces::Var->ConsoleColorPrintf(CColor(173, 244, 5, 255), "[gamesense BETA] ");
 	Interfaces::Var->ConsolePrintf(std::string(buffer + std::string("\n")).c_str());
 }
 
 void CUtilities::Console_SetTitle(std::string title)
 {
 	SetConsoleTitleA(title.c_str());
+}
+
+void CUtilities::Console_SetColor(CUtilities::ConsoleColor color)
+{
+	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), (WORD)color);
 }
 
 bool CUtilities::IsAnyMouseDown()
@@ -76,7 +83,7 @@ bool CUtilities::IsAnyMouseDown()
 	return false;
 }
 
-DWORD CUtilities::Memory_PatternScan(std::string moduleName, std::string pattern) 
+DWORD CUtilities::Memory_PatternScan(std::string moduleName, std::string pattern)
 {
 	MODULEINFO modInfo;
 	GetModuleInformation(GetCurrentProcess(), GetModuleHandleA(moduleName.c_str()), &modInfo, sizeof(MODULEINFO));
@@ -117,15 +124,15 @@ LRESULT CUtilities::WndProcHandler(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lP
 {
 	int dbutton = 0;
 	int ubutton = 0;
-	switch (msg) 
+	switch (msg)
 	{
-	case WM_LBUTTONDOWN: 
+	case WM_LBUTTONDOWN:
 		dbutton = 0; break;
-	case WM_RBUTTONDOWN: 
+	case WM_RBUTTONDOWN:
 		dbutton = 1; break;
-	case WM_MBUTTONDOWN: 
+	case WM_MBUTTONDOWN:
 		dbutton = 2; break;
-	case WM_XBUTTONDOWN: 
+	case WM_XBUTTONDOWN:
 	{
 		if (LOWORD(wParam) == MK_XBUTTON1)
 			dbutton = 3;
@@ -138,11 +145,11 @@ LRESULT CUtilities::WndProcHandler(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lP
 		this->MouseDown[dbutton] = true;
 		return true;
 	}
-	case WM_LBUTTONUP: 
+	case WM_LBUTTONUP:
 		ubutton = 0;
-	case WM_RBUTTONUP: 
-		ubutton = 1; 
-	case WM_MBUTTONUP: 
+	case WM_RBUTTONUP:
+		ubutton = 1;
+	case WM_MBUTTONUP:
 		ubutton = 2;
 	case WM_XBUTTONUP:
 	{
@@ -220,7 +227,7 @@ inline RECT viewport() {
 bool CUtilities::WorldToScreen(const Vector& in, Vector& out)
 {
 	if (screen_transform(in, out)) {
-		
+
 
 		out.x = (w / 2.0f) + (out.x * w) / 2.0f;
 		out.y = (h / 2.0f) - (out.y * h) / 2.0f;

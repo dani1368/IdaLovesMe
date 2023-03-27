@@ -46,9 +46,6 @@ namespace Features
 		bool GetBoundingBox(CBaseEntity* ent, Vector& min, Vector& max);
 		void Run();
 		void DrawBox(ESPInfo inf);
-		void DrawName(ESPInfo inf);
-		void DrawHealth(ESPInfo inf);
-		void DrawSideInfo(ESPInfo inf);
 		ESPInfo Info[64];
 	};
 
