@@ -119,6 +119,14 @@ void CMenu::Draw()
 			}
 			ui::EndChild();
 			////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+				//if (this->m_nCurrentTab == 0) {
+		//ui::BeginChild("Weapon type ", { Vec2(0, 0), Vec2(3, 0) }, Flags_NoResize | Flags_NoMove);
+		//ui::CheckboxBold("Butterfly Knife", &cfg->b["kjnadfv"]);
+		//ui::LegitButton("    8", &this->legitsel, 1, 6, GuiFlags_LegitTab);
+		//if (cfg->b["kjnadfv"]) {
+			//this->legitsel = true;
+		//}
+		//ui::EndChild();
 			ui::BeginChild("Aimbot", { Vec2(0, 0), Vec2(3, 10) });
 			{
 				ui::Checkbox("Enabled", &cfg->b["rage_enabled"]);
