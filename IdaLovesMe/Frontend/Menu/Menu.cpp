@@ -119,6 +119,14 @@ void CMenu::Draw()
 			}
 			ui::EndChild();
 			////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+				//if (this->m_nCurrentTab == 0) {
+		//ui::BeginChild("Weapon type ", { Vec2(0, 0), Vec2(3, 0) }, Flags_NoResize | Flags_NoMove);
+		//ui::CheckboxBold("Butterfly Knife", &cfg->b["kjnadfv"]);
+		//ui::LegitButton("    8", &this->legitsel, 1, 6, GuiFlags_LegitTab);
+		//if (cfg->b["kjnadfv"]) {
+			//this->legitsel = true;
+		//}
+		//ui::EndChild();
 			ui::BeginChild("Aimbot", { Vec2(0, 0), Vec2(3, 10) });
 			{
 				ui::Checkbox("Enabled", &cfg->b["rage_enabled"]);
@@ -284,29 +292,57 @@ void CMenu::Draw()
 		case 4:
 		{
 			ui::BeginChild("Miscellaneous", { Vec2(0,0), Vec2(3, 10) });
-			ui::EndChild();
-			ui::BeginChild("Movement", { Vec2(6, 0), Vec2(3, 4) });
-			ui::EndChild();
-			ui::BeginChild("Settings", { Vec2(6, 6), Vec2(3, 4) });
-			ui::Label("Menu key");
-			ui::KeyBind("misc_menu_key", &cfg->i["menu_key"], &cfg->i["misc_menu_keystyle"]);
-			ui::Label("Menu color");
-			ui::ColorPicker("MenuColor", cfg->c["MenuColor"]);
-			ui::SingleSelect("DPI scale", &cfg->i["menu_scale"], { "100%", "125%", "150%", "175%", "200%" });
-			ui::Checkbox("Anti-untrusted", &cfg->b["misc_anti_untrusted"]);
-			ui::Checkbox("Hide from OBS", &cfg->b["misc_hide_from_obs"]);
-			ui::Checkbox("Low FPS warning", &cfg->b["misc_low_fps_warning"]);
-			ui::Checkbox("Lock menu layout", &cfg->b["misc_lock_menu_layout"]);
-			if (ui::Button("Reset menu layout"))
-				Settings->ResetLayout = true;
-			else
-				Settings->ResetLayout = false;
+		ui::SliderInt("Override FOV", &cfg->i["misc_overridefov"], 0, 120, "%d°");
+		ui::SliderInt("Override zoom FOV", &cfg->i["misc_overridefovzoom"], 0, 120, "%d°");
+		ui::Checkbox("Knifebot", &cfg->b["misc_knifebot"]);
+		ui::Checkbox("Zeusbot", &cfg->b["misc_zeusbot"]);
+		ui::Checkbox("Automatic weapons", &cfg->b["misc_autoweapons"]);
+		ui::Checkbox("Quick switch", &cfg->b["misc_quickswitch"]);
+		ui::Checkbox("Reveal competitive ranks", &cfg->b["misc_rankscomp"]);
+		ui::Checkbox("Reveal overwatch players", &cfg->b["misc_overwatch"]);
+		ui::Checkbox("Auto-accept matchmaking", &cfg->b["misc_automatch"]);
+		ui::Checkbox("Clan tag spammer", &cfg->b["misc_clantag"]);
+		ui::Checkbox("Log weapon purchases", &cfg->b["misc_weaponpurchases"]);
+		ui::Checkbox("Log damage dealt", &cfg->b["misc_damagedealt"]);
+		ui::Checkbox("Automatic grenade release", &cfg->b["misc_autogrenade"]);
+		ui::KeyBind("misc_autogrenade", &cfg->i["misc_autogrenade"], &cfg->i["misc_autogrenade"]);
+		ui::Checkbox("Super toss", &cfg->b["misc_supertoss"]);
+		ui::Checkbox("Ping spike", &cfg->b["misc_pingspike"]);
+		ui::KeyBind("misc_pingspike", &cfg->i["misc_pingspike"], &cfg->i["misc_pingspike"]);
+		ui::Label("Freelook");
+		ui::KeyBind("misc_freelook", &cfg->i["misc_freelook"], &cfg->i["misc_freelook"]);
+		ui::Checkbox("Persistent kill feed", &cfg->b["misc_killfeedpasted"]);
+		ui::Label("Last second defuse");
+		ui::KeyBind("misc_lastsecond", &cfg->i["misc_lastsecond"], &cfg->i["misc_lastsecond"]);
+		ui::Checkbox("Disable sv_pure", &cfg->b["misc_svpurebypass"]);
+		ui::Checkbox("Unlock hidden cvars", &cfg->b["misc_hiddencvars"]);
+		ui::Checkbox("Rebuy fix", &cfg->b["misc_rebuyfix"]);
+		ui::Checkbox("Draw console output", &cfg->b["misc_consoleoutput"]);
+		ui::Button("Steal player name");
+		ui::Button("Dump MM wins");
+		ui::EndChild();
+		ui::BeginChild("Movement", { Vec2(6, 0), Vec2(3, 4) });
+		ui::EndChild();
+		ui::BeginChild("Settings", { Vec2(6, 6), Vec2(3, 4) });
+		ui::Label("Menu key");
+		ui::KeyBind("misc_menu_key", &cfg->i["menu_key"], &cfg->i["misc_menu_keystyle"]);
+		ui::Label("Menu color");
+		ui::ColorPicker("MenuColor", cfg->c["MenuColor"]);
+		ui::SingleSelect("DPI scale", &cfg->i["menu_scale"], { "100%", "125%", "150%", "175%", "200%", "250%", "300%", "500%" });
+		ui::Checkbox("Anti-untrusted", &cfg->b["misc_anti_untrusted"]);
+		ui::Checkbox("Hide from OBS", &cfg->b["misc_hide_from_obs"]);
+		ui::Checkbox("Low FPS warning", &cfg->b["misc_low_fps_warning"]);
+		ui::Checkbox("Lock menu layout", &cfg->b["misc_lock_menu_layout"]);
+		if (ui::Button("Reset menu layout"))
+			Settings->ResetLayout = true;
+		else
+			Settings->ResetLayout = false;
 
-			if (ui::Button("Unload"))
-				Settings->UnloadCheat = true;
-			ui::EndChild();
+		if (ui::Button("Unload"))
+			Settings->UnloadCheat = true;
+		ui::EndChild();
 
-			break;
+		break;
 		}
 	
 		//
